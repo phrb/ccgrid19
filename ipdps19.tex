@@ -1,4 +1,4 @@
-% Created 2018-09-30 Sun 19:15
+% Created 2018-09-30 Sun 22:08
 % Intended LaTeX compiler: pdflatex
 \documentclass[conference]{IEEEtran}
 
@@ -25,15 +25,15 @@
 Arnaud Legrand\IEEEauthorrefmark{1},
 Brice Videau\IEEEauthorrefmark{1} and
 Alfredo Goldman\IEEEauthorrefmark{2}}
-\IEEEauthorblockA{\IEEEauthorrefmark{1}Univ. Grenoble Alpes, CNRS, INRIA, LIG - Grenoble, France\\
+\IEEEauthorblockA{\IEEEauthorrefmark{1}University of Grenoble Alpes, CNRS, INRIA, LIG - Grenoble, France\\
 Email: \{arnaud.legrand, brice.videau\}@imag.fr}
-\IEEEauthorblockA{\IEEEauthorrefmark{2}Univ. of São Paulo - São Paulo, Brazil\\
-Email: \{phrb,gold\}@ime.usp.br}}
+\IEEEauthorblockA{\IEEEauthorrefmark{2}University of São Paulo - São Paulo, Brazil\\
+Email: \{phrb, gold\}@ime.usp.br}}
 \date{\today}
-\title{Autotuning under Budget Constraints: a Design of Experiments Approach}
+\title{A Design of Experiments Approach to Autotuning under Tight Budget Constraints}
 \hypersetup{
  pdfauthor={},
- pdftitle={Autotuning under Budget Constraints: a Design of Experiments Approach},
+ pdftitle={A Design of Experiments Approach to Autotuning under Tight Budget Constraints},
  pdfkeywords={},
  pdfsubject={},
  pdfcreator={Emacs 26.1 (Org mode 9.1.14)},
@@ -46,54 +46,81 @@ Abstract
 \end{abstract}
 
 \section{Introduction}
-\label{sec:orgaa3a372}
+\label{sec:orgc7c5923}
 Optimizing code for objectives such as performance and power consumption is
 fundamental to the success and cost effectiveness of industrial and scientific
-endeavours related to High Performance Computing. A considerable amount of
-highly specialized time and effort is spent in porting code to GPUs, FPGAs and
-other hardware accelerators. Experts are also needed in leveraging bleeding edge
-software improvements in compilers, languages, libraries and frameworks.
+endeavors in High Performance Computing. A considerable amount of highly
+specialized time and effort is spent in porting and optimizing code to GPUs,
+FPGAs and other hardware accelerators. Experts are also needed to leverage
+bleeding edge software improvements in compilers, languages, libraries and
+frameworks.
 
 The automatic configuration and optimization of High Performance Computing
 applications, or autotuning, decreases the cost and time needed to adopt
-efficient hardware and sofware. Typical targets for autotuning include algorithm
+efficient hardware and software. Typical targets for autotuning include algorithm
 selection, source-to-source transformations and compiler configuration.
 
-The autotuning of Hgh Performance Computing applications can be studied as a
-search problem, where the objective is to minimize single or multiple sofware of
-hardware metrics. The exploration of the search spaces defined by configurations
-and optimizations present interesting challenges to search algorithms. These
-search spaces grow exponentially with the number of considered configuration
-parameters and their possible values, and it is also difficult to explore these
-search spaces extensively, due to the often prohibitive costs of hardware
-utilization and program execution times. Developing efficient autotuning
-strategies is therefore essential for decreasing optimization cost and time.
+The autotuning of High Performance Computing applications can be studied as a
+search problem, where the objective is to minimize single or multiple software
+of hardware metrics. The exploration of the search spaces defined by
+configurations and optimizations present interesting challenges to search
+strategies. These search spaces grow exponentially with the number of considered
+configuration parameters and their possible values. They are also difficult to
+extensively explore due to the often prohibitive costs of hardware utilization
+and program compilation and execution times. Developing autotuning strategies
+capable of producing good optimizations using as few resources as possible is
+therefore essential. The capability of acquiring knowledge about an optimization
+problem is also a desired feature of an autotuning strategy, since it can
+decrease the cost of subsequent optimizations of the same application or for the
+same hardware.
+
+It is common and usually effective to implement search meta-heuristics such as
+genetic algorithms and simulated annealing in autotuning systems, but these
+strategies usually attempt to exploit local properties of the search space and
+are not capable of fully exploiting global structures. These strategies are also
+not much more effective in comparison with a naive uniform random sample of the
+search space\cite{seymour2008comparison,knijnenburg2003combined}, and usually
+rely on a large number of measurements and frequent restarts to achieve good
+performance improvements.
+
+Search strategies based on gradient descent also are commonly used in autotuning
+and rely on a large number of measurements. Their effectiveness diminishes
+additionally in search spaces with complex local structures. Completely
+automated machine learning autotuning strategies are effective in building
+models for predicting important optimization parameters, but still rely on a
+sizable data set in order to train useful models.
+
+Search strategies based on meta-heuristics, gradient descent and machine
+learning require a large number of measurements to be effective, and are usually
+incapable of providing knowledge about search spaces to users. It is impossible
+at the end of each autotuning session to decide whether further exploration is
+warranted and to know which parameters were responsible for the observed
+improvements.
 
 \section{Related Work}
-\label{sec:org794e81c}
+\label{sec:orgb511da1}
 \subsection{Source-to-source Transformation}
-\label{sec:org1dd77b5}
+\label{sec:orgf7342c6}
 \subsection{Autotuning}
-\label{sec:orgebe1a2b}
+\label{sec:org9c33698}
 \subsection{Search Space Exploration Strategies}
-\label{sec:orgc7165d4}
-
+\label{sec:org6f14bf1}
 \section{Design of Experiments}
-\label{sec:org1a508b1}
+\label{sec:org19a1a6e}
 \subsection{D-Optimal Designs}
-\label{sec:orgb65403c}
-
+\label{sec:org6c071a0}
 \section{Applying Design of Experiments to Autotuning}
-\label{sec:org7e7566d}
-
+\label{sec:org97e64a4}
 \subsection{Experimental Methodology}
-\label{sec:org7d30f97}
+\label{sec:orgdb09a2e}
 \subsection{Performance on a GPU Laplacian Kernel}
-\label{sec:orgca83fb2}
-
+\label{sec:orgfb754b4}
 \section{Results on the SPAPT Benchmark}
-\label{sec:org2ebd0ab}
-
+\label{sec:orgfda8502}
 \section{Conclusion}
-\label{sec:org5e5218a}
+\label{sec:org99226d3}
+\section*{Acknowledgment}
+\label{sec:orgfbf4e92}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
 \end{document}
