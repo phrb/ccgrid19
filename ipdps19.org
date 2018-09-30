@@ -1,0 +1,151 @@
+# -*- mode: org -*-
+# -*- coding: utf-8 -*-
+#+STARTUP: overview indent inlineimages logdrawer
+#+TITLE: Autotuning under Budget Constraints: a Design of Experiments Approach
+#+LANGUAGE:    en
+#+TAGS: noexport(n) Stats(S)
+#+TAGS: Teaching(T) R(R) OrgMode(O) Python(P)
+#+TAGS: Book(b) DOE(D) Code(C) NODAL(N) FPGA(F) Autotuning(A) Arnaud(r)
+#+TAGS: DataVis(v) PaperReview(W)
+#+EXPORT_SELECT_TAGS: Blog
+#+OPTIONS:   H:3 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+COLUMNS: %25ITEM %TODO %3PRIORITY %TAGS
+#+SEQ_TODO: TODO(t!) STARTED(s!) WAITING(w@) APPT(a!) | DONE(d!) CANCELLED(c!) DEFERRED(f!)
+
+#+LATEX_CLASS: org-ieeetran
+#+LATEX_CLASS_OPTIONS: [conference]
+#+LATEX_HEADER: \usepackage{graphicx}
+#+LATEX_HEADER: \usepackage{amssymb}
+#+LATEX_HEADER: \usepackage{amsmath}
+#+LATEX_HEADER: \usepackage{xcolor}
+#+LATEX_HEADER: \usepackage{url}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+LATEX_HEADER: \usepackage[english]{babel}
+#+LATEX_HEADER: \usepackage{multirow}
+#+LATEX_HEADER: \usepackage{textcomp}
+#+LATEX_HEADER: \usepackage{caption}
+#+LATEX_HEADER: \usepackage{hyperref}
+#+LATEX_HEADER: \usepackage{booktabs}
+#+LATEX_HEADER: \usepackage{array}
+#+LATEX_HEADER: \usepackage{relsize}
+#+LATEX_HEADER: \usepackage{bm}
+#+LATEX_HEADER: \usepackage{wasysym}
+#+LATEX_HEADER: \usepackage{ragged2e}
+#+LATEX_HEADER: \renewcommand*{\UrlFont}{\ttfamily\smaller\relax}
+
+#+LATEX_HEADER: \author{\IEEEauthorblockN{Pedro Bruel\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},
+#+LATEX_HEADER: Arnaud Legrand\IEEEauthorrefmark{1},
+#+LATEX_HEADER: Brice Videau\IEEEauthorrefmark{1} and
+#+LATEX_HEADER: Alfredo Goldman\IEEEauthorrefmark{2}}
+#+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{1}Univ. Grenoble Alpes, CNRS, INRIA, LIG - Grenoble, France\\
+#+LATEX_HEADER: Email: \{arnaud.legrand, brice.videau\}@imag.fr}
+#+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{2}Univ. of São Paulo - São Paulo, Brazil\\
+#+LATEX_HEADER: Email: \{phrb,gold\}@ime.usp.br}}
+
+#+LATEX: \begin{abstract}
+Abstract
+#+LATEX: \end{abstract}
+
+* Arnaud's Draft                                                   :noexport:
+** Intro
+** Context
+- HPC, optimizing code is a nightmare although very important gains
+  can be expected when one can afford an expert to work on it.
+- Typical techniques are source-to-source transformation + compiler
+  flag optimization
+- Even when automatic, this optimization can be very time consumming
+  (costly experiments + curse of dimensionality).
+** Related Work
+*** Source-to-source transformation
+*** Auto-tuning frameworks
+*** Exploration Strategies
+** Statement
+- Generic Meta-Heuristics (GAs, Simulated Annealing, Tabu Search) do
+  not exploit well specific properties of the problem and require very
+  large amount of measurements.
+- Classical Mathematical Optimization techniques (gradient, surrogate,
+  ...) are ineffective in this context as the geometry is far more
+  complicated than what can be found in maths textbooks
+- Fully automatic ML make sense to model and predict important factors
+  but typically require a large amount of data to be effective as the
+  class of underlying models is generally very large.
+- In many settings a naive uniform random sampling strategy works just
+  as well as other methods.
+- None of the above methods really brings exploitable knowledge
+  allowing to decide whether further exploration may be useful.
+** Proposal
+Sequential approach, using D-optimal designs. Requires a model
+(ideally provided by an expert) which is iteratively refined.
+*** D-optimal designs in a nutshell
+- Explanations of DoE + Simple illustration
+- Analysis strategy (aov, lm)
+- Allows a global overview and to detect the main factors right away
+  to focus on the most promising parts of the subspace
+- This assumes that there is a global geometry of the problem that can
+  be exploited despite the roughness of the local geometry. This
+  assumption may be wrong but is likely to go detected.
+*** General Method in the context of auto-tuning
+Ideally, human in the loop but for the sake of a general performance
+evaluation, we had to automate it.
+** Performance Evaluation
+*** Experimental Methodology
+G5K, database, RR, R + julia +...
+*** Working out a simple example in details: a Laplacian Kernel
+Laplacian Kernel on a GPU + BOAST
+*** Evaluation on the ??? benchmark suite
+ORIO
+** Conclusion and Future Work
+- DoE based strategy
+- Revealed impressively effective for the Laplacian kernel.
+- Not as impressive on the other benchmarks but despite their general
+  use, it apears that little gain can be expected. In any cases, our
+  approach produces at least as good results with far fewer measurements.
+- Future work:
+  - Other benchmarks
+  - source-to-source + compiler flags
+  - connexion with online learning
+
+
+* Introduction
+Optimizing code for objectives such as performance and power consumption is
+fundamental to the success and cost effectiveness of industrial and scientific
+endeavours related to High Performance Computing. A considerable amount of
+highly specialized time and effort is spent in porting code to GPUs, FPGAs and
+other hardware accelerators. Experts are also needed in leveraging bleeding edge
+software improvements in compilers, languages, libraries and frameworks.
+
+The automatic configuration and optimization of High Performance Computing
+applications, or autotuning, decreases the cost and time needed to adopt
+efficient hardware and sofware. Typical targets for autotuning include algorithm
+selection, source-to-source transformations and compiler configuration.
+
+The autotuning of Hgh Performance Computing applications can be studied as a
+search problem, where the objective is to minimize single or multiple sofware of
+hardware metrics. The exploration of the search spaces defined by configurations
+and optimizations present interesting challenges to search algorithms. These
+search spaces grow exponentially with the number of considered configuration
+parameters and their possible values, and it is also difficult to explore these
+search spaces extensively, due to the often prohibitive costs of hardware
+utilization and program execution times. Developing efficient autotuning
+strategies is therefore essential for decreasing optimization cost and time.
+
+* Related Work
+** Source-to-source Transformation
+** Autotuning
+** Search Space Exploration Strategies
+
+* Design of Experiments
+** D-Optimal Designs
+
+* Applying Design of Experiments to Autotuning
+
+** Experimental Methodology
+** Performance on a GPU Laplacian Kernel
+
+* Results on the SPAPT Benchmark
+
+* Conclusion

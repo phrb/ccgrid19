@@ -1,0 +1,99 @@
+% Created 2018-09-30 Sun 19:15
+% Intended LaTeX compiler: pdflatex
+\documentclass[conference]{IEEEtran}
+
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{multirow}
+\usepackage{textcomp}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{relsize}
+\usepackage{bm}
+\usepackage{wasysym}
+\usepackage{ragged2e}
+\renewcommand*{\UrlFont}{\ttfamily\smaller\relax}
+\author{\IEEEauthorblockN{Pedro Bruel\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},
+Arnaud Legrand\IEEEauthorrefmark{1},
+Brice Videau\IEEEauthorrefmark{1} and
+Alfredo Goldman\IEEEauthorrefmark{2}}
+\IEEEauthorblockA{\IEEEauthorrefmark{1}Univ. Grenoble Alpes, CNRS, INRIA, LIG - Grenoble, France\\
+Email: \{arnaud.legrand, brice.videau\}@imag.fr}
+\IEEEauthorblockA{\IEEEauthorrefmark{2}Univ. of São Paulo - São Paulo, Brazil\\
+Email: \{phrb,gold\}@ime.usp.br}}
+\date{\today}
+\title{Autotuning under Budget Constraints: a Design of Experiments Approach}
+\hypersetup{
+ pdfauthor={},
+ pdftitle={Autotuning under Budget Constraints: a Design of Experiments Approach},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 26.1 (Org mode 9.1.14)},
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\begin{abstract}
+Abstract
+\end{abstract}
+
+\section{Introduction}
+\label{sec:orgaa3a372}
+Optimizing code for objectives such as performance and power consumption is
+fundamental to the success and cost effectiveness of industrial and scientific
+endeavours related to High Performance Computing. A considerable amount of
+highly specialized time and effort is spent in porting code to GPUs, FPGAs and
+other hardware accelerators. Experts are also needed in leveraging bleeding edge
+software improvements in compilers, languages, libraries and frameworks.
+
+The automatic configuration and optimization of High Performance Computing
+applications, or autotuning, decreases the cost and time needed to adopt
+efficient hardware and sofware. Typical targets for autotuning include algorithm
+selection, source-to-source transformations and compiler configuration.
+
+The autotuning of Hgh Performance Computing applications can be studied as a
+search problem, where the objective is to minimize single or multiple sofware of
+hardware metrics. The exploration of the search spaces defined by configurations
+and optimizations present interesting challenges to search algorithms. These
+search spaces grow exponentially with the number of considered configuration
+parameters and their possible values, and it is also difficult to explore these
+search spaces extensively, due to the often prohibitive costs of hardware
+utilization and program execution times. Developing efficient autotuning
+strategies is therefore essential for decreasing optimization cost and time.
+
+\section{Related Work}
+\label{sec:org794e81c}
+\subsection{Source-to-source Transformation}
+\label{sec:org1dd77b5}
+\subsection{Autotuning}
+\label{sec:orgebe1a2b}
+\subsection{Search Space Exploration Strategies}
+\label{sec:orgc7165d4}
+
+\section{Design of Experiments}
+\label{sec:org1a508b1}
+\subsection{D-Optimal Designs}
+\label{sec:orgb65403c}
+
+\section{Applying Design of Experiments to Autotuning}
+\label{sec:org7e7566d}
+
+\subsection{Experimental Methodology}
+\label{sec:org7d30f97}
+\subsection{Performance on a GPU Laplacian Kernel}
+\label{sec:orgca83fb2}
+
+\section{Results on the SPAPT Benchmark}
+\label{sec:org2ebd0ab}
+
+\section{Conclusion}
+\label{sec:org5e5218a}
+\end{document}
