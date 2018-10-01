@@ -30,4 +30,9 @@ P.~M. Knijnenburg, T.~Kisuki, and M.~F. O'Boyle, ``Combined selection of tile
   sizes and unroll factors using iterative compilation,'' \emph{The Journal of
   Supercomputing}, vol.~24, no.~1, pp. 43--67, 2003.
 
+\bibitem{balaprakash2012spapt}
+P.~Balaprakash, S.~M. Wild, and B.~Norris, ``Spapt: Search problems in
+  automatic performance tuning,'' \emph{Procedia Computer Science}, vol.~9, pp.
+  1959--1968, 2012.
+
 \end{thebibliography}

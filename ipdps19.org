@@ -24,10 +24,9 @@
 #+LATEX_HEADER: \usepackage{xcolor}
 #+LATEX_HEADER: \usepackage{url}
 #+LATEX_HEADER: \usepackage{listings}
-#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+LATEX_HEADER: %\usepackage[utf8]{inputenc}
 #+LATEX_HEADER: \usepackage[english]{babel}
 #+LATEX_HEADER: \usepackage{multirow}
-#+LATEX_HEADER: \usepackage{textcomp}
 #+LATEX_HEADER: \usepackage{caption}
 #+LATEX_HEADER: \usepackage{hyperref}
 #+LATEX_HEADER: \usepackage{booktabs}
@@ -114,63 +113,99 @@ ORIO
 Optimizing code for objectives such as performance and power consumption is
 fundamental to the success and cost effectiveness of industrial and scientific
 endeavors in High Performance Computing. A considerable amount of highly
-specialized time and effort is spent in porting and optimizing code to GPUs,
+specialized time and effort is spent in porting and optimizing code for GPUs,
 FPGAs and other hardware accelerators. Experts are also needed to leverage
 bleeding edge software improvements in compilers, languages, libraries and
-frameworks.
+frameworks. The automatic configuration and optimization of High Performance
+Computing applications, or /autotuning/, is a technique effective in decreasing
+the cost and time needed to adopt efficient hardware and software. Typical
+targets for autotuning include algorithm selection, source-to-source
+transformations and compiler configuration.
 
-The automatic configuration and optimization of High Performance Computing
-applications, or autotuning, decreases the cost and time needed to adopt
-efficient hardware and software. Typical targets for autotuning include algorithm
-selection, source-to-source transformations and compiler configuration.
+Autotuning can be studied as a search problem, where the objective is to
+minimize single or multiple software of hardware metrics. The exploration of the
+search spaces defined by configurations and optimizations present interesting
+challenges to search strategies. These search spaces grow exponentially with the
+number of considered configuration parameters and their possible values. They
+are also difficult to extensively explore due to the often prohibitive costs of
+hardware utilization and program compilation and execution times. Developing
+autotuning strategies capable of producing good optimizations while minimizing
+resource utilization is therefore essential. The capability of acquiring
+knowledge about an optimization problem is also a desired feature of an
+autotuning strategy, since this knowledge can decrease the cost of subsequent
+optimizations of the same application or for the same hardware.
 
-The autotuning of High Performance Computing applications can be studied as a
-search problem, where the objective is to minimize single or multiple software
-of hardware metrics. The exploration of the search spaces defined by
-configurations and optimizations present interesting challenges to search
-strategies. These search spaces grow exponentially with the number of considered
-configuration parameters and their possible values. They are also difficult to
-extensively explore due to the often prohibitive costs of hardware utilization
-and program compilation and execution times. Developing autotuning strategies
-capable of producing good optimizations using as few resources as possible is
-therefore essential. The capability of acquiring knowledge about an optimization
-problem is also a desired feature of an autotuning strategy, since it can
-decrease the cost of subsequent optimizations of the same application or for the
-same hardware.
-
-It is common and usually effective to implement search meta-heuristics such as
-genetic algorithms and simulated annealing in autotuning systems, but these
-strategies usually attempt to exploit local properties of the search space and
-are not capable of fully exploiting global structures. These strategies are also
-not much more effective in comparison with a naive uniform random sample of the
-search space\cite{seymour2008comparison,knijnenburg2003combined}, and usually
-rely on a large number of measurements and frequent restarts to achieve good
-performance improvements.
-
-Search strategies based on gradient descent also are commonly used in autotuning
-and rely on a large number of measurements. Their effectiveness diminishes
-additionally in search spaces with complex local structures. Completely
-automated machine learning autotuning strategies are effective in building
-models for predicting important optimization parameters, but still rely on a
-sizable data set in order to train useful models.
+It is common and usually effective to use search meta-heuristics such as genetic
+algorithms and simulated annealing in autotuning. These strategies usually
+attempt to exploit local properties and are not capable of fully exploiting
+global search space structures. They are also not much more effective in
+comparison with a naive uniform random sample of the search
+space\nbsp{}\cite{seymour2008comparison,knijnenburg2003combined}, and usually rely on a
+large number of measurements and frequent restarts to achieve good performance
+improvements. Search strategies based on gradient descent also are commonly used
+in autotuning and rely on a large number of measurements. Their effectiveness
+diminishes additionally in search spaces with complex local structures.
+Completely automated machine learning autotuning strategies are effective in
+building models for predicting important optimization parameters, but still rely
+on a sizable data set for training. Large data sets are fundamental to
+strategies based on machine learning since they select models from a generally
+very large class.
 
 Search strategies based on meta-heuristics, gradient descent and machine
 learning require a large number of measurements to be effective, and are usually
-incapable of providing knowledge about search spaces to users. It is impossible
-at the end of each autotuning session to decide whether further exploration is
-warranted and to know which parameters were responsible for the observed
+incapable of providing knowledge about search spaces to users. At the end of
+each autotuning session it is difficult to decide if and where further
+exploration is warranted, and impossible to know which parameters are
+responsible for the observed improvements. After exploring a search space, it is
+impossible to confidently deduce its global properties since its was explored
+with unknown biases.
+
+In this paper we propose an autotuning strategy that leverages existing expert
+and approximate knowledge about a problem in the form of a performance model,
+and refines this initial model iteratively using empirical performance
+evaluations, statistical analysis and user input. Our strategy puts a heavy
+weight on decreasing the costs of autotuning by using efficient Design of
+Experiments strategies to minimize the number of experiments needed to find good
+optimizations. Each optimization iteration uses /Analysis of Variance/ (ANOVA)
+to help identify the relative significance of each configurable parameter to the
+performance observations. An architecture- and problem-specific performance
+model is built iteratively and with user input, enabling informed decisions on
+which regions of the search space are worth exploring.
+
+We present the performance of our approach on a Laplacian Kernel for GPUs where
+the search space, global optimum and performance model approximation are known.
+The experimental budget on this application were tightly constrained. The
+speedups achieved and the budget utilization of our approach on this setting
+motivated a more comprehensive performance evaluation. We chose the /Search
+Problems in Automatic Performance Tuning/
+(SPAPT)\nbsp{}\cite{balaprakash2012spapt} benchmark for this evaluation, where
+our approach was able to find speedups of over 50$\times$ for some SPAPT
+applications, finding speedups better than random sampling in some scenarios.
+Despite using generic performance models for every SPAPT application, our
+approach was able to significantly decrease the budget used to find performance
 improvements.
 
-* Related Work
+The rest of this paper is organized as follows. Section [[Background]] presents
+related work on source-to-source transformation, which is the main optimization
+target in SPAPT problems, on autotuning systems and on search space exploration
+strategies. Section [[Applying Design of Experiments to Autotuning]] presents a
+detailed description of the implementation of our approach and its background.
+It discusses the Design of Experiments concepts we incorporate, and the ANOVA
+and linear regression algorithms we use in analysis steps. Section [[Performance
+Evaluations]] presents our results with the GPU Laplacian Kernel and the SPAPT
+benchmark. Section [[Conclusion]] discusses our conclusions and future work.
+* Background
 ** Source-to-source Transformation
 ** Autotuning
 ** Search Space Exploration Strategies
-* Design of Experiments
-** D-Optimal Designs
 * Applying Design of Experiments to Autotuning
-** Experimental Methodology
-** Performance on a GPU Laplacian Kernel
-* Results on the SPAPT Benchmark
+** Design of Experiments
+*** D-Optimal Designs
+** ANOVA
+* Performance Evaluations
+** Example on a GPU Laplacian Kernel
+** Results on the SPAPT Benchmark
+*** Experimental Methodology
 * Conclusion
 * Acknowledgment
 :PROPERTIES:
