@@ -35,6 +35,8 @@
 #+LATEX_HEADER: \usepackage{bm}
 #+LATEX_HEADER: \usepackage{wasysym}
 #+LATEX_HEADER: \usepackage{ragged2e}
+
+#+LATEX_HEADER: \graphicspath{{./img/}}
 #+LATEX_HEADER: \renewcommand*{\UrlFont}{\ttfamily\smaller\relax}
 
 #+LATEX_HEADER: \author{\IEEEauthorblockN{Pedro Bruel\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},
@@ -197,11 +199,102 @@ benchmark. Section [[Conclusion]] discusses our conclusions and future work.
 * Background
 ** Source-to-source Transformation
 ** Autotuning
+Rice's conceptual framework\nbsp{}\cite{rice1976algorithm} formed the foundation
+of autotuners in various problem domains. In 1997, the PHiPAC
+system\nbsp{}\cite{bilmes1997optimizing} used code generators and search scripts
+to automatically generate high performance code for matrix multiplication. Since
+then, systems tackled different domains with a diversity of strategies. Dongarra
+/et al./\nbsp{}\cite{dongarra1998automatically} introduced the ATLAS
+project, that optimizes dense matrix multiplication routines. The
+OSKI\nbsp{}\cite{vuduc2005oski} library provides automatically tuned kernels for
+sparse matrices. The FFTW\nbsp{}\cite{frigo1998fftw} library provides tuned C
+subroutines for computing the Discrete Fourier Transform.
+Periscope\nbsp{}\cite{gerndt2010automatic} is a distributed online autotuner for
+parallel systems and single-node performance. In an effort to provide a common
+representation of multiple parallel programming models, the INSIEME compiler
+project\nbsp{}\cite{jordan2012multi} implements abstractions for OpenMP, MPI and
+OpenCL, and generates optimized parallel code for heterogeneous multi-core
+architectures.
+
+Some systems provide generic tools that enable the implementation of autotuners
+in various domains. PetaBricks\nbsp{}\cite{ansel2009petabricks} is a language,
+compiler and autotuner that introduces abstractions that enable programmers to
+define multiple algorithms for the same problem. The ParamILS
+framework\nbsp{}\cite{hutter2009paramils} applies stochastic local search methods for
+algorithm configuration and parameter tuning. The OpenTuner
+framework\nbsp{}\cite{ansel2014opentuner} provides ensembles of techniques that search
+spaces of program configurations.
 ** Search Space Exploration Strategies
 * Applying Design of Experiments to Autotuning
-** Design of Experiments
-*** D-Optimal Designs
+An /experimental design/ is a plan for executing a series of experiments
+whose objective is to identify the relationships between /factors/ and
+/responses/. While factors and responses can refer to different concrete
+entities in other domains, in computer experiments factors can be configuration
+parameters for algorithms and compilers, for example, and responses can be the
+execution time or memory consumption of a program.
+
+Experimental designs can be used with various objectives, from identifying the
+most important factors to building an analytical model for the response. The
+field of Design of Experiments encompasses the mathematical formalization of
+the construction of experimental designs. More practical works in the field
+present algorithms to generate designs with different objectives and
+restrictions.
+
+One of the first detailed descriptions and mathematical treatment of Design of
+Experiments was presented by Ronald Fisher\nbsp{}\cite{fisher1937design} in his
+1937 book /The Design of Experiments/, where he discussed principles of
+experimentation, latin square sampling and factorial designs. Later books such
+as the ones from Jain\nbsp{}\cite{bukh1992art},
+Montgomery\nbsp{}\cite{montgomery2017design} and Box /et
+al./\nbsp{}\cite{box2005statistics} present comprehensive and detailed
+foundations.
+** Design Construction Techniques
+Our application of Design of Experiments requires support for factors of
+different types and number of possible values, such as binary flags, integer
+and floating point numerical values and unordered enumerations of abstract
+values. We also need designs that minimize the number of experiments needed for
+identifying the most relevant factors in a given problem, since at this moment
+we are not interesting in a precise analytical model.
+
+The design construction techniques that fit these requirements are limited.  In
+the /2-level screening with random level sampling/ technique, factors
+with more than two unordered levels are sampled at two random levels. This
+enables using small design such as the Plackett-Burman screening design.
+Advantages are the small design size and good estimation capability for main
+effects. Disadvantages are the incapability of estimating interactions, but
+mainly the lack of information regarding the response for levels not selected
+in the initial screening.
+
+In /contractive replacement/, an initial 2-Level design is used to
+generate mixed-level designs by re-encoding columns into a new single column
+representing a multi-level factor. The contractive replacement of
+Addelman-Kempthorne is a strategy of this kind.  Advantages are also small
+design sizes and good estimation capability of main effects. Additionally, the
+contractive replacement technique keeps orthogonality of designs.
+Disadvantages are the requirements on the initial designs. Not all 2-Level
+designs can be contracted with those methods if orthogonality is desired.
+
+The /direct generation/ algorithm presented by Grömping and
+Fontana\nbsp{}\cite{ulrike2018algorithm} enables the generation of multi-level
+designs with the Generalized Minimum Aberration optimality criterion by solving
+mixed integer problems. Advantages are the direct generation of multi-level
+designs and the optimality criteria. Disadvantages are the use of proprietary
+MIP solvers and the limitations on the size and shape of the designs that can be
+generated.
+** D-Optimal Designs
+The best candidate we have found so far are /D-Optimal/ designs. Considering
+that we are going to analyse the results of an experiments plan, the
+/D-Efficiency/ of a design is inversely proportional to the /geometric mean/ of
+the /eigenvalues/ of the plan's /covariance matrix/. A D-Optimal design has the
+best D-Efficiency. Our current approach is based on D-Optimal designs.
 ** ANOVA
+** The DLMT Strategy
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width .8\columnwidth
+#+ATTR_ORG: :width 400
+[[./img/doe_anova_strategy.eps]]
+#+END_CENTER
+
 * Performance Evaluations
 ** Example on a GPU Laplacian Kernel
 ** Results on the SPAPT Benchmark
