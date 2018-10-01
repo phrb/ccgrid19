@@ -4,8 +4,8 @@ This paper was written and exported to `pdf` using [Emacs Org mode](https://orgm
 
 ##### Org Mode LaTex: Exporting IEEEtran
 
-Add the following to your `Emacs` configuration to be able to export using the
-`org-ieeetran` class:
+After installing the IEEEtran template, add the following to your `Emacs`
+configuration to be able to export using the `org-ieeetran` class:
 
 ```lisp
 (with-eval-after-load 'ox-latex
@@ -17,4 +17,11 @@ Add the following to your `Emacs` configuration to be able to export using the
                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+```
+
+You must use the `pdflatex` compiler to generate the correct template in `pdf`. You can
+use `latexmk` in your `Emacs` configuration to properly export references:
+
+```lisp
+(setq org-latex-pdf-process (list "latexmk -pdflatex='pdflatex' -pdf -f %f"))
 ```
