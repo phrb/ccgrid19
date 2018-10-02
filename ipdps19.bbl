@@ -90,27 +90,22 @@ J.~Ansel, S.~Kamil, K.~Veeramachaneni, J.~Ragan-Kelley, J.~Bosboom, U.-M.
   conference on Parallel architectures and compilation}.\hskip 1em plus 0.5em
   minus 0.4em\relax ACM, 2014, pp. 303--316.
 
-\bibitem{fisher1937design}
-R.~A. Fisher, \emph{The design of experiments}.\hskip 1em plus 0.5em minus
-  0.4em\relax Oliver And Boyd; Edinburgh; London, 1937.
+\bibitem{plackett1946design}
+R.~L. Plackett and J.~P. Burman, ``The design of optimum multifactorial
+  experiments,'' \emph{Biometrika}, vol.~33, no.~4, pp. 305--325, 1946.
 
-\bibitem{bukh1992art}
-P.~N.~D. Bukh, \emph{The art of computer systems performance analysis,
-  techniques for experimental design, measurement, simulation and
-  modeling}.\hskip 1em plus 0.5em minus 0.4em\relax JSTOR, 1992.
-
-\bibitem{montgomery2017design}
-D.~C. Montgomery, \emph{Design and analysis of experiments}.\hskip 1em plus
-  0.5em minus 0.4em\relax John wiley \& sons, 2017.
-
-\bibitem{box2005statistics}
-G.~E. Box, J.~S. Hunter, and W.~G. Hunter, \emph{Statistics for experimenters:
-  design, innovation, and discovery}.\hskip 1em plus 0.5em minus 0.4em\relax
-  Wiley-Interscience New York, 2005, vol.~2.
+\bibitem{addelman1961some}
+S.~Addelman and O.~Kempthorne, ``Some main-effect plans and orthogonal arrays
+  of strength two,'' \emph{The Annals of Mathematical Statistics}, pp.
+  1167--1176, 1961.
 
 \bibitem{ulrike2018algorithm}
 U.~Grömping and R.~Fontana, ``An algorithm for generating good mixed level
   factorial designs,'' Beuth University of Applied Sciences, Berlin, Tech.
   Rep., 2018.
+
+\bibitem{fedorov1972theory}
+V.~V. Fedorov, \emph{Theory of optimal experiments}.\hskip 1em plus 0.5em minus
+  0.4em\relax Elsevier, 1972.
 
 \end{thebibliography}

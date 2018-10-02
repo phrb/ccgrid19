@@ -1,0 +1,4 @@
+"Method","Mean","Min.","Max."
+"Random Sampling",70.1552708333333,1.16999999999999,596.57
+"D-Opt. w/ Linear Model",14416.4666666667,14409,14425
+"D-Opt. w/ Correct Model",0,0,0

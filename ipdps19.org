@@ -36,6 +36,24 @@
 #+LATEX_HEADER: \usepackage{wasysym}
 #+LATEX_HEADER: \usepackage{ragged2e}
 
+#+LATEX_HEADER: \lstset{ %
+#+LATEX_HEADER:   backgroundcolor={},
+#+LATEX_HEADER:   basicstyle=\ttfamily\scriptsize,
+#+LATEX_HEADER:   breakatwhitespace=true,
+#+LATEX_HEADER:   breaklines=true,
+#+LATEX_HEADER:   captionpos=n,
+#+LATEX_HEADER:   extendedchars=true,
+#+LATEX_HEADER:   frame=n,
+#+LATEX_HEADER:   rulecolor=\color{black},
+#+LATEX_HEADER:   showspaces=false,
+#+LATEX_HEADER:   showstringspaces=false,
+#+LATEX_HEADER:   showtabs=false,
+#+LATEX_HEADER:   stepnumber=2,
+#+LATEX_HEADER:   stringstyle=\color{gray},
+#+LATEX_HEADER:   tabsize=2,
+#+LATEX_HEADER: }
+#+LATEX_HEADER: \renewcommand*{\UrlFont}{\ttfamily\smaller\relax}
+
 #+LATEX_HEADER: \graphicspath{{./img/}}
 #+LATEX_HEADER: \renewcommand*{\UrlFont}{\ttfamily\smaller\relax}
 
@@ -110,6 +128,147 @@ ORIO
   - Other benchmarks
   - source-to-source + compiler flags
   - connexion with online learning
+* Rosenbrock Example Setup                                         :noexport:
+#+HEADER: :results output :session *R* :exports none :eval no-export
+#+BEGIN_SRC R
+library(AlgDesign)
+
+rosenbrock <- function(x, y) {
+    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)))
+}
+
+rosenbrock_data <- expand.grid(seq(-4, 4, 0.05), seq(-4, 4, 0.05))
+rosenbrock_data$Y <- mapply(rosenbrock, rosenbrock_data$Var1, rosenbrock_data$Var2)
+
+dim(rosenbrock_data)
+rosenbrock(1, 1)
+#+END_SRC
+
+#+RESULTS:
+: [1] 25921     3
+: [1] 0
+
+#+HEADER: :results output :session *R* :exports none :eval no-export
+#+BEGIN_SRC R
+random_sample <- rosenbrock_data[sample(1:nrow(rosenbrock_data), 8, replace = TRUE), ]
+dim(random_sample)
+random_sample[random_sample$Y == min(random_sample$Y), ]
+#+END_SRC
+
+#+RESULTS:
+: [1] 8 3
+:        Var1 Var2        Y
+: 19215 -1.25 1.95 20.07813
+
+#+HEADER: :results output :session *R* :exports none :eval no-export
+#+BEGIN_SRC R
+sampled_mins <- replicate(30, {
+  random_sample <- rosenbrock_data[sample(1:nrow(rosenbrock_data), 10, replace = TRUE), ]
+  sample_min <- random_sample[random_sample$Y == min(random_sample$Y), "Y"]
+  sample_min
+  })
+
+sampled_mins <- as.numeric(unlist(sampled_mins))
+random_summary <- summary(sampled_mins)
+random_summary
+#+END_SRC
+
+#+RESULTS:
+:    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+:   0.800   8.125  21.012  83.440 136.680 409.000
+
+#+HEADER: :results output :session *R* :exports none :eval no-export
+#+BEGIN_SRC R
+i <- 0
+linear_mins <- replicate(30, {
+  output <- optFederov(~ ., data = rosenbrock_data, nTrials = 10)
+  regression <- lm(Y ~ ., data = output$design)
+  summary.aov(regression)
+  prediction <- predict(regression, rosenbrock_data)
+  best_predicted <- rosenbrock_data[prediction == min(prediction), ]
+  i <<- i + 1
+  print(i)
+  best_predicted$Y
+})
+
+linear_mins <- as.numeric(unlist(linear_mins))
+linear_summary <- summary(linear_mins)
+linear_summary
+#+END_SRC
+
+#+HEADER: :results output :session *R* :exports none :eval no-export
+#+BEGIN_SRC R
+i <- 0
+modelled_mins <- replicate(30, {
+  output <- optFederov(~ Var1 + Var2 + I(Var1 ^ 4) + I(Var1 ^ 2) + I(Var2 ^ 2) + I(Var1 ^ 2):Var2, data = rosenbrock_data, nTrials = 8)
+  regression <- lm(Y ~ Var1 + Var2 + I(Var1 ^ 4) + I(Var1 ^ 2) + I(Var2 ^ 2) + I(Var1 ^ 2):Var2, data = output$design)
+  summary.aov(regression)
+  prediction <- predict(regression, rosenbrock_data)
+  best_predicted <- rosenbrock_data[prediction == min(prediction), ]
+  i <<- i + 1
+  print(i)
+  best_predicted$Y
+})
+
+modelled_mins <- as.numeric(unlist(modelled_mins))
+modelled_summary <- summary(modelled_mins)
+modelled_summary
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+[1] 11
+[1] 12
+[1] 13
+[1] 14
+[1] 15
+[1] 16
+[1] 17
+[1] 18
+[1] 19
+[1] 20
+[1] 21
+[1] 22
+[1] 23
+[1] 24
+[1] 25
+[1] 26
+[1] 27
+[1] 28
+[1] 29
+[1] 30
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+      0       0       0       0       0       0
+#+end_example
+
+#+HEADER: :results output :session *R* :exports none :eval no-export
+#+BEGIN_SRC R
+library(dplyr)
+
+summaries <- as.data.frame(rbind(random_summary, linear_summary, modelled_summary))
+summaries <- summaries[, c("Min.", "Mean", "Max.")]
+summaries$Method <- c("Random Sampling", "D-Opt. w/ Linear Model", "D-Opt. w/ Correct Model")
+summaries <- summaries[, c("Method", "Mean", "Min.", "Max.")]
+rownames(summaries) <- NULL
+summaries
+write.csv(summaries, file = "data/rosenbrock_summaries.csv", row.names = FALSE)
+#+END_SRC
+
+#+RESULTS:
+:                    Method        Mean     Min.     Max.
+: 1         Random Sampling    70.15527     1.17   596.57
+: 2  D-Opt. w/ Linear Model 14416.46667 14409.00 14425.00
+: 3 D-Opt. w/ Correct Model     0.00000     0.00     0.00
 
 * Introduction
 Optimizing code for objectives such as performance and power consumption is
@@ -199,12 +358,12 @@ benchmark. Section [[Conclusion]] discusses our conclusions and future work.
 * Background
 ** Source-to-source Transformation
 ** Autotuning
-Rice's conceptual framework\nbsp{}\cite{rice1976algorithm} formed the foundation
-of autotuners in various problem domains. In 1997, the PHiPAC
+John Rice's Algorithm Selection framework\nbsp{}\cite{rice1976algorithm} is the
+precursor of autotuners in various problem domains. In 1997, the PHiPAC
 system\nbsp{}\cite{bilmes1997optimizing} used code generators and search scripts
 to automatically generate high performance code for matrix multiplication. Since
-then, systems tackled different domains with a diversity of strategies. Dongarra
-/et al./\nbsp{}\cite{dongarra1998automatically} introduced the ATLAS
+then, systems approached different domains with a variety of strategies.
+Dongarra /et al./\nbsp{}\cite{dongarra1998automatically} introduced the ATLAS
 project, that optimizes dense matrix multiplication routines. The
 OSKI\nbsp{}\cite{vuduc2005oski} library provides automatically tuned kernels for
 sparse matrices. The FFTW\nbsp{}\cite{frigo1998fftw} library provides tuned C
@@ -216,77 +375,252 @@ project\nbsp{}\cite{jordan2012multi} implements abstractions for OpenMP, MPI and
 OpenCL, and generates optimized parallel code for heterogeneous multi-core
 architectures.
 
-Some systems provide generic tools that enable the implementation of autotuners
-in various domains. PetaBricks\nbsp{}\cite{ansel2009petabricks} is a language,
-compiler and autotuner that introduces abstractions that enable programmers to
-define multiple algorithms for the same problem. The ParamILS
-framework\nbsp{}\cite{hutter2009paramils} applies stochastic local search methods for
-algorithm configuration and parameter tuning. The OpenTuner
-framework\nbsp{}\cite{ansel2014opentuner} provides ensembles of techniques that search
-spaces of program configurations.
+A different approach is to combine generic search algorithms and problem
+representation data structures in a single system that enables the
+implementation of autotuners for different domains. The
+PetaBricks\nbsp{}\cite{ansel2009petabricks} project provides a language,
+compiler and autotuner, enabling the definition and selection of multiple
+algorithms for the same problem. The ParamILS
+framework\nbsp{}\cite{hutter2009paramils} applies stochastic local search
+algorithms to algorithm configuration and parameter tuning. The OpenTuner
+framework\nbsp{}\cite{ansel2014opentuner} provides ensembles of techniques that
+search the same space in parallel, while exploration is managed by an
+implementation of a solver of the multi-armed bandit problem.
 ** Search Space Exploration Strategies
-* Applying Design of Experiments to Autotuning
-An /experimental design/ is a plan for executing a series of experiments
-whose objective is to identify the relationships between /factors/ and
-/responses/. While factors and responses can refer to different concrete
-entities in other domains, in computer experiments factors can be configuration
-parameters for algorithms and compilers, for example, and responses can be the
-execution time or memory consumption of a program.
+* Design of Experiments
+An /experimental design/ determines a selection of experiments whose objective
+is to identify the relationships between /factors/ and /responses/. While
+factors and responses can refer to different concrete entities in other domains,
+in computer experiments factors can be configuration parameters for algorithms
+and compilers, for example, and responses can be the execution time or memory
+consumption of a program. Each possible value of a factor is called a /level/.
 
-Experimental designs can be used with various objectives, from identifying the
-most important factors to building an analytical model for the response. The
-field of Design of Experiments encompasses the mathematical formalization of
-the construction of experimental designs. More practical works in the field
-present algorithms to generate designs with different objectives and
-restrictions.
-
-One of the first detailed descriptions and mathematical treatment of Design of
-Experiments was presented by Ronald Fisher\nbsp{}\cite{fisher1937design} in his
-1937 book /The Design of Experiments/, where he discussed principles of
-experimentation, latin square sampling and factorial designs. Later books such
-as the ones from Jain\nbsp{}\cite{bukh1992art},
-Montgomery\nbsp{}\cite{montgomery2017design} and Box /et
-al./\nbsp{}\cite{box2005statistics} present comprehensive and detailed
-foundations.
+Experimental designs are with objectives such as identifying the most important
+factors and building an analytical model for the response. The remaining of this
+section discusses some design construction techniques we explored and presents
+the technique we selected for our approach.
 ** Design Construction Techniques
-Our application of Design of Experiments requires support for factors of
-different types and number of possible values, such as binary flags, integer
-and floating point numerical values and unordered enumerations of abstract
-values. We also need designs that minimize the number of experiments needed for
-identifying the most relevant factors in a given problem, since at this moment
-we are not interesting in a precise analytical model.
+The application of Design of Experiments to autotuning problems requires design
+construction techniques that support factors of different types and number of
+possible values. Autotuning problems typically combine factors such as binary
+flags, integer and floating point numerical values, and unordered enumerations
+of abstract values. Minimizing the number of experiments needed to find good
+optimizations is a also a fundamental requirement since we are interested in
+autotuning for scenarios with tight budget constraints.
 
-The design construction techniques that fit these requirements are limited.  In
-the /2-level screening with random level sampling/ technique, factors
-with more than two unordered levels are sampled at two random levels. This
-enables using small design such as the Plackett-Burman screening design.
-Advantages are the small design size and good estimation capability for main
-effects. Disadvantages are the incapability of estimating interactions, but
-mainly the lack of information regarding the response for levels not selected
-in the initial screening.
+The design construction techniques that fit these requirements are limited.
+Designs that simply test all possible factor combinations, or /full factorial
+designs/, would provide complete information about the global minimum but are
+unfeasible for most autotuning problems. In the /2-level screening with random
+level sampling/ technique, factors with more than two unordered levels are
+sampled at two random levels. This enables using small design such as the
+Plackett-Burman\nbsp{}\cite{plackett1946design} screening design. Advantages are
+the small design size and good estimation capability for main effects.
+Incapability of estimating interactions is a disadvantage of this strategy, but
+the main drawback is the lack of information for levels not selected in the
+initial screening.
 
-In /contractive replacement/, an initial 2-Level design is used to
-generate mixed-level designs by re-encoding columns into a new single column
-representing a multi-level factor. The contractive replacement of
-Addelman-Kempthorne is a strategy of this kind.  Advantages are also small
-design sizes and good estimation capability of main effects. Additionally, the
-contractive replacement technique keeps orthogonality of designs.
-Disadvantages are the requirements on the initial designs. Not all 2-Level
-designs can be contracted with those methods if orthogonality is desired.
+In /contractive replacement/, an initial 2-level design is used to generate
+mixed-level designs by re-encoding columns into a new single column representing
+a multi-level factor. The contractive replacement of
+Addelman-Kempthorne\nbsp{}\cite{addelman1961some} is a strategy of this kind.
+Advantages of this technique are the small design sizes and the ability to
+estimate main effects. Additionally, the contractive replacement technique
+preserves orthogonality. Due to strict requirements on initial designs, not all
+2-level designs can be contracted.
 
 The /direct generation/ algorithm presented by Grömping and
 Fontana\nbsp{}\cite{ulrike2018algorithm} enables the generation of multi-level
-designs with the Generalized Minimum Aberration optimality criterion by solving
-mixed integer problems. Advantages are the direct generation of multi-level
-designs and the optimality criteria. Disadvantages are the use of proprietary
-MIP solvers and the limitations on the size and shape of the designs that can be
-generated.
-** D-Optimal Designs
-The best candidate we have found so far are /D-Optimal/ designs. Considering
-that we are going to analyse the results of an experiments plan, the
+designs by solving Mixed Integer Problems (MIP). The advantages of this
+technique are the direct generation of multi-level designs and a clearly defined
+optimality criterion. Since this construction relies on solving carefully
+formulated MIP problems, it presents strong restrictions on the size and shape
+of the designs that can be generated.
+* D-Optimal Designs
+/D-Optimal designs/ are the class of designs that best fits our requirements of
+supporting multi-level factors and minimizing the number of experiments. The
+algorithms for constructing D-Optimal designs are relatively fast and have few
+restrictions.
+
+It is necessary to select a model that relates factors and responses to
+construct a D-Optimal design. The model selection can be based on previous
+experiments or on expert knowledge of the problem. Once a model is selected,
+algorithmic construction is performed by searching for the set of experiments
+that minimizes the /D-Optimality/ criterion, a measure of the /variance/ of the
+/estimators/ of the /regression coefficients/ associated with the selected
+model. This search is usually done by swapping experiments from the current
+candidate set with experiments from a pool of possible experiments, according to
+certain rules, until some stopping criterion is met. In the approach presented
+in this paper we used Fedorov's algorithm\nbsp{}\cite{fedorov1972theory} for
+constructing D-Optimal designs, implemented in =R= in the =AlgDesign= package.
+
+Considering that we are going to analyze the results of an experiments plan, the
 /D-Efficiency/ of a design is inversely proportional to the /geometric mean/ of
 the /eigenvalues/ of the plan's /covariance matrix/. A D-Optimal design has the
 best D-Efficiency. Our current approach is based on D-Optimal designs.
+
+#+CAPTION: Defining the Rosenbrock function in =R=
+#+BEGIN_figure
+#+HEADER: :results output :session *R* :exports code
+#+BEGIN_SRC R
+rosenbrock <- function(x, y) {
+    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)))
+}
+#+END_SRC
+
+#+RESULTS:
+
+#+END_FIGURE
+
+#+HEADER: :results output latex :session *R* :exports results
+#+BEGIN_SRC R
+library(xtable)
+
+cap <- "Comparison of 3 optimization methods on Rosenbrock's function, using a buget of 10 points with 30 repetitions"
+rosenbrock_summaries <- read.csv(file = "./data/rosenbrock_summaries.csv", header = TRUE)
+x <- xtable(rosenbrock_summaries, caption = cap, display = c("s", "s", "g", "g", "g"), digits = 2)
+align(x) <- xalign(x)
+print(x, size = "\\small", include.rownames = FALSE, booktabs = TRUE, math.style.exponents = TRUE)
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Tue Oct  2 22:53:10 2018
+\begin{table}[ht]
+\centering
+\begingroup\small
+\begin{tabular}{lrrr}
+  \toprule
+Method & Mean & Min. & Max. \\
+  \midrule
+Random Sampling &  70 & 1.2 & $6 \times 10^{2}$ \\
+  D-Opt. w/ Linear Model & $1.4 \times 10^{4}$ & $1.4 \times 10^{4}$ & $1.4 \times 10^{4}$ \\
+  D-Opt. w/ Correct Model &   0 &   0 &   0 \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\caption{Comparison of 3 optimization methods on Rosenbrock's function, using a buget of 10 points with 30 repetitions}
+\end{table}
+#+END_EXPORT
+
+#+HEADER: :results graphics output :session *R* :exports none :eval no-export
+#+HEADER: :file "./img/rosenbrock.pdf"
+#+HEADER: :width 12 :height 12
+#+BEGIN_SRC R
+library(ggplot2)
+
+rosenbrock_data <- expand.grid(seq(-4, 4, 0.05),
+                               seq(-4, 4, 0.05))
+
+names(rosenbrock_data) <- c("x", "y")
+
+rosenbrock_data$Y <- mapply(rosenbrock,
+                            rosenbrock_data$x,
+                            rosenbrock_data$y)
+
+dim(rosenbrock_data)
+
+ggplot(rosenbrock_data, aes(x, y, z = Y)) +
+      scale_x_continuous(limits = c(-4, 4), expand = c(0, 0)) +
+      scale_y_continuous(limits = c(-4, 4), expand = c(0, 0)) +
+      geom_contour(colour = "black", show.legend = FALSE, breaks = 5 * (10 ^ (-1:7))) +
+      geom_point(size = 4, colour = "black", pch = 19, data = rosenbrock_data[rosenbrock_data$Y == min(rosenbrock_data$Y), ]) +
+      geom_label(size = 11, colour = "black", data = rosenbrock_data[rosenbrock_data$Y == min(rosenbrock_data$Y), ], aes(x = x, y = y + 0.35, label = "rosenbrock(1, 1) = 0")) +
+      theme_bw(base_size = 35) +
+      theme(panel.grid = element_blank(), panel.border = element_blank())
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/rosenbrock.pdf]]
+
+#+BEGIN_CENTER
+#+CAPTION: Contour plot in $log_{10}$ scale and global optimum of Rosenbrock's function
+#+BEGIN_figure
+#+ATTR_LATEX: :width .8\columnwidth
+[[./img/rosenbrock.pdf]]
+#+END_FIGURE
+#+END_CENTER
+
+#+HEADER: :results output latex :session *R* :exports results :eval no-export
+#+BEGIN_SRC R
+library(AlgDesign)
+library(xtable)
+
+output <- optFederov(~ x + y + I(x ^ 4) + I(y ^ 2) + I(y ^ 2) + I(x ^ 2):y, data = rosenbrock_data, nTrials = 10)
+regression <- aov(Y ~ x + y + I(x ^ 4) + I(x ^ 2) + I(y ^ 2) + I(x ^ 2):y, data = output$design)
+s_regression <- as.data.frame(summary.aov(regression)[[1]])
+s_regression <- s_regression[1:6, c("F value", "Pr(>F)")]
+
+cap <- "Shortened ANOVA table for the fit of the correct model using 10 experiments"
+x <- xtable(s_regression, caption = cap, display = c("s","g", "g"), digits = 2)
+align(x) <- xalign(x)
+print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE)
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Tue Oct  2 23:21:26 2018
+\begin{table}[ht]
+\centering
+\begingroup\small
+\begin{tabular}{lrr}
+  \toprule
+ & F value & Pr($>$F) \\
+  \midrule
+x           & $3.1 \times 10^{29}$ & $1.3 \times 10^{-44}$ \\
+  y           & $6.1 \times 10^{31}$ & $4.7 \times 10^{-48}$ \\
+  I(x\verb|^|4)      & $1.3 \times 10^{32}$ & $1.4 \times 10^{-48}$ \\
+  I(x\verb|^|2)      & $1.7 \times 10^{30}$ & $9.7 \times 10^{-46}$ \\
+  I(y\verb|^|2)      & $3.2 \times 10^{29}$ & $1.2 \times 10^{-44}$ \\
+  y:I(x\verb|^|2)    & $2.6 \times 10^{31}$ & $1.6 \times 10^{-47}$ \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\caption{Shortened ANOVA table for the fit of the correct model using 10 experiments}
+\end{table}
+#+END_EXPORT
+
+#+HEADER: :results output latex :session *R* :exports results :eval no-export
+#+BEGIN_SRC R
+library(AlgDesign)
+library(xtable)
+
+output <- optFederov(~ ., data = rosenbrock_data, nTrials = 10)
+regression <- lm(Y ~ ., data = output$design)
+s_regression <- as.data.frame(summary.aov(regression)[[1]])
+s_regression <- s_regression[1:2, c("F value", "Pr(>F)")]
+
+cap <- "Shortened ANOVA table for the fit of the naive linear model using 10 experiments"
+x <- xtable(s_regression, caption = cap, display = c("s","g", "g"), digits = 2)
+align(x) <- xalign(x)
+print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE)
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Tue Oct  2 23:21:57 2018
+\begin{table}[ht]
+\centering
+\begingroup\small
+\begin{tabular}{lrr}
+  \toprule
+ & F value & Pr($>$F) \\
+  \midrule
+x           & 0.0016 & 0.97 \\
+  y           & 1.4 & 0.27 \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\caption{Shortened ANOVA table for the fit of the naive linear model using 10 experiments}
+\end{table}
+#+END_EXPORT
+
+
+
+* Applying Design of Experiments to Autotuning
 ** ANOVA
 ** The DLMT Strategy
 #+BEGIN_CENTER
