@@ -59,6 +59,7 @@
 
 #+LATEX_HEADER: \author{\IEEEauthorblockN{Pedro Bruel\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},
 #+LATEX_HEADER: Arnaud Legrand\IEEEauthorrefmark{1},
+#+LATEX_HEADER: Jean-Marc Vincent\IEEEauthorrefmark{1},
 #+LATEX_HEADER: Brice Videau\IEEEauthorrefmark{1} and
 #+LATEX_HEADER: Alfredo Goldman\IEEEauthorrefmark{2}}
 #+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{1}University of Grenoble Alpes, CNRS, INRIA, LIG - Grenoble, France\\
@@ -590,7 +591,7 @@ ggplot(plot_data, aes(min_run_cost, best_iteration, color = technique)) +
 library(ggplot2)
 
 rosenbrock <- function(x, y) {
-    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)))
+    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2))+ rnorm(1, sd = 10))
 }
 
 rosenbrock_data <- expand.grid(seq(-4, 4, 0.05),
@@ -738,7 +739,7 @@ strategies. Section [[Applying Design of Experiments to Autotuning]] presents a
 detailed description of the implementation of our approach and its background.
 It discusses the Design of Experiments concepts we incorporate, and the ANOVA
 and linear regression algorithms we use in analysis steps. Section [[Performance
-Evaluations]] presents our results with the GPU Laplacian Kernel and the SPAPT
+Evaluation]] presents our results with the GPU Laplacian Kernel and the SPAPT
 benchmark. Section [[Conclusion]] discusses our conclusions and future work.
 * Background
 ** Source-to-source Transformation
@@ -780,69 +781,13 @@ in computer experiments factors can be configuration parameters for algorithms
 and compilers, for example, and responses can be the execution time or memory
 consumption of a program. Each possible value of a factor is called a /level/.
 
-Experimental designs are with objectives such as identifying the most important
-factors and building an analytical model for the response. The remaining of this
-section discusses some design construction techniques we explored and presents
+Experimental designs are constructed with objectives such as identifying the
+most important factors and building an analytical model for the response. This
+Section discusses some design construction techniques we explored and presents
 the technique we selected for our approach.
-** Design Construction Techniques
-The application of Design of Experiments to autotuning problems requires design
-construction techniques that support factors of different types and number of
-possible values. Autotuning problems typically combine factors such as binary
-flags, integer and floating point numerical values, and unordered enumerations
-of abstract values. Minimizing the number of experiments needed to find good
-optimizations is a also a fundamental requirement since we are interested in
-autotuning for scenarios with tight budget constraints.
-
-The design construction techniques that fit these requirements are limited.
-Designs that simply test all possible factor combinations, or /full factorial
-designs/, would provide complete information about the global minimum but are
-unfeasible for most autotuning problems. In the /2-level screening with random
-level sampling/ technique, factors with more than two unordered levels are
-sampled at two random levels. This enables using small design such as the
-Plackett-Burman\nbsp{}\cite{plackett1946design} screening design. Advantages are
-the small design size and good estimation capability for main effects.
-Incapability of estimating interactions is a disadvantage of this strategy, but
-the main drawback is the lack of information for levels not selected in the
-initial screening.
-
-In /contractive replacement/, an initial 2-level design is used to generate
-mixed-level designs by re-encoding columns into a new single column representing
-a multi-level factor. The contractive replacement of
-Addelman-Kempthorne\nbsp{}\cite{addelman1961some} is a strategy of this kind.
-Advantages of this technique are the small design sizes and the ability to
-estimate main effects. Additionally, the contractive replacement technique
-preserves orthogonality. Due to strict requirements on initial designs, not all
-2-level designs can be contracted.
-
-The /direct generation/ algorithm presented by Grömping and
-Fontana\nbsp{}\cite{ulrike2018algorithm} enables the generation of multi-level
-designs by solving Mixed Integer Problems (MIP). The advantages of this
-technique are the direct generation of multi-level designs and a clearly defined
-optimality criterion. Since this construction relies on solving carefully
-formulated MIP problems, it presents strong restrictions on the size and shape
-of the designs that can be generated.
-* D-Optimal Designs
-/D-Optimal designs/ are the class of designs that best fits our requirements of
-supporting multi-level factors and minimizing the number of experiments. The
-algorithms for constructing D-Optimal designs are relatively fast and have few
-restrictions.
-
-It is necessary to select a model that relates factors and responses to
-construct a D-Optimal design. The model selection can be based on previous
-experiments or on expert knowledge of the problem. Once a model is selected,
-algorithmic construction is performed by searching for the set of experiments
-that minimizes the /D-Optimality/ criterion, a measure of the /variance/ of the
-/estimators/ of the /regression coefficients/ associated with the selected
-model. This search is usually done by swapping experiments from the current
-candidate set with experiments from a pool of possible experiments, according to
-certain rules, until some stopping criterion is met. In the approach presented
-in this paper we used Fedorov's algorithm\nbsp{}\cite{fedorov1972theory} for
-constructing D-Optimal designs, implemented in =R= in the =AlgDesign= package.
-
-Considering that we are going to analyze the results of an experiments plan, the
-/D-Efficiency/ of a design is inversely proportional to the /geometric mean/ of
-the /eigenvalues/ of the plan's /covariance matrix/. A D-Optimal design has the
-best D-Efficiency. Our current approach is based on D-Optimal designs.
+** Screening
+*** ANOVA
+**** A Simple Example
 
 #+CAPTION: Defining the Rosenbrock function in =R=
 #+BEGIN_figure
@@ -903,7 +848,7 @@ library(AlgDesign)
 library(xtable)
 
 rosenbrock <- function(x, y) {
-    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)))
+    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)) + rnorm(1, sd = 10))
 }
 
 rosenbrock_data <- expand.grid(seq(-4, 4, 0.05),
@@ -928,7 +873,7 @@ print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE, caption
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Wed Oct  3 13:38:25 2018
+% Wed Oct  3 16:57:45 2018
 \begin{table}[ht]
 \centering
 \caption{Shortened ANOVA table for the fit of the correct model using 10 experiments}
@@ -937,12 +882,12 @@ print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE, caption
   \toprule
  & F value & Pr($>$F) \\
   \midrule
-x           & $9.4 \times 10^{28}$ & $7.6 \times 10^{-44}$ \\
-  y           & $1 \times 10^{32}$ & $2.1 \times 10^{-48}$ \\
-  I(x\verb|^|4)      & $2.3 \times 10^{32}$ & $6.4 \times 10^{-49}$ \\
-  I(x\verb|^|2)      & $2.4 \times 10^{30}$ & $5.8 \times 10^{-46}$ \\
-  I(y\verb|^|2)      & $6.8 \times 10^{29}$ & $3.9 \times 10^{-45}$ \\
-  y:I(x\verb|^|2)    & $4.5 \times 10^{31}$ & $7.3 \times 10^{-48}$ \\
+x           & $2 \times 10^{4}$ & $7.5 \times 10^{-7}$ \\
+  y           & $9.2 \times 10^{6}$ & $7.9 \times 10^{-11}$ \\
+  I(x\verb|^|4)      & $2 \times 10^{7}$ & $2.4 \times 10^{-11}$ \\
+  I(x\verb|^|2)      & $3.3 \times 10^{5}$ & $1.2 \times 10^{-8}$ \\
+  I(y\verb|^|2)      & $3 \times 10^{4}$ & $4.2 \times 10^{-7}$ \\
+  y:I(x\verb|^|2)    & $3.9 \times 10^{6}$ & $2.8 \times 10^{-10}$ \\
    \bottomrule
 \end{tabular}
 \endgroup
@@ -996,18 +941,85 @@ x           & $7.5 \times 10^{-6}$ &   1 \\
 \endgroup
 \end{table}
 #+END_EXPORT
+** Multi-Level Design Construction Techniques
+The application of Design of Experiments to autotuning problems requires design
+construction techniques that support factors of different types and number of
+possible values. Autotuning problems typically combine factors such as binary
+flags, integer and floating point numerical values, and unordered enumerations
+of abstract values. Minimizing the number of experiments needed to find good
+optimizations is a also a fundamental requirement since we are interested in
+autotuning for scenarios with tight budget constraints.
 
+The design construction techniques that fit these requirements are limited.
+Designs that simply test all possible factor combinations, or /full factorial
+designs/, would provide complete information about the global minimum but are
+unfeasible for most autotuning problems. In the /2-level screening with random
+level sampling/ technique, factors with more than two unordered levels are
+sampled at two random levels. This enables using small design such as the
+Plackett-Burman\nbsp{}\cite{plackett1946design} screening design. Advantages are
+the small design size and good estimation capability for main effects.
+Incapability of estimating interactions is a disadvantage of this strategy, but
+the main drawback is the lack of information for levels not selected in the
+initial screening.
+
+In /contractive replacement/, an initial 2-level design is used to generate
+mixed-level designs by re-encoding columns into a new single column representing
+a multi-level factor. The contractive replacement of
+Addelman-Kempthorne\nbsp{}\cite{addelman1961some} is a strategy of this kind.
+Advantages of this technique are the small design sizes and the ability to
+estimate main effects. Additionally, the contractive replacement technique
+preserves orthogonality. Due to strict requirements on initial designs, not all
+2-level designs can be contracted.
+
+The /direct generation/ algorithm presented by Grömping and
+Fontana\nbsp{}\cite{ulrike2018algorithm} enables the generation of multi-level
+designs by solving Mixed Integer Problems (MIP). The advantages of this
+technique are the direct generation of multi-level designs and a clearly defined
+optimality criterion. Since this construction relies on solving carefully
+formulated MIP problems, it presents strong restrictions on the size and shape
+of the designs that can be generated.
+*** D-Optimal Designs
+/D-Optimal designs/ are the class of designs that best fits our requirements of
+supporting multi-level factors and minimizing the number of experiments. The
+algorithms for constructing D-Optimal designs are relatively fast and have few
+restrictions.
+
+It is necessary to select a model that relates factors and responses to
+construct a D-Optimal design. The model selection can be based on previous
+experiments or on expert knowledge of the problem. Once a model is selected,
+algorithmic construction is performed by searching for the set of experiments
+that minimizes the /D-Optimality/ criterion, a measure of the /variance/ of the
+/estimators/ of the /regression coefficients/ associated with the selected
+model. This search is usually done by swapping experiments from the current
+candidate set with experiments from a pool of possible experiments, according to
+certain rules, until some stopping criterion is met. In the approach presented
+in this paper we used Fedorov's algorithm\nbsp{}\cite{fedorov1972theory} for
+constructing D-Optimal designs, implemented in =R= in the =AlgDesign= package.
+
+Considering that we are going to analyze the results of an experiments plan, the
+/D-Efficiency/ of a design is inversely proportional to the /geometric mean/ of
+the /eigenvalues/ of the plan's /covariance matrix/. A D-Optimal design has the
+best D-Efficiency. Our current approach is based on D-Optimal designs.
 * Applying Design of Experiments to Autotuning
-** ANOVA
 ** The DLMT Strategy
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width .8\columnwidth
 #+ATTR_ORG: :width 400
 [[./img/doe_anova_strategy.eps]]
 #+END_CENTER
-
-* Performance Evaluations
+* Performance Evaluation
 ** Example on a GPU Laplacian Kernel
+#+BEGIN_EXPORT latex
+{\small
+\begin{align*}
+Y = & \; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} +
+%& \; vector_length + lws_y + 1 / lws_y + \\
+%& \; load_overlap + temporary_size + \\
+%& \; elements_number + 1 / elements_number + \\
+%& \; threads_number + 1 / threads_number
+\end{align*}
+}
+#+END_EXPORT
 *** Results
 #+HEADER: :results output latex :session *R* :exports results
 #+BEGIN_SRC R
@@ -1108,9 +1120,10 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 *** Results
 #+BEGIN_CENTER
 #+CAPTION: Results
-#+ATTR_LATEX: :float multicolumn :placement [ht] :width .95\textwidth
+#+ATTR_LATEX: :float multicolumn :placement [p] :width .9\textwidth
 [[./img/iteration_best_comparison.pdf]]
 #+END_CENTER
+\clearpage
 * Conclusion
 * Acknowledgment
 :PROPERTIES:
