@@ -157,12 +157,12 @@ random_sample[random_sample$Y == min(random_sample$Y), ]
 
 #+RESULTS:
 : [1] 8 3
-:        Var1 Var2        Y
-: 19215 -1.25 1.95 20.07813
+:       Var1 Var2      Y
+: 16666  0.1 1.15 130.77
 
 #+HEADER: :results output :session *R* :exports none :eval no-export
 #+BEGIN_SRC R
-sampled_mins <- replicate(30, {
+sampled_mins <- replicate(100, {
   random_sample <- rosenbrock_data[sample(1:nrow(rosenbrock_data), 10, replace = TRUE), ]
   sample_min <- random_sample[random_sample$Y == min(random_sample$Y), "Y"]
   sample_min
@@ -174,16 +174,15 @@ random_summary
 #+END_SRC
 
 #+RESULTS:
-:    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
-:   0.800   8.125  21.012  83.440 136.680 409.000
+:     Min.  1st Qu.   Median     Mean  3rd Qu.     Max.
+:    1.153   10.954   43.828  133.926  130.590 1529.620
 
 #+HEADER: :results output :session *R* :exports none :eval no-export
 #+BEGIN_SRC R
 i <- 0
-linear_mins <- replicate(30, {
+linear_mins <- replicate(100, {
   output <- optFederov(~ ., data = rosenbrock_data, nTrials = 10)
   regression <- lm(Y ~ ., data = output$design)
-  summary.aov(regression)
   prediction <- predict(regression, rosenbrock_data)
   best_predicted <- rosenbrock_data[prediction == min(prediction), ]
   i <<- i + 1
@@ -196,10 +195,150 @@ linear_summary <- summary(linear_mins)
 linear_summary
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+[1] 11
+[1] 12
+[1] 13
+[1] 14
+[1] 15
+[1] 16
+[1] 17
+[1] 18
+[1] 19
+[1] 20
+[1] 21
+[1] 22
+[1] 23
+[1] 24
+[1] 25
+[1] 26
+[1] 27
+[1] 28
+[1] 29
+[1] 30
+[1] 31
+[1] 32
+[1] 33
+[1] 34
+[1] 35
+[1] 36
+[1] 37
+[1] 38
+[1] 39
+[1] 40
+[1] 41
+[1] 42
+[1] 43
+[1] 44
+[1] 45
+[1] 46
+[1] 47
+[1] 48
+[1] 49
+[1] 50
+[1] 51
+[1] 52
+[1] 53
+[1] 54
+[1] 55
+[1] 56
+[1] 57
+[1] 58
+[1] 59
+[1] 60
+[1] 61
+[1] 62
+[1] 63
+[1] 64
+[1] 65
+[1] 66
+[1] 67
+[1] 68
+[1] 69
+[1] 70
+[1] 71
+[1] 72
+[1] 73
+[1] 74
+[1] 75
+[1] 76
+[1] 77
+[1] 78
+[1] 79
+[1] 80
+[1] 81
+[1] 82
+[1] 83
+[1] 84
+[1] 85
+[1] 86
+[1] 87
+[1] 88
+[1] 89
+[1] 90
+[1] 91
+[1] 92
+[1] 93
+[1] 94
+[1] 95
+[1] 96
+[1] 97
+[1] 98
+[1] 99
+[1] 100
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+  14409   14409   14409   14416   14425   14425
+#+end_example
+
 #+HEADER: :results output :session *R* :exports none :eval no-export
 #+BEGIN_SRC R
 i <- 0
-modelled_mins <- replicate(30, {
+simple_model_mins <- replicate(10, {
+  output <- optFederov(~ Var1 + Var2 + I(Var1 ^ 2) + I(Var2 ^ 2), data = rosenbrock_data, nTrials = 8)
+  regression <- lm(Y ~ Var1 + Var2 + I(Var1 ^ 2) + I(Var2 ^ 2), data = output$design)
+  prediction <- predict(regression, rosenbrock_data)
+  best_predicted <- rosenbrock_data[prediction == min(prediction), ]
+  i <<- i + 1
+  print(i)
+  best_predicted$Y
+})
+
+simple_model_mins <- as.numeric(unlist(simple_model_mins))
+simple_model_summary <- summary(simple_model_mins)
+simple_model_summary
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+   1583    1583    1588    1588    1593    1593
+#+end_example
+
+#+HEADER: :results output :session *R* :exports none :eval no-export
+#+BEGIN_SRC R
+i <- 0
+modelled_mins <- replicate(100, {
   output <- optFederov(~ Var1 + Var2 + I(Var1 ^ 4) + I(Var1 ^ 2) + I(Var2 ^ 2) + I(Var1 ^ 2):Var2, data = rosenbrock_data, nTrials = 8)
   regression <- lm(Y ~ Var1 + Var2 + I(Var1 ^ 4) + I(Var1 ^ 2) + I(Var2 ^ 2) + I(Var1 ^ 2):Var2, data = output$design)
   summary.aov(regression)
@@ -247,6 +386,76 @@ modelled_summary
 [1] 28
 [1] 29
 [1] 30
+[1] 31
+[1] 32
+[1] 33
+[1] 34
+[1] 35
+[1] 36
+[1] 37
+[1] 38
+[1] 39
+[1] 40
+[1] 41
+[1] 42
+[1] 43
+[1] 44
+[1] 45
+[1] 46
+[1] 47
+[1] 48
+[1] 49
+[1] 50
+[1] 51
+[1] 52
+[1] 53
+[1] 54
+[1] 55
+[1] 56
+[1] 57
+[1] 58
+[1] 59
+[1] 60
+[1] 61
+[1] 62
+[1] 63
+[1] 64
+[1] 65
+[1] 66
+[1] 67
+[1] 68
+[1] 69
+[1] 70
+[1] 71
+[1] 72
+[1] 73
+[1] 74
+[1] 75
+[1] 76
+[1] 77
+[1] 78
+[1] 79
+[1] 80
+[1] 81
+[1] 82
+[1] 83
+[1] 84
+[1] 85
+[1] 86
+[1] 87
+[1] 88
+[1] 89
+[1] 90
+[1] 91
+[1] 92
+[1] 93
+[1] 94
+[1] 95
+[1] 96
+[1] 97
+[1] 98
+[1] 99
+[1] 100
    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
       0       0       0       0       0       0
 #+end_example
@@ -265,10 +474,186 @@ write.csv(summaries, file = "data/rosenbrock_summaries.csv", row.names = FALSE)
 #+END_SRC
 
 #+RESULTS:
-:                    Method        Mean     Min.     Max.
-: 1         Random Sampling    70.15527     1.17   596.57
-: 2  D-Opt. w/ Linear Model 14416.46667 14409.00 14425.00
-: 3 D-Opt. w/ Correct Model     0.00000     0.00     0.00
+:                    Method       Mean         Min.     Max.
+: 1         Random Sampling   133.9259     1.153125  1529.62
+: 2  D-Opt. w/ Linear Model 14415.8800 14409.000000 14425.00
+: 3 D-Opt. w/ Correct Model     0.0000     0.000000     0.00
+
+* Generating Figures                                               :noexport:
+** SPAPT
+*** Cloning/Pulling the Repository
+#+HEADER: :results output :eval no-export
+#+BEGIN_SRC shell
+git clone https://github.com/phrb/dlmt_spapt_experiments.git || (cd dlmt_spapt_experiments && git pull)
+#+END_SRC
+
+#+RESULTS:
+: Already up to date.
+
+*** Generate pdf
+#+HEADER: :results graphics output :session *R* :eval no-export
+#+HEADER: :file ./img/iteration_best_comparison.pdf
+#+HEADER: :width 11 :height 16
+#+BEGIN_SRC R
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(reshape2)
+library(openssl)
+library(RColorBrewer)
+library(extrafont)
+
+data_dir <- "dlmt_spapt_experiments/data/results"
+target_dirs <- list.dirs(path = data_dir, full.names = FALSE, recursive = FALSE)
+data <- NULL
+
+read.csv.iterations.cost <- function(csv_file) {
+    data <- read.csv(csv_file, header = TRUE)
+
+    data$experiment_id <- rep(sha1(csv_file), nrow(data))
+    data_baseline <- data[data$baseline == "True", "cost_mean"]
+    data$cost_baseline <- rep(data_baseline, nrow(data))
+    data$speedup <- data_baseline / data$cost_mean
+    data$max_run_speedup <- rep(max(data$speedup), nrow(data))
+    data$min_run_cost <- rep(min(data$cost_mean), nrow(data))
+
+    data <- data[data$baseline == "False", ]
+    data <- data[data$correct_result == "True", ]
+
+    data$best_iteration <- rep(as.numeric(rownames(data[data$speedup == max(data$speedup), ])), nrow(data))
+    data$points <- rep(nrow(data), nrow(data))
+
+    return(data)
+}
+
+for (target_dir in target_dirs) {
+    target_path <- paste(data_dir, "/", target_dir, "/", sep = "")
+
+    csv_files <- list.files(path = target_path, pattern = "search_space.csv", recursive = TRUE)
+    if (length(csv_files) != 0) {
+        csv_files <- paste0(target_path, csv_files)
+
+        info <- file.info(csv_files)
+        non_empty <- rownames(info[info$size != 0, ])
+        csv_files <- csv_files[csv_files %in% non_empty]
+        target_data <- lapply(csv_files, read.csv.iterations.cost)
+        target_data <- bind_rows(target_data)
+        target_data <- target_data[, c("cost_mean", "experiment_id", "technique", "cost_baseline", "min_run_cost", "best_iteration")]
+        target_data$application <- rep(target_dir, nrow(target_data))
+
+        if (is.null(data)) {
+            data <- target_data
+        } else {
+            data <- bind_rows(data, target_data)
+        }
+    }
+}
+
+plot_data <- data %>%
+             distinct(experiment_id, .keep_all = TRUE) %>%
+             group_by(application) %>%
+             mutate(mean_cost_baseline = mean(cost_baseline)) %>%
+             ungroup()
+
+rs_sample <- data[data$technique == "RS", c("application", "technique", "cost_mean")]
+dlmt_sample <- data[data$technique == "DLMT", c("application", "technique", "cost_mean")]
+
+ggplot(plot_data, aes(min_run_cost, best_iteration, color = technique)) +
+    facet_wrap(application ~ ., ncol = 2) +
+    geom_jitter(data = rs_sample, aes(x = cost_mean, y = 300), pch = 19, alpha = 0.1, height = 85, width = 0) +
+    geom_jitter(data = dlmt_sample, aes(x = cost_mean, y = 100), pch = 19, alpha = 0.1, height = 85, width = 0) +
+    geom_point(size = 2, pch = 19) +
+    stat_ellipse(type = "t", linetype = 13) +
+    geom_vline(aes(xintercept = mean_cost_baseline), linetype = 8, color = "black") +
+    scale_x_continuous(trans = "log10") +
+    #coord_flip() +
+    ggtitle("") +
+    ylab("Iteration where Best was Found") +
+    xlab("Best Cost") +
+    theme_bw(base_size = 14) +
+    theme(legend.position = "bottom",
+          legend.direction = "horizontal",
+          legend.title = element_blank(),
+          text = element_text(family="Noto Serif"),
+          strip.background = element_rect(fill = "white"),
+          plot.margin = unit(c(0.2, 0.2, 0.2, 0.2), "cm"))  +
+    scale_color_brewer(palette = "Set1")
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/iteration_best_comparison.pdf]]
+** Rosenbrock
+#+HEADER: :results graphics output :session *R* :exports none :eval no-export
+#+HEADER: :file "./img/rosenbrock.pdf"
+#+HEADER: :width 12 :height 12
+#+BEGIN_SRC R
+library(ggplot2)
+
+rosenbrock <- function(x, y) {
+    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)))
+}
+
+rosenbrock_data <- expand.grid(seq(-4, 4, 0.05),
+                               seq(-4, 4, 0.05))
+
+names(rosenbrock_data) <- c("x", "y")
+rosenbrock_data$Y <- mapply(rosenbrock,
+                            rosenbrock_data$x,
+                            rosenbrock_data$y)
+
+ggplot(rosenbrock_data, aes(x, y, z = Y)) +
+      scale_x_continuous(limits = c(-4, 4), expand = c(0, 0)) +
+      scale_y_continuous(limits = c(-4, 4), expand = c(0, 0)) +
+      geom_contour(colour = "black", show.legend = FALSE, breaks = 5 * (10 ^ (-1:7))) +
+      geom_point(size = 4, colour = "black", pch = 19, data = rosenbrock_data[rosenbrock_data$Y == min(rosenbrock_data$Y), ]) +
+      geom_label(size = 11, colour = "black", data = rosenbrock_data[rosenbrock_data$Y == min(rosenbrock_data$Y), ], aes(x = x, y = y + 0.35, label = "rosenbrock(1, 1) = 0")) +
+      theme_bw(base_size = 35) +
+      theme(panel.grid = element_blank(), panel.border = element_blank())
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/rosenbrock.pdf]]
+** GPU Laplacian Kernel
+#+HEADER: :file ./img/comparison_histogram.pdf :exports none :width 7 :height 8 :eval no-export
+#+BEGIN_SRC R :results output graphics  :session *R*
+library(ggplot2)
+library(plyr)
+
+df_all_methods <- read.csv("./data/complete_1000.csv", strip.white = T, header = T)
+df_all_methods$method <- factor(df_all_methods$method, levels = c("RS","LHS","GS","GSR","GA","LM", "LMB", "LMBT", "RQ", "DOPT", "DLM", "DLMT"))
+df_all_methods <- subset(df_all_methods, method %in% c("RS", "LHS", "GS", "GSR", "GA", "LM", "DLMT"))
+
+df_mean = ddply(df_all_methods,.(method), summarize,
+                mean = mean(slowdown))
+
+df_median = ddply(df_all_methods,.(method), summarize,
+                  median = median(slowdown))
+
+df_err = ddply(df_all_methods,.(method), summarize,
+              mean = mean(slowdown), err = 2 * sd(slowdown) / sqrt(length(slowdown)))
+
+df_max = ddply(df_all_methods,.(method), summarize, max = max(slowdown))
+
+ggplot(df_all_methods) +
+    facet_grid(method ~ .) +
+    theme_bw(base_size = 14) +
+    coord_cartesian(xlim = c(.9, 4), ylim = c(0, 1000)) +
+    geom_histogram(aes(slowdown), binwidth = .05, fill = "gray48") +
+    geom_curve(data = df_max, aes(x = max + .1, y = 500, xend = max, yend = 5), arrow = arrow(length = unit(0.05, "npc")), curvature = 0.3) +
+    geom_text( aes(x = max+.2, y = 550, label = "max"), data = df_max ) +
+    geom_rect(data = df_err, aes(xmin = mean-err, xmax = mean + err, ymin = 0, ymax = 1000, fill = "red"), alpha = 0.3) +
+    geom_vline( aes(xintercept = median), df_median, color = "darkgreen", linetype = 3 ) +
+    geom_vline( aes(xintercept = mean), df_mean, color = "red", linetype = 2 ) +
+    labs(y = "Frequency", x = "Slowdown compared to the optimal solution") +
+    scale_fill_discrete(name = "",breaks = c("red"), labels = c("Mean error")) +
+    ggtitle("") +
+    theme(legend.position = "none",
+          text = element_text(family="Noto Serif"),
+          strip.background = element_rect(fill = "white"))
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/comparison_histogram.pdf]]
 
 * Introduction
 Optimizing code for objectives such as performance and power consumption is
@@ -476,17 +861,17 @@ rosenbrock <- function(x, y) {
 #+BEGIN_SRC R
 library(xtable)
 
-cap <- "Comparison of 3 optimization methods on Rosenbrock's function, using a buget of 10 points with 30 repetitions"
+cap <- "Comparison of 3 optimization methods on Rosenbrock's function, using a buget of 10 points with 100 repetitions"
 rosenbrock_summaries <- read.csv(file = "./data/rosenbrock_summaries.csv", header = TRUE)
 x <- xtable(rosenbrock_summaries, caption = cap, display = c("s", "s", "g", "g", "g"), digits = 2)
 align(x) <- xalign(x)
-print(x, size = "\\small", include.rownames = FALSE, booktabs = TRUE, math.style.exponents = TRUE)
+print(x, size = "\\small", include.rownames = FALSE, booktabs = TRUE, math.style.exponents = TRUE, caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Oct  2 22:53:10 2018
+% Wed Oct  3 11:29:52 2018
 \begin{table}[ht]
 \centering
 \begingroup\small
@@ -494,45 +879,15 @@ print(x, size = "\\small", include.rownames = FALSE, booktabs = TRUE, math.style
   \toprule
 Method & Mean & Min. & Max. \\
   \midrule
-Random Sampling &  70 & 1.2 & $6 \times 10^{2}$ \\
+Random Sampling & $1.3 \times 10^{2}$ & 1.2 & $1.5 \times 10^{3}$ \\
   D-Opt. w/ Linear Model & $1.4 \times 10^{4}$ & $1.4 \times 10^{4}$ & $1.4 \times 10^{4}$ \\
   D-Opt. w/ Correct Model &   0 &   0 &   0 \\
    \bottomrule
 \end{tabular}
 \endgroup
-\caption{Comparison of 3 optimization methods on Rosenbrock's function, using a buget of 10 points with 30 repetitions}
+\caption{Comparison of 3 optimization methods on Rosenbrock's function, using a buget of 10 points with 100 repetitions}
 \end{table}
 #+END_EXPORT
-
-#+HEADER: :results graphics output :session *R* :exports none :eval no-export
-#+HEADER: :file "./img/rosenbrock.pdf"
-#+HEADER: :width 12 :height 12
-#+BEGIN_SRC R
-library(ggplot2)
-
-rosenbrock_data <- expand.grid(seq(-4, 4, 0.05),
-                               seq(-4, 4, 0.05))
-
-names(rosenbrock_data) <- c("x", "y")
-
-rosenbrock_data$Y <- mapply(rosenbrock,
-                            rosenbrock_data$x,
-                            rosenbrock_data$y)
-
-dim(rosenbrock_data)
-
-ggplot(rosenbrock_data, aes(x, y, z = Y)) +
-      scale_x_continuous(limits = c(-4, 4), expand = c(0, 0)) +
-      scale_y_continuous(limits = c(-4, 4), expand = c(0, 0)) +
-      geom_contour(colour = "black", show.legend = FALSE, breaks = 5 * (10 ^ (-1:7))) +
-      geom_point(size = 4, colour = "black", pch = 19, data = rosenbrock_data[rosenbrock_data$Y == min(rosenbrock_data$Y), ]) +
-      geom_label(size = 11, colour = "black", data = rosenbrock_data[rosenbrock_data$Y == min(rosenbrock_data$Y), ], aes(x = x, y = y + 0.35, label = "rosenbrock(1, 1) = 0")) +
-      theme_bw(base_size = 35) +
-      theme(panel.grid = element_blank(), panel.border = element_blank())
-#+END_SRC
-
-#+RESULTS:
-[[file:./img/rosenbrock.pdf]]
 
 #+BEGIN_CENTER
 #+CAPTION: Contour plot in $log_{10}$ scale and global optimum of Rosenbrock's function
@@ -547,6 +902,18 @@ ggplot(rosenbrock_data, aes(x, y, z = Y)) +
 library(AlgDesign)
 library(xtable)
 
+rosenbrock <- function(x, y) {
+    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)))
+}
+
+rosenbrock_data <- expand.grid(seq(-4, 4, 0.05),
+                               seq(-4, 4, 0.05))
+
+names(rosenbrock_data) <- c("x", "y")
+rosenbrock_data$Y <- mapply(rosenbrock,
+                            rosenbrock_data$x,
+                            rosenbrock_data$y)
+
 output <- optFederov(~ x + y + I(x ^ 4) + I(y ^ 2) + I(y ^ 2) + I(x ^ 2):y, data = rosenbrock_data, nTrials = 10)
 regression <- aov(Y ~ x + y + I(x ^ 4) + I(x ^ 2) + I(y ^ 2) + I(x ^ 2):y, data = output$design)
 s_regression <- as.data.frame(summary.aov(regression)[[1]])
@@ -555,30 +922,30 @@ s_regression <- s_regression[1:6, c("F value", "Pr(>F)")]
 cap <- "Shortened ANOVA table for the fit of the correct model using 10 experiments"
 x <- xtable(s_regression, caption = cap, display = c("s","g", "g"), digits = 2)
 align(x) <- xalign(x)
-print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE)
+print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE, caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Oct  2 23:21:26 2018
+% Wed Oct  3 13:38:25 2018
 \begin{table}[ht]
 \centering
+\caption{Shortened ANOVA table for the fit of the correct model using 10 experiments}
 \begingroup\small
 \begin{tabular}{lrr}
   \toprule
  & F value & Pr($>$F) \\
   \midrule
-x           & $3.1 \times 10^{29}$ & $1.3 \times 10^{-44}$ \\
-  y           & $6.1 \times 10^{31}$ & $4.7 \times 10^{-48}$ \\
-  I(x\verb|^|4)      & $1.3 \times 10^{32}$ & $1.4 \times 10^{-48}$ \\
-  I(x\verb|^|2)      & $1.7 \times 10^{30}$ & $9.7 \times 10^{-46}$ \\
-  I(y\verb|^|2)      & $3.2 \times 10^{29}$ & $1.2 \times 10^{-44}$ \\
-  y:I(x\verb|^|2)    & $2.6 \times 10^{31}$ & $1.6 \times 10^{-47}$ \\
+x           & $9.4 \times 10^{28}$ & $7.6 \times 10^{-44}$ \\
+  y           & $1 \times 10^{32}$ & $2.1 \times 10^{-48}$ \\
+  I(x\verb|^|4)      & $2.3 \times 10^{32}$ & $6.4 \times 10^{-49}$ \\
+  I(x\verb|^|2)      & $2.4 \times 10^{30}$ & $5.8 \times 10^{-46}$ \\
+  I(y\verb|^|2)      & $6.8 \times 10^{29}$ & $3.9 \times 10^{-45}$ \\
+  y:I(x\verb|^|2)    & $4.5 \times 10^{31}$ & $7.3 \times 10^{-48}$ \\
    \bottomrule
 \end{tabular}
 \endgroup
-\caption{Shortened ANOVA table for the fit of the correct model using 10 experiments}
 \end{table}
 #+END_EXPORT
 
@@ -586,6 +953,18 @@ x           & $3.1 \times 10^{29}$ & $1.3 \times 10^{-44}$ \\
 #+BEGIN_SRC R
 library(AlgDesign)
 library(xtable)
+
+rosenbrock <- function(x, y) {
+    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)))
+}
+
+rosenbrock_data <- expand.grid(seq(-4, 4, 0.05),
+                               seq(-4, 4, 0.05))
+
+names(rosenbrock_data) <- c("x", "y")
+rosenbrock_data$Y <- mapply(rosenbrock,
+                            rosenbrock_data$x,
+                            rosenbrock_data$y)
 
 output <- optFederov(~ ., data = rosenbrock_data, nTrials = 10)
 regression <- lm(Y ~ ., data = output$design)
@@ -595,30 +974,28 @@ s_regression <- s_regression[1:2, c("F value", "Pr(>F)")]
 cap <- "Shortened ANOVA table for the fit of the naive linear model using 10 experiments"
 x <- xtable(s_regression, caption = cap, display = c("s","g", "g"), digits = 2)
 align(x) <- xalign(x)
-print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE)
+print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE, caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Oct  2 23:21:57 2018
+% Wed Oct  3 13:38:41 2018
 \begin{table}[ht]
 \centering
+\caption{Shortened ANOVA table for the fit of the naive linear model using 10 experiments}
 \begingroup\small
 \begin{tabular}{lrr}
   \toprule
  & F value & Pr($>$F) \\
   \midrule
-x           & 0.0016 & 0.97 \\
+x           & $7.5 \times 10^{-6}$ &   1 \\
   y           & 1.4 & 0.27 \\
    \bottomrule
 \end{tabular}
 \endgroup
-\caption{Shortened ANOVA table for the fit of the naive linear model using 10 experiments}
 \end{table}
 #+END_EXPORT
-
-
 
 * Applying Design of Experiments to Autotuning
 ** ANOVA
@@ -631,8 +1008,109 @@ x           & 0.0016 & 0.97 \\
 
 * Performance Evaluations
 ** Example on a GPU Laplacian Kernel
+*** Results
+#+HEADER: :results output latex :session *R* :exports results
+#+BEGIN_SRC R
+library(xtable)
+
+df_all_methods <- read.csv("./data/complete_1000.csv", strip.white = T, header = T)
+df_all_methods$method <- factor(df_all_methods$method, levels = c("RS","LHS","GS","GSR","GA","LM", "LMB", "LMBT", "RQ", "DOPT", "DLM", "DLMT"))
+df_all_methods <- subset(df_all_methods, method %in% c("RS", "LHS", "GS", "GSR", "GA", "LM", "DLMT"))
+
+summaries <- data.frame(RS = c(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "RS", ]$slowdown)))[ , 1],
+                              mean(df_all_methods[df_all_methods$method == "RS",]$point_number),
+                              max(df_all_methods[df_all_methods$method == "RS",]$point_number)),
+                        LHS = c(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "LHS", ]$slowdown)))[ , 1],
+                                mean(df_all_methods[df_all_methods$method == "LHS",]$point_number),
+                                max(df_all_methods[df_all_methods$method == "LHS",]$point_number)),
+                        GS = c(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "GS", ]$slowdown)))[ , 1],
+                              mean(df_all_methods[df_all_methods$method == "GS",]$point_number),
+                              max(df_all_methods[df_all_methods$method == "GS",]$point_number)),
+                        GSR = c(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "GSR", ]$slowdown)))[ , 1],
+                                mean(df_all_methods[df_all_methods$method == "GSR",]$point_number),
+                                max(df_all_methods[df_all_methods$method == "GSR",]$point_number)),
+                        GA = c(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "GA", ]$slowdown)))[ , 1],
+                              mean(df_all_methods[df_all_methods$method == "GA",]$point_number),
+                              max(df_all_methods[df_all_methods$method == "GA",]$point_number)),
+                        LM = c(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "LM", ]$slowdown)))[ , 1],
+                              mean(df_all_methods[df_all_methods$method == "LM",]$point_number),
+                              max(df_all_methods[df_all_methods$method == "LM",]$point_number)),
+                        DLMT = c(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "DLMT", ]$slowdown)))[ , 1],
+                                    mean(df_all_methods[df_all_methods$method == "DLMT",]$point_number),
+                                    max(df_all_methods[df_all_methods$method == "DLMT",]$point_number)))
+
+rownames(summaries) <- c(rownames(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "RS", ]$slowdown)))), "Mean Points", "Max Points")
+summaries <- t(summaries)
+summaries <- summaries[ , c("Mean", "Min.", "Max.", "Mean Points", "Max Points")]
+
+cap <- "Comparison of 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions"
+x <- xtable(summaries, caption = cap, digits = 2)
+align(x) <- xalign(x)
+display(x) <- display(x)
+print(x, size = "\\small", booktabs = TRUE, math.style.exponents = TRUE, caption.placement = "top")
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Wed Oct  3 15:31:56 2018
+\begin{table}[ht]
+\centering
+\caption{Comparison of 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
+\begingroup\small
+\begin{tabular}{lrrrrr}
+  \toprule
+ & Mean & Min. & Max. & Mean Points & Max Points \\
+  \midrule
+RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
+  LHS & 1.17 & 1.00 & 1.52 & 98.92 & 125.00 \\
+  GS & 6.46 & 1.00 & 124.76 & 22.17 & 106.00 \\
+  GSR & 1.23 & 1.00 & 3.16 & 120.00 & 120.00 \\
+  GA & 1.12 & 1.00 & 1.65 & 120.00 & 120.00 \\
+  LM & 1.02 & 1.01 & 3.77 & 119.00 & 119.00 \\
+  DLMT & 1.01 & 1.01 & 1.01 & 54.84 & 56.00 \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\end{table}
+#+END_EXPORT
+
+#+BEGIN_CENTER
+#+CAPTION: Results
+#+ATTR_LATEX: :float t :placement [ht] :width .9\columnwidth
+[[./img/comparison_histogram.pdf]]
+#+END_CENTER
 ** Results on the SPAPT Benchmark
+*** The SPAPT Benchmark
+#+ATTR_LATEX: :booktabs t :align llll :font \scriptsize :float t :placement [ht]
+#+CAPTION: Set of applications we used from the SPAPT benchmark
+|---------------+---------------------------------+---------+----------------------|
+| Kernel        | Operation                       | Factors | Size                 |
+|---------------+---------------------------------+---------+----------------------|
+| =atax=        | Matrix transp. & vector mult.   |      18 | $2.6 \times 10^{16}$ |
+| =dgemv3=      | Scalar, vector & matrix mult.   |      49 | $3.8 \times 10^{36}$ |
+| =gemver=      | Vector mult. & matrix add.      |      24 | $2.6 \times 10^{22}$ |
+| =gesummv=     | Scalar, vector, & matrix mult.  |      11 | $5.3 \times 10^{9}$  |
+| =hessian=     | Hessian computation             |       9 | $3.7 \times 10^{7}$  |
+| =mm=          | Matrix multiplication           |      13 | $1.2 \times 10^{12}$ |
+| =mvt=         | Matrix vector product & transp. |      12 | $1.1 \times 10^{9}$  |
+| =tensor=      | Tensor matrix mult.             |      20 | $1.2 \times 10^{19}$ |
+| =trmm=        | Triangular matrix operations    |      25 | $3.7 \times 10^{23}$ |
+| =bicg=        | Subkernel of BiCGStab           |      13 | $3.2 \times 10^{11}$ |
+| =lu=          | LU decomposition                |      14 | $9.6 \times 10^{12}$ |
+| =adi=         | Matrix sub., mult., & div.      |      20 | $6.0 \times 10^{15}$ |
+| =jacobi=      | 1-D Jacobi computation          |      11 | $5.3 \times 10^{9}$  |
+| =seidel=      | Matrix factorization            |      15 | $1.3 \times 10^{14}$ |
+| =stencil3d=   | 3-D stencil computation         |      29 | $9.7 \times 10^{27}$ |
+| =correlation= | Correlation computation         |      21 | $4.5 \times 10^{17}$ |
+|---------------+---------------------------------+---------+----------------------|
 *** Experimental Methodology
+*** Results
+#+BEGIN_CENTER
+#+CAPTION: Results
+#+ATTR_LATEX: :float multicolumn :placement [ht] :width .95\textwidth
+[[./img/iteration_best_comparison.pdf]]
+#+END_CENTER
 * Conclusion
 * Acknowledgment
 :PROPERTIES:
