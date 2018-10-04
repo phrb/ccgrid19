@@ -605,7 +605,7 @@ rosenbrock_data$Y <- mapply(rosenbrock,
 ggplot(rosenbrock_data, aes(x, y, z = Y)) +
       scale_x_continuous(limits = c(-4, 4), expand = c(0, 0)) +
       scale_y_continuous(limits = c(-4, 4), expand = c(0, 0)) +
-      geom_contour(colour = "black", show.legend = FALSE, breaks = 5 * (10 ^ (-1:7))) +
+      #geom_contour(colour = "black", show.legend = FALSE, breaks = 5 * (10 ^ (-1:7))) +
       geom_point(size = 4, colour = "black", pch = 19, data = rosenbrock_data[rosenbrock_data$Y == min(rosenbrock_data$Y), ]) +
       geom_label(size = 11, colour = "black", data = rosenbrock_data[rosenbrock_data$Y == min(rosenbrock_data$Y), ], aes(x = x, y = y + 0.35, label = "rosenbrock(1, 1) = 0")) +
       theme_bw(base_size = 35) +
@@ -637,16 +637,17 @@ df_max = ddply(df_all_methods,.(method), summarize, max = max(slowdown))
 
 ggplot(df_all_methods) +
     facet_grid(method ~ .) +
-    theme_bw(base_size = 14) +
+    theme_bw(base_size = 18) +
     coord_cartesian(xlim = c(.9, 4), ylim = c(0, 1000)) +
     geom_histogram(aes(slowdown), binwidth = .05, fill = "gray48") +
+    scale_y_continuous(breaks = c(0, 1000), labels = c("0", "1000")) +
     geom_curve(data = df_max, aes(x = max + .1, y = 500, xend = max, yend = 5), arrow = arrow(length = unit(0.05, "npc")), curvature = 0.3) +
-    geom_text( aes(x = max+.2, y = 550, label = "max"), data = df_max ) +
+    geom_text(aes(x = max+.2, y = 550, label = "max"), data = df_max) +
     geom_rect(data = df_err, aes(xmin = mean-err, xmax = mean + err, ymin = 0, ymax = 1000, fill = "red"), alpha = 0.3) +
-    geom_vline( aes(xintercept = median), df_median, color = "darkgreen", linetype = 3 ) +
-    geom_vline( aes(xintercept = mean), df_mean, color = "red", linetype = 2 ) +
+    geom_vline(aes(xintercept = median), df_median, color = "darkgreen", linetype = 3) +
+    geom_vline(aes(xintercept = mean), df_mean, color = "red", linetype = 2) +
     labs(y = "Frequency", x = "Slowdown compared to the optimal solution") +
-    scale_fill_discrete(name = "",breaks = c("red"), labels = c("Mean error")) +
+    scale_fill_discrete(name = "", breaks = c("red"), labels = c("Mean error")) +
     ggtitle("") +
     theme(legend.position = "none",
           text = element_text(family="Noto Serif"),
@@ -655,7 +656,142 @@ ggplot(df_all_methods) +
 
 #+RESULTS:
 [[file:./img/comparison_histogram.pdf]]
+** Representing Sampling Strategies
+*** Generate Data
+#+HEADER: :results output :session *R* :eval no-export
+#+BEGIN_SRC R
+library(ggplot2)
+library(DoE.wrapper)
+library(AlgDesign)
+library(dplyr)
+library(RColorBrewer)
 
+sample_size <- 50
+pre_sample_size <- 30 * sample_size
+search_space_size <- 100
+
+objective_data <- expand.grid(seq(0, 100, 1),
+                              seq(0, 100, 1))
+
+names(objective_data) <- c("x1", "x2")
+objective_data$Y <- ((objective_data$x1 - (search_space_size / 2)) ^ 2) + ((objective_data$x2 - (search_space_size / 2)) ^ 2)
+
+rs_data <- data.frame(x1 = sample(0:search_space_size, sample_size, replace = T),
+                      x2 = sample(0:search_space_size, sample_size, replace = T))
+rs_data$name <- rep("Random Sampling", nrow(rs_data))
+data <- rs_data
+
+lhs_data <- lhs.design(nruns = sample_size ,nfactors = 2, digits = 0, type = "maximin",
+                       factor.names = list(x1 = c(0, search_space_size), x2 = c(0, search_space_size)))
+lhs_data$name <- rep("Latin Hyper Square", nrow(lhs_data))
+data <- bind_rows(data, lhs_data)
+
+full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
+names(full_factorial) <- c("x1", "x2")
+output <- optFederov(~., full_factorial, nTrials = sample_size)
+dopt_data <- output$design
+dopt_data$name <- rep("DOpt. Linear Model", nrow(dopt_data))
+data <- bind_rows(data, dopt_data)
+
+full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
+names(full_factorial) <- c("x1", "x2")
+output <- optFederov(~ . + I(x1 ^ 2) + I(x2 ^ 2), full_factorial, nTrials = sample_size)
+#output <- optFederov(~ . + quad(.), full_factorial, nTrials = sample_size)
+doptq_data <- output$design
+doptq_data$name <- rep("DOpt. Quadratic Model", nrow(doptq_data))
+data <- bind_rows(data, doptq_data)
+
+fake_gradient_data_seed <- data.frame(x1 = c(1, 1, 99, 99),
+                                      x2 = c(1, 99, 1, 99),
+                                      run = c(1, 2, 3, 4),
+                                      sign1 = c(1, 1, -1, -1),
+                                      sign2 = c(1, -1, 1, -1))
+
+fake_gradient_data <- NULL
+
+for(run_id in c(1, 2, 3, 4)) {
+  if (is.null(fake_gradient_data)) {
+      fake_gradient_data <- fake_gradient_data_seed[run_id, ]
+  } else {
+      fake_gradient_data <- rbind(fake_gradient_data, fake_gradient_data_seed[run_id, ])
+  }
+
+  for(i in 1:10) {
+      row <- nrow(fake_gradient_data)
+      fake_descent <- data.frame(x1 = ceiling(fake_gradient_data[row, "x1"] + (fake_gradient_data[row, "sign1"] * runif(1, min = 1, max = 5))),
+                                 x2 = ceiling(fake_gradient_data[row, "x2"] + (fake_gradient_data[row, "sign2"] * runif(1, min = 1, max = 5))),
+                                 run = fake_gradient_data[row, "run"],
+                                 sign1 = fake_gradient_data[row, "sign1"],
+                                 sign2 = fake_gradient_data[row, "sign2"])
+      fake_gradient_data <- rbind(fake_gradient_data, fake_descent)
+  }
+}
+
+fake_gradient_data$name <- rep("Gradient Descent", nrow(fake_gradient_data))
+data <- bind_rows(data, fake_gradient_data)
+
+fake_sima_data_seed <- data.frame(x1 = c(30, 30, 70, 70),
+                                  x2 = c(30, 70, 30, 70),
+                                  run = c(1, 2, 3, 4),
+                                  sign1 = c(1, 1, -1, -1),
+                                  sign2 = c(1, -1, 1, -1))
+
+fake_sima_data <- NULL
+
+for(run_id in c(1, 2, 3, 4)) {
+  if (is.null(fake_sima_data)) {
+      fake_sima_data <- fake_sima_data_seed[run_id, ]
+  } else {
+      fake_sima_data <- rbind(fake_sima_data, fake_sima_data_seed[run_id, ])
+  }
+
+  for(i in 1:10) {
+      row <- nrow(fake_sima_data)
+      fake_descent <- data.frame(x1 = ceiling(fake_sima_data[row, "x1"] + (fake_sima_data[row, "sign1"] * runif(1, min = -5, max = 5))),
+                                 x2 = ceiling(fake_sima_data[row, "x2"] + (fake_sima_data[row, "sign2"] * runif(1, min = -5, max = 5))),
+                                 run = fake_sima_data[row, "run"],
+                                 sign1 = fake_sima_data[row, "sign1"],
+                                 sign2 = fake_sima_data[row, "sign2"])
+      fake_sima_data <- rbind(fake_sima_data, fake_descent)
+  }
+}
+
+fake_sima_data$name <- rep("Simulated Annealing", nrow(fake_sima_data))
+data <- bind_rows(data, fake_sima_data)
+#+END_SRC
+
+#+RESULTS:
+
+*** Plot
+#+HEADER: :results graphics output :session *R*
+#+HEADER: :file ./img/sampling_comparison.pdf :exports none :width 13 :height 10 :eval no-export
+#+BEGIN_SRC R
+  library(extrafont)
+  data$facet <- factor(data$name, levels = c("Random Sampling", "Latin Hyper Square", "Gradient Descent", "Simulated Annealing", "DOpt. Linear Model", "DOpt. Quadratic Model"))
+  ggplot(data, aes(x = x1, y = x2)) +
+      scale_x_continuous(limits = c(-1, 101), expand = c(0, 0)) +
+      scale_y_continuous(limits = c(-1, 101), expand = c(0, 0)) +
+      xlab("x") +
+      ylab("y") +
+      facet_wrap(facet ~ ., ncol = 3) +
+      #geom_raster(data = objective_data, aes(fill = Y), show.legend = FALSE) +
+      #geom_contour(data = objective_data, aes(z = Y), colour = "white", linetype = 8) + #, breaks = 1 * (2 ^ (2:20))) +
+      geom_contour(data = objective_data, aes(z = Y), linetype = 1, colour = "black", alpha = 0.5, show.legend = FALSE, breaks = 1 * (2 ^ (4:20))) +
+      geom_line(data = subset(data, name %in% c("Gradient Descent", "Simulated Annealing")), aes(group = run), color = "black", alpha = 0.6) +
+      geom_point(shape = 19, size = 2, colour = "black", alpha = 0.6) +
+      scale_fill_distiller(palette = "Greys", direction = -1, limits = c(min(objective_data$Y) - 1000, max(objective_data$Y))) +
+      theme_bw(base_size = 30) +
+      theme(panel.grid = element_blank(),
+            text = element_text(family="Noto Serif"),
+            strip.background = element_rect(fill = "white"),
+            axis.text.x = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks.y = element_blank())
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/sampling_comparison.pdf]]
 * Introduction
 Optimizing code for objectives such as performance and power consumption is
 fundamental to the success and cost effectiveness of industrial and scientific
@@ -773,6 +909,11 @@ framework\nbsp{}\cite{ansel2014opentuner} provides ensembles of techniques that
 search the same space in parallel, while exploration is managed by an
 implementation of a solver of the multi-armed bandit problem.
 ** Search Space Exploration Strategies
+#+BEGIN_CENTER
+#+CAPTION: Exploration of the search space defined by $x^2 + y^2$, using a fixed budget of 50 points
+#+ATTR_LATEX: :width .95\columnwidth
+[[./img/sampling_comparison.pdf]]
+#+END_CENTER
 * Design of Experiments
 An /experimental design/ determines a selection of experiments whose objective
 is to identify the relationships between /factors/ and /responses/. While
@@ -786,9 +927,80 @@ most important factors and building an analytical model for the response. This
 Section discusses some design construction techniques we explored and presents
 the technique we selected for our approach.
 ** Screening
-*** ANOVA
-**** A Simple Example
+#+HEADER: :results output latex :session *R* :exports results
+#+BEGIN_SRC R
+library(FrF2)
+library(xtable)
 
+options(warn = -1)
+design <- pb(8, factor.names = c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
+options(warn = 0)
+
+design$Y <- (0.1 * as.numeric(design$x1)) + (1.3 * as.numeric(design$x3)) +
+            (3.1 * as.numeric(design$x5)) + (-1.4 * as.numeric(design$x7)) +
+            rnorm(1, sd = 5)
+
+regression <- lm(Y ~ ., data = design)
+
+cap <- "Randomized Plackett-Burman design for 8 factors"
+tab <- xtable(design, caption = cap)
+align(tab) <- "ccccccccc"
+print(tab, booktabs = TRUE, include.rownames = FALSE, caption.placement = "top", size = "\\small")
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Thu Oct  4 21:15:27 2018
+\begin{table}[ht]
+\centering
+\caption{Randomized Plackett-Burman design for 8 factors}
+\begingroup\small
+\begin{tabular}{cccccccc}
+  \toprule
+x1 & x2 & x3 & x4 & x5 & x6 & x7 & Y \\
+  \midrule
+1 & -1 & 1 & -1 & -1 & 1 & 1 & -2.16 \\
+  1 & -1 & -1 & 1 & 1 & 1 & -1 & 1.04 \\
+  -1 & 1 & -1 & -1 & 1 & 1 & 1 & -0.46 \\
+  -1 & 1 & 1 & 1 & -1 & 1 & -1 & -0.86 \\
+  1 & 1 & -1 & 1 & -1 & -1 & 1 & -3.46 \\
+  1 & 1 & 1 & -1 & 1 & -1 & -1 & 2.34 \\
+  -1 & -1 & -1 & -1 & -1 & -1 & -1 & -2.16 \\
+  -1 & -1 & 1 & 1 & 1 & -1 & 1 & 0.84 \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\end{table}
+#+END_EXPORT
+
+#+HEADER: :results graphics output :session *R* :exports none :eval no-export
+#+HEADER: :file ./img/main_effects.pdf
+#+HEADER: :width 8 :height 4
+#+BEGIN_SRC R
+library(extrafont)
+
+par(family = 'serif')
+par(mar = c(0.5,0.5,0.5,0.5))
+p <- MEPlot(regression, main = NULL, pch = 16, lwd = 1, cex.xax = 1, cex.main = 1, cex.axis = 1)
+p
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/main_effects.pdf]]
+
+*** Analysis of Variance (ANOVA)
+#+BEGIN_EXPORT latex
+\begin{figure}
+{\normalsize
+\begin{align*}
+\mathbf{Y} = \bm{\beta}\mathbf{X} + \bm{\epsilon}
+\end{align*}
+}
+\caption{Linear model assumed in main-effect analysis of screening designs}
+\end{figure}
+#+END_EXPORT
+**** Optimizing the Rosenbrock Function                         :noexport:
 #+CAPTION: Defining the Rosenbrock function in =R=
 #+BEGIN_figure
 #+HEADER: :results output :session *R* :exports code
@@ -802,7 +1014,7 @@ rosenbrock <- function(x, y) {
 
 #+END_FIGURE
 
-#+HEADER: :results output latex :session *R* :exports results
+#+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
 library(xtable)
 
@@ -978,7 +1190,7 @@ technique are the direct generation of multi-level designs and a clearly defined
 optimality criterion. Since this construction relies on solving carefully
 formulated MIP problems, it presents strong restrictions on the size and shape
 of the designs that can be generated.
-*** D-Optimal Designs
+** D-Optimal Designs
 /D-Optimal designs/ are the class of designs that best fits our requirements of
 supporting multi-level factors and minimizing the number of experiments. The
 algorithms for constructing D-Optimal designs are relatively fast and have few
@@ -1005,21 +1217,39 @@ best D-Efficiency. Our current approach is based on D-Optimal designs.
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width .8\columnwidth
 #+ATTR_ORG: :width 400
-[[./img/doe_anova_strategy.eps]]
+[[./img/doe_anova_strategy.pdf]]
 #+END_CENTER
 * Performance Evaluation
 ** Example on a GPU Laplacian Kernel
 #+BEGIN_EXPORT latex
-{\small
+\begin{figure}
+{\scriptsize
 \begin{align*}
-Y = & \; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} +
-%& \; vector_length + lws_y + 1 / lws_y + \\
-%& \; load_overlap + temporary_size + \\
-%& \; elements_number + 1 / elements_number + \\
-%& \; threads_number + 1 / threads_number
+\texttt{time\_per\_pixel} \thicksim & \; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} \; + \\
+& \; \texttt{vector\_length} + \texttt{lws\_y} + 1 / \texttt{lws\_y} \; + \\
+& \; \texttt{load\_overlap} + \texttt{temporary\_size} \; + \\
+& \; \texttt{elements\_number} + 1 / \texttt{elements\_number} \; + \\
+& \; \texttt{threads\_number} + 1 /\texttt{threads\_number}
 \end{align*}
 }
+\caption{Initial performance model used by LM and DLMT}
+\end{figure}
 #+END_EXPORT
+
+#+ATTR_LATEX: :booktabs t :align ll :font \footnotesize :float t :placement [ht]
+#+CAPTION: Algorithms compared in the GPU Laplacian Kernel
+|------+-----------------------------|
+|      | Algorithm                   |
+|------+-----------------------------|
+| RS   | Random Sampling             |
+| LHS  | Latin Hyper Square Sampling |
+| GS   | Greedy Search               |
+| GSR  | Greedy Search w/ Restart    |
+| GA   | Genetic Algorithm           |
+| LM   | Iterative Linear Model      |
+| DLMT | D-Optimal Designs           |
+|------+-----------------------------|
+
 *** Results
 #+HEADER: :results output latex :session *R* :exports results
 #+BEGIN_SRC R
@@ -1055,7 +1285,7 @@ rownames(summaries) <- c(rownames(as.data.frame(unclass(summary(df_all_methods[d
 summaries <- t(summaries)
 summaries <- summaries[ , c("Mean", "Min.", "Max.", "Mean Points", "Max Points")]
 
-cap <- "Comparison of 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions"
+cap <- "Slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions"
 x <- xtable(summaries, caption = cap, digits = 2)
 align(x) <- xalign(x)
 display(x) <- display(x)
@@ -1065,10 +1295,10 @@ print(x, size = "\\small", booktabs = TRUE, math.style.exponents = TRUE, caption
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Wed Oct  3 15:31:56 2018
+% Thu Oct  4 17:04:18 2018
 \begin{table}[ht]
 \centering
-\caption{Comparison of 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
+\caption{Comparison of slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
 \begingroup\small
 \begin{tabular}{lrrrrr}
   \toprule
@@ -1088,7 +1318,7 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 #+END_EXPORT
 
 #+BEGIN_CENTER
-#+CAPTION: Results
+#+CAPTION: Histograms of 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions
 #+ATTR_LATEX: :float t :placement [ht] :width .9\columnwidth
 [[./img/comparison_histogram.pdf]]
 #+END_CENTER

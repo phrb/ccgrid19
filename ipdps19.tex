@@ -1,4 +1,4 @@
-% Created 2018-10-03 Wed 17:51
+% Created 2018-10-04 Thu 17:57
 % Intended LaTeX compiler: pdflatex
 \documentclass[conference]{IEEEtran}
 
@@ -64,7 +64,7 @@ Abstract
 \end{abstract}
 
 \section{Introduction}
-\label{sec:org0e7532a}
+\label{sec:orgaf5aad2}
 Optimizing code for objectives such as performance and power consumption is
 fundamental to the success and cost effectiveness of industrial and scientific
 endeavors in High Performance Computing. A considerable amount of highly
@@ -140,20 +140,20 @@ Despite using generic performance models for every SPAPT application, our
 approach was able to significantly decrease the budget used to find performance
 improvements.
 
-The rest of this paper is organized as follows. Section \ref{sec:orged6d1a6} presents
+The rest of this paper is organized as follows. Section \ref{sec:orgfdcbc28} presents
 related work on source-to-source transformation, which is the main optimization
 target in SPAPT problems, on autotuning systems and on search space exploration
-strategies. Section \ref{sec:org897e2d5} presents a
+strategies. Section \ref{sec:org2cfbaf8} presents a
 detailed description of the implementation of our approach and its background.
 It discusses the Design of Experiments concepts we incorporate, and the ANOVA
-and linear regression algorithms we use in analysis steps. Section \ref{sec:org62eab34} presents our results with the GPU Laplacian Kernel and the SPAPT
-benchmark. Section \ref{sec:orgfe28a60} discusses our conclusions and future work.
+and linear regression algorithms we use in analysis steps. Section \ref{sec:org94a595e} presents our results with the GPU Laplacian Kernel and the SPAPT
+benchmark. Section \ref{sec:org8cea8dc} discusses our conclusions and future work.
 \section{Background}
-\label{sec:orged6d1a6}
+\label{sec:orgfdcbc28}
 \subsection{Source-to-source Transformation}
-\label{sec:orgffef665}
+\label{sec:orgf07ad84}
 \subsection{Autotuning}
-\label{sec:orga87df1b}
+\label{sec:org7242ecf}
 John Rice's Algorithm Selection framework~\cite{rice1976algorithm} is the
 precursor of autotuners in various problem domains. In 1997, the PHiPAC
 system~\cite{bilmes1997optimizing} used code generators and search scripts
@@ -183,9 +183,16 @@ framework~\cite{ansel2014opentuner} provides ensembles of techniques that
 search the same space in parallel, while exploration is managed by an
 implementation of a solver of the multi-armed bandit problem.
 \subsection{Search Space Exploration Strategies}
-\label{sec:org334d8b7}
+\label{sec:org75b2da1}
+\begin{center}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.95\columnwidth]{./img/sampling_comparison.pdf}
+\caption{Exploration of the search space defined by \(x^2 + y^2\), using a fixed budget of 50 points}
+\end{figure}
+\end{center}
 \section{Design of Experiments}
-\label{sec:org1b0fb7f}
+\label{sec:org0c81bd2}
 An \emph{experimental design} determines a selection of experiments whose objective
 is to identify the relationships between \emph{factors} and \emph{responses}. While
 factors and responses can refer to different concrete entities in other domains,
@@ -198,90 +205,46 @@ most important factors and building an analytical model for the response. This
 Section discusses some design construction techniques we explored and presents
 the technique we selected for our approach.
 \subsection{Screening}
-\label{sec:org7bbb4b5}
-\subsubsection{ANOVA}
-\label{sec:org0923d11}
-\begin{enumerate}
-\item A Simple Example
-\label{sec:org0f964d5}
+\label{sec:org20804b7}
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Thu Oct  4 17:57:02 2018
+\begin{table}[ht]
+\centering
+\caption{Randomized Plackett-Burman design for 12 factors}
+\begingroup\small
+\begin{tabular}{cccccccccccc}
+  \toprule
+A & B & C & D & E & F & G & H & J & K & L & Y \\
+  \midrule
+1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 7.40 \\
+  1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 7.30 \\
+  1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 11.80 \\
+  -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & 5.20 \\
+  1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 9.10 \\
+  1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 9.10 \\
+  -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & 3.80 \\
+  -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & 5.10 \\
+  -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & 8.30 \\
+  1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 8.70 \\
+  -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & 8.20 \\
+  -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & 9.60 \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\end{table}
 
+\subsubsection{Analysis of Variance (ANOVA)}
+\label{sec:org6e0fece}
 \begin{figure}
-\lstset{language=r,label= ,caption= ,captionpos=b,numbers=none}
-\begin{lstlisting}
-rosenbrock <- function(x, y) {
-    return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)))
+{\normalsize
+\begin{align*}
+\mathbf{Y} = \bm{\beta}\mathbf{X} + \bm{\epsilon}
+\end{align*}
 }
-\end{lstlisting}
-\caption{Defining the Rosenbrock function in \texttt{R}}
+\caption{Linear model assumed in main-effect analysis of screening designs}
 \end{figure}
-
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Wed Oct  3 17:51:19 2018
-\begin{table}[ht]
-\centering
-\caption{Comparison of 3 optimization methods on Rosenbrock's function, using a buget of 10 points with 100 repetitions}
-\begingroup\small
-\begin{tabular}{lrrr}
-  \toprule
-Method & Mean & Min. & Max. \\
-  \midrule
-Random Sampling & $1.3 \times 10^{2}$ & 1.2 & $1.5 \times 10^{3}$ \\
-  D-Opt. w/ Linear Model & $1.4 \times 10^{4}$ & $1.4 \times 10^{4}$ & $1.4 \times 10^{4}$ \\
-  D-Opt. w/ Correct Model &   0 &   0 &   0 \\
-   \bottomrule
-\end{tabular}
-\endgroup
-\end{table}
-
-\begin{center}
-\begin{figure}
-\begin{center}
-\includegraphics[width=.8\columnwidth]{./img/rosenbrock.pdf}
-\end{center}
-\caption{Contour plot in \(log_{10}\) scale and global optimum of Rosenbrock's function}
-\end{figure}
-\end{center}
-
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Wed Oct  3 16:57:45 2018
-\begin{table}[ht]
-\centering
-\caption{Shortened ANOVA table for the fit of the correct model using 10 experiments}
-\begingroup\small
-\begin{tabular}{lrr}
-  \toprule
- & F value & Pr($>$F) \\
-  \midrule
-x           & $2 \times 10^{4}$ & $7.5 \times 10^{-7}$ \\
-  y           & $9.2 \times 10^{6}$ & $7.9 \times 10^{-11}$ \\
-  I(x\verb|^|4)      & $2 \times 10^{7}$ & $2.4 \times 10^{-11}$ \\
-  I(x\verb|^|2)      & $3.3 \times 10^{5}$ & $1.2 \times 10^{-8}$ \\
-  I(y\verb|^|2)      & $3 \times 10^{4}$ & $4.2 \times 10^{-7}$ \\
-  y:I(x\verb|^|2)    & $3.9 \times 10^{6}$ & $2.8 \times 10^{-10}$ \\
-   \bottomrule
-\end{tabular}
-\endgroup
-\end{table}
-
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Wed Oct  3 13:38:41 2018
-\begin{table}[ht]
-\centering
-\caption{Shortened ANOVA table for the fit of the naive linear model using 10 experiments}
-\begingroup\small
-\begin{tabular}{lrr}
-  \toprule
- & F value & Pr($>$F) \\
-  \midrule
-x           & $7.5 \times 10^{-6}$ &   1 \\
-  y           & 1.4 & 0.27 \\
-   \bottomrule
-\end{tabular}
-\endgroup
-\end{table}
-\end{enumerate}
 \subsection{Multi-Level Design Construction Techniques}
-\label{sec:org869e5a1}
+\label{sec:org5b55232}
 The application of Design of Experiments to autotuning problems requires design
 construction techniques that support factors of different types and number of
 possible values. Autotuning problems typically combine factors such as binary
@@ -318,8 +281,8 @@ technique are the direct generation of multi-level designs and a clearly defined
 optimality criterion. Since this construction relies on solving carefully
 formulated MIP problems, it presents strong restrictions on the size and shape
 of the designs that can be generated.
-\subsubsection{D-Optimal Designs}
-\label{sec:org3cbb08d}
+\subsection{D-Optimal Designs}
+\label{sec:orgfc8693c}
 \emph{D-Optimal designs} are the class of designs that best fits our requirements of
 supporting multi-level factors and minimizing the number of experiments. The
 algorithms for constructing D-Optimal designs are relatively fast and have few
@@ -342,34 +305,57 @@ Considering that we are going to analyze the results of an experiments plan, the
 the \emph{eigenvalues} of the plan's \emph{covariance matrix}. A D-Optimal design has the
 best D-Efficiency. Our current approach is based on D-Optimal designs.
 \section{Applying Design of Experiments to Autotuning}
-\label{sec:org897e2d5}
+\label{sec:org2cfbaf8}
 \subsection{The DLMT Strategy}
-\label{sec:orge664f06}
+\label{sec:orgc3d017e}
 \begin{center}
 \begin{center}
-\includegraphics[width=.8\columnwidth]{./img/doe_anova_strategy.eps}
+\includegraphics[width=.8\columnwidth]{./img/doe_anova_strategy.pdf}
 \end{center}
 \end{center}
 \section{Performance Evaluation}
-\label{sec:org62eab34}
+\label{sec:org94a595e}
 \subsection{Example on a GPU Laplacian Kernel}
-\label{sec:org6ca5215}
-{\small
+\label{sec:org3eed071}
+\begin{figure}
+{\scriptsize
 \begin{align*}
-Y = & \; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} +
-%& \; vector_length + lws_y + 1 / lws_y + \\
-%& \; load_overlap + temporary_size + \\
-%& \; elements_number + 1 / elements_number + \\
-%& \; threads_number + 1 / threads_number
+\texttt{time\_per\_pixel} \thicksim & \; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} \; + \\
+& \; \texttt{vector\_length} + \texttt{lws\_y} + 1 / \texttt{lws\_y} \; + \\
+& \; \texttt{load\_overlap} + \texttt{temporary\_size} \; + \\
+& \; \texttt{elements\_number} + 1 / \texttt{elements\_number} \; + \\
+& \; \texttt{threads\_number} + 1 /\texttt{threads\_number}
 \end{align*}
 }
+\caption{Initial performance model used by LM and DLMT}
+\end{figure}
+
+\begin{table}[ht]
+\caption{Algorithms compared in the GPU Laplacian Kernel}
+\centering
+\footnotesize
+\begin{tabular}{ll}
+\toprule
+ & Algorithm\\
+\midrule
+RS & Random Sampling\\
+LHS & Latin Hyper Square Sampling\\
+GS & Greedy Search\\
+GSR & Greedy Search w/ Restart\\
+GA & Genetic Algorithm\\
+LM & Iterative Linear Model\\
+DLMT & D-Optimal Designs\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsubsection{Results}
-\label{sec:org91864a7}
+\label{sec:orgdf0334b}
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Wed Oct  3 17:51:19 2018
+% Thu Oct  4 17:57:03 2018
 \begin{table}[ht]
 \centering
-\caption{Comparison of 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
+\caption{Slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
 \begingroup\small
 \begin{tabular}{lrrrrr}
   \toprule
@@ -391,13 +377,13 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 \begin{figure}[ht]
 \centering
 \includegraphics[width=.9\columnwidth]{./img/comparison_histogram.pdf}
-\caption{Results}
+\caption{Histograms of 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
 \end{figure}
 \end{center}
 \subsection{Results on the SPAPT Benchmark}
-\label{sec:org3f92a20}
+\label{sec:orgc020dc4}
 \subsubsection{The SPAPT Benchmark}
-\label{sec:org1d27407}
+\label{sec:orgc3c8cf3}
 \begin{table}[ht]
 \caption{Set of applications we used from the SPAPT benchmark}
 \centering
@@ -426,9 +412,9 @@ Kernel & Operation & Factors & Size\\
 \end{tabular}
 \end{table}
 \subsubsection{Experimental Methodology}
-\label{sec:orgbe51a17}
+\label{sec:orgaab9e17}
 \subsubsection{Results}
-\label{sec:orgd5a162e}
+\label{sec:org402fb25}
 \begin{center}
 \begin{figure*}[p]
 \centering
@@ -438,9 +424,9 @@ Kernel & Operation & Factors & Size\\
 \end{center}
 \clearpage
 \section{Conclusion}
-\label{sec:orgfe28a60}
+\label{sec:org8cea8dc}
 \section*{Acknowledgment}
-\label{sec:org15d32eb}
+\label{sec:orgcbda47f}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 \end{document}
