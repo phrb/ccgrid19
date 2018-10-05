@@ -657,50 +657,9 @@ ggplot(df_all_methods) +
 #+RESULTS:
 [[file:./img/comparison_histogram.pdf]]
 ** Representing Sampling Strategies
-*** Generate Data
-#+HEADER: :results output :session *R* :eval no-export
+*** Generate Fake Data with Algorithms
+#+HEADER: :results output :session *R* :exports none :eval no-export
 #+BEGIN_SRC R
-library(ggplot2)
-library(DoE.wrapper)
-library(AlgDesign)
-library(dplyr)
-library(RColorBrewer)
-
-sample_size <- 50
-pre_sample_size <- 30 * sample_size
-search_space_size <- 100
-
-objective_data <- expand.grid(seq(0, 100, 1),
-                              seq(0, 100, 1))
-
-names(objective_data) <- c("x1", "x2")
-objective_data$Y <- ((objective_data$x1 - (search_space_size / 2)) ^ 2) + ((objective_data$x2 - (search_space_size / 2)) ^ 2)
-
-rs_data <- data.frame(x1 = sample(0:search_space_size, sample_size, replace = T),
-                      x2 = sample(0:search_space_size, sample_size, replace = T))
-rs_data$name <- rep("Random Sampling", nrow(rs_data))
-data <- rs_data
-
-lhs_data <- lhs.design(nruns = sample_size ,nfactors = 2, digits = 0, type = "maximin",
-                       factor.names = list(x1 = c(0, search_space_size), x2 = c(0, search_space_size)))
-lhs_data$name <- rep("Latin Hyper Square", nrow(lhs_data))
-data <- bind_rows(data, lhs_data)
-
-full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
-names(full_factorial) <- c("x1", "x2")
-output <- optFederov(~., full_factorial, nTrials = sample_size)
-dopt_data <- output$design
-dopt_data$name <- rep("DOpt. Linear Model", nrow(dopt_data))
-data <- bind_rows(data, dopt_data)
-
-full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
-names(full_factorial) <- c("x1", "x2")
-output <- optFederov(~ . + I(x1 ^ 2) + I(x2 ^ 2), full_factorial, nTrials = sample_size)
-#output <- optFederov(~ . + quad(.), full_factorial, nTrials = sample_size)
-doptq_data <- output$design
-doptq_data$name <- rep("DOpt. Quadratic Model", nrow(doptq_data))
-data <- bind_rows(data, doptq_data)
-
 fake_gradient_data_seed <- data.frame(x1 = c(1, 1, 99, 99),
                                       x2 = c(1, 99, 1, 99),
                                       run = c(1, 2, 3, 4),
@@ -759,12 +718,88 @@ for(run_id in c(1, 2, 3, 4)) {
 fake_sima_data$name <- rep("Simulated Annealing", nrow(fake_sima_data))
 data <- bind_rows(data, fake_sima_data)
 #+END_SRC
+*** Generate Data
+#+HEADER: :results output :session *R* :eval no-export
+#+BEGIN_SRC R
+library(ggplot2)
+library(DoE.wrapper)
+library(AlgDesign)
+library(dplyr)
+library(RColorBrewer)
+
+sample_size <- 50
+pre_sample_size <- 30 * sample_size
+search_space_size <- 100
+
+objective_data <- expand.grid(seq(0, 100, 1),
+                              seq(0, 100, 1))
+names(objective_data) <- c("x1", "x2")
+
+sima_samples <- 20
+
+plot(x = c(0, 100, 50, 100, 0), y = c(0, 100, 50, 0, 100))
+fake_sima_data <- as.data.frame(locator(n = sima_samples, type = "l"))
+names(fake_sima_data) <- c("x1", "x2")
+dev.off()
+
+fake_sima_data$run <- c(rep(1, nrow(fake_sima_data)))
+fake_sima_data$name <- rep("Simulated Annealing", nrow(fake_sima_data))
+data <- fake_sima_data
+
+descent_samples <- 20
+
+plot(x = c(0, 100, 50, 100, 0), y = c(0, 100, 50, 0, 100))
+fake_descent_data <- as.data.frame(locator(n = descent_samples, type = "l"))
+names(fake_descent_data) <- c("x1", "x2")
+dev.off()
+
+paths <- 5
+fake_runs <- rep(1, descent_samples / paths)
+for(i in 2:paths){
+  fake_runs <- c(fake_runs, rep(i, descent_samples / paths))
+}
+
+fake_descent_data$run <- fake_runs
+fake_descent_data$name <- rep("Gradient Descent", nrow(fake_descent_data))
+data <- bind_rows(data, fake_descent_data)
+
+objective_data$Y <- ((objective_data$x1 - (search_space_size / 3)) ^ 2) + ((objective_data$x2 - (search_space_size / 1.5)) ^ 2)
+
+rs_data <- data.frame(x1 = sample(0:search_space_size, sample_size, replace = T),
+                      x2 = sample(0:search_space_size, sample_size, replace = T))
+rs_data$name <- rep("Random Sampling", nrow(rs_data))
+data <- bind_rows(data, rs_data)
+
+lhs_data <- lhs.design(nruns = sample_size ,nfactors = 2, digits = 0, type = "maximin",
+                       factor.names = list(x1 = c(0, search_space_size), x2 = c(0, search_space_size)))
+lhs_data$name <- rep("Latin Hyper Square", nrow(lhs_data))
+data <- bind_rows(data, lhs_data)
+
+full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
+names(full_factorial) <- c("x1", "x2")
+output <- optFederov(~., full_factorial, nTrials = sample_size)
+dopt_data <- output$design
+dopt_data$name <- rep("DOpt. Linear Model", nrow(dopt_data))
+data <- bind_rows(data, dopt_data)
+
+full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
+names(full_factorial) <- c("x1", "x2")
+output <- optFederov(~ . + I(x1 ^ 2) + I(x2 ^ 2), full_factorial, nTrials = sample_size)
+#output <- optFederov(~ . + quad(.), full_factorial, nTrials = sample_size)
+doptq_data <- output$design
+doptq_data$name <- rep("DOpt. Quadratic Model", nrow(doptq_data))
+data <- bind_rows(data, doptq_data)
+#+END_SRC
 
 #+RESULTS:
+: null device
+:           1
+: null device
+:           1
 
 *** Plot
 #+HEADER: :results graphics output :session *R*
-#+HEADER: :file ./img/sampling_comparison.pdf :exports none :width 13 :height 10 :eval no-export
+#+HEADER: :file ./img/test_sampling_comparison.pdf :exports none :width 13 :height 10 :eval no-export
 #+BEGIN_SRC R
   library(extrafont)
   data$facet <- factor(data$name, levels = c("Random Sampling", "Latin Hyper Square", "Gradient Descent", "Simulated Annealing", "DOpt. Linear Model", "DOpt. Quadratic Model"))
@@ -777,7 +812,7 @@ data <- bind_rows(data, fake_sima_data)
       #geom_raster(data = objective_data, aes(fill = Y), show.legend = FALSE) +
       #geom_contour(data = objective_data, aes(z = Y), colour = "white", linetype = 8) + #, breaks = 1 * (2 ^ (2:20))) +
       geom_contour(data = objective_data, aes(z = Y), linetype = 1, colour = "black", alpha = 0.5, show.legend = FALSE, breaks = 1 * (2 ^ (4:20))) +
-      geom_line(data = subset(data, name %in% c("Gradient Descent", "Simulated Annealing")), aes(group = run), color = "black", alpha = 0.6) +
+      geom_path(data = subset(data, name %in% c("Gradient Descent", "Simulated Annealing")), aes(group = run), color = "black", alpha = 0.6) +
       geom_point(shape = 19, size = 2, colour = "black", alpha = 0.6) +
       scale_fill_distiller(palette = "Greys", direction = -1, limits = c(min(objective_data$Y) - 1000, max(objective_data$Y))) +
       theme_bw(base_size = 30) +
@@ -791,7 +826,87 @@ data <- bind_rows(data, fake_sima_data)
 #+END_SRC
 
 #+RESULTS:
-[[file:./img/sampling_comparison.pdf]]
+[[file:./img/test_sampling_comparison.pdf]]
+** Sampling & D-Optimal Designs
+*** Generate Data
+#+HEADER: :results output :session *R* :exports none :eval no-export
+#+BEGIN_SRC R
+library(ggplot2)
+library(DoE.wrapper)
+library(AlgDesign)
+library(dplyr)
+
+sample_size <- 10
+pre_sample_size <- 2 * sample_size
+search_space_size <- 100
+
+objective_data <- expand.grid(seq(0, 100, 1),
+                              seq(0, 100, 1))
+names(objective_data) <- c("x1", "x2")
+objective_data$Y <- ((objective_data$x1 - (search_space_size / 2)) ^ 2) + ((objective_data$x2 - (search_space_size / 2)) ^ 2)
+
+full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
+names(full_factorial) <- c("x1", "x2")
+output <- optFederov(~., full_factorial, nTrials = sample_size)
+dopt_data <- output$design
+dopt_data$name <- rep("DOpt. Linear Model", nrow(dopt_data))
+data <- dopt_data
+
+full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
+names(full_factorial) <- c("x1", "x2")
+output <- optFederov(~ . + I(x1 ^ 2) + I(x2 ^ 2), full_factorial, nTrials = sample_size)
+#output <- optFederov(~ . + quad(.), full_factorial, nTrials = sample_size)
+doptq_data <- output$design
+doptq_data$name <- rep("DOpt. Quadratic Model", nrow(doptq_data))
+data <- bind_rows(data, doptq_data)
+
+drs_data <- data.frame(x1 = sample(0:search_space_size, pre_sample_size, replace = T),
+                       x2 = sample(0:search_space_size, pre_sample_size, replace = T))
+output <- optFederov(~., drs_data, nTrials = sample_size)
+dopt_data <- output$design
+dopt_data$name <- rep("Small RS + DOpt. Linear", nrow(dopt_data))
+data <- bind_rows(data, dopt_data)
+
+drs_data <- data.frame(x1 = sample(0:search_space_size, pre_sample_size, replace = T),
+                       x2 = sample(0:search_space_size, pre_sample_size, replace = T))
+output <- optFederov(~ . + I(x1 ^ 2) + I(x2 ^ 2), drs_data, nTrials = sample_size)
+doptq_data <- output$design
+doptq_data$name <- rep("Small RS + DOpt. Quadratic", nrow(doptq_data))
+data <- bind_rows(data, doptq_data)
+#+END_SRC
+
+#+RESULTS:
+
+*** Plot
+#+HEADER: :results graphics output :session *R*
+#+HEADER: :file ./img/dopt_comparison.pdf :exports none :width 11 :height 12 :eval no-export
+#+BEGIN_SRC R
+  library(extrafont)
+  data$facet <- factor(data$name, levels = c("DOpt. Linear Model", "DOpt. Quadratic Model", "Small RS + DOpt. Linear", "Small RS + DOpt. Quadratic"))
+  ggplot(data, aes(x = x1, y = x2)) +
+      scale_x_continuous(limits = c(-1, 101), expand = c(0, 0)) +
+      scale_y_continuous(limits = c(-1, 101), expand = c(0, 0)) +
+      xlab("x") +
+      ylab("y") +
+      facet_wrap(facet ~ ., ncol = 2) +
+      #geom_raster(data = objective_data, aes(fill = Y), show.legend = FALSE) +
+      #geom_contour(data = objective_data, aes(z = Y), colour = "white", linetype = 8) + #, breaks = 1 * (2 ^ (2:20))) +
+      geom_contour(data = objective_data, aes(z = Y), linetype = 1, colour = "black", alpha = 0.5, show.legend = FALSE, breaks = 1 * (2 ^ (4:20))) +
+      geom_point(shape = 19, size = 2, colour = "black", alpha = 0.6) +
+      scale_fill_distiller(palette = "Greys", direction = -1, limits = c(min(objective_data$Y) - 1000, max(objective_data$Y))) +
+      theme_bw(base_size = 33) +
+      theme(panel.grid = element_blank(),
+            text = element_text(family="Noto Serif"),
+            strip.background = element_rect(fill = "white"),
+            axis.text.x = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks.y = element_blank())
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/dopt_comparison.pdf]]
+
 * Introduction
 Optimizing code for objectives such as performance and power consumption is
 fundamental to the success and cost effectiveness of industrial and scientific
@@ -921,89 +1036,209 @@ factors and responses can refer to different concrete entities in other domains,
 in computer experiments factors can be configuration parameters for algorithms
 and compilers, for example, and responses can be the execution time or memory
 consumption of a program. Each possible value of a factor is called a /level/.
+The /effect/ of a factor on the measured response, without its /interactions/
+with other factors, is the /main effect/ of that factor. Experimental designs
+are constructed with objectives such as identifying the main effects and
+building an analytical model for the response.
 
-Experimental designs are constructed with objectives such as identifying the
-most important factors and building an analytical model for the response. This
-Section discusses some design construction techniques we explored and presents
-the technique we selected for our approach.
-** Screening
-#+HEADER: :results output latex :session *R* :exports results
+In this Section we use an example of /Screening/, an efficient but limited
+technique for identifying main effects, to present the assumptions of a
+traditional Design of Experiments methodology. We also discuss some techniques
+for the construction of efficient designs for factors with different numbers and
+types of levels, and present /D-Optimal/ designs, the technique we used in the
+approach presented in this paper.
+** Screening 2-Level Factors with Linear Models and ANOVA
+Screening designs are used to identify the main effects of 2-level factors in
+the initial stages of studying a problem. Interactions are not considered at
+this stage, and screening designs are usually small. Identifying main effects
+early enables focusing on a smaller set of factors on subsequent more detailed
+experiments. A specially efficient design construction technique for screening
+designs was presented by Plackett and Burman\nbsp{}\cite{plackett1946design}
+in 1946. Despite having strong restrictions on the number of factors,
+Plackett-Burman designs enable the identification of main effects of $n$ factors
+with $n + 1$ experiments.
+
+#+BEGIN_EXPORT latex
+\begin{figure}
+{\normalsize
+\begin{align*}
+\mathbf{Y} = \bm{\beta}\mathbf{X} + \epsilon
+\end{align*}
+}
+\caption{Linear model assumed in main-effect analysis of screening designs}
+\label{fig:linear_assumption}
+\end{figure}
+#+END_EXPORT
+
+Assuming a linear relationship between factors and the response is fundamental
+for the analysis of a Plackett-Burman design. For the following example,
+consider the linear relationship presented in Figure
+\ref{fig:linear_assumption}, where $\epsilon$ is the error term, $\mathbf{Y}$ is
+the observed response, $\mathbf{X} = \left(1, x_1,\dots,x_n\right)$ is the set
+of $n$ 2-level factors, and $\bm{\beta} = \left(\beta_0,\dots,\beta_n\right)$ is
+the set with the /intercept/ $\beta_0$ and the corresponding /model
+coefficients/.
+
+#+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
 library(FrF2)
 library(xtable)
 
+set.seed(3138989)
+
 options(warn = -1)
-design <- pb(8, factor.names = c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
+design <- pb(12, factor.names = c("x_1", "x_2", "x_3",
+                                  "x_4", "x_5", "x_6",
+                                  "x_7", "x_8", "d_1",
+                                  "d_2", "d_3"))
 options(warn = 0)
 
-design$Y <- (0.1 * as.numeric(design$x1)) + (1.3 * as.numeric(design$x3)) +
-            (3.1 * as.numeric(design$x5)) + (-1.4 * as.numeric(design$x7)) +
-            rnorm(1, sd = 5)
+design$Y <- (-1.5 * as.numeric(design$x_1)) + (1.3 * as.numeric(design$x_3)) +
+            (0.6 * as.numeric(design$x_1) * as.numeric(design$x_3)) +
+            (0.35 * as.numeric(design$x_8) * as.numeric(design$x_8)) +
+            (3.1 * as.numeric(design$x_5)) + (-1.4 * as.numeric(design$x_7)) +
+            rnorm(1, sd = 2)
 
-regression <- lm(Y ~ ., data = design)
-
-cap <- "Randomized Plackett-Burman design for 8 factors"
-tab <- xtable(design, caption = cap)
-align(tab) <- "ccccccccc"
-print(tab, booktabs = TRUE, include.rownames = FALSE, caption.placement = "top", size = "\\small")
+names(design) <- c("$x_1$", "$x_2$", "$x_3$",
+                   "$x_4$", "$x_5$", "$x_6$",
+                   "$x_7$", "$x_8$", "$d_1$",
+                   "$d_2$", "$d_3$", "$Y$")
+cap <- "Randomized Plackett-Burman design for factors $x_1, \\dots, x_8$, using 12 experiments and ``dummy'' factors $d_1, \\dots, d_3$, and computed response $\\mathbf{Y}$"
+tab <- xtable(design, caption = cap, label = "tab:plackett")
+align(tab) <- "ccccccccccccc"
+print(tab, booktabs = TRUE,
+      include.rownames = FALSE,
+      caption.placement = "top",
+      size = "\\scriptsize",
+      sanitize.text.function=function(x){x})
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Thu Oct  4 21:15:27 2018
+% Sat Oct  6 00:14:54 2018
 \begin{table}[ht]
 \centering
-\caption{Randomized Plackett-Burman design for 8 factors}
-\begingroup\small
-\begin{tabular}{cccccccc}
+\caption{Randomized Plackett-Burman design for factors $x_1, \dots, x_8$, using 12 experiments and ``dummy'' factors $d_1, \dots, d_3$, and computed response $\mathbf{Y}$}
+\label{tab:plackett}
+\begingroup\scriptsize
+\begin{tabular}{cccccccccccc}
   \toprule
-x1 & x2 & x3 & x4 & x5 & x6 & x7 & Y \\
+$x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $x_8$ & $d_1$ & $d_2$ & $d_3$ & $Y$ \\
   \midrule
-1 & -1 & 1 & -1 & -1 & 1 & 1 & -2.16 \\
-  1 & -1 & -1 & 1 & 1 & 1 & -1 & 1.04 \\
-  -1 & 1 & -1 & -1 & 1 & 1 & 1 & -0.46 \\
-  -1 & 1 & 1 & 1 & -1 & 1 & -1 & -0.86 \\
-  1 & 1 & -1 & 1 & -1 & -1 & 1 & -3.46 \\
-  1 & 1 & 1 & -1 & 1 & -1 & -1 & 2.34 \\
-  -1 & -1 & -1 & -1 & -1 & -1 & -1 & -2.16 \\
-  -1 & -1 & 1 & 1 & 1 & -1 & 1 & 0.84 \\
+-1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & 1.90 \\
+  1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 4.10 \\
+  1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 6.60 \\
+  -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & 5.50 \\
+  1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 3.75 \\
+  -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & 0.50 \\
+  -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & 7.95 \\
+  1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 3.15 \\
+  1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 2.10 \\
+  -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & 4.85 \\
+  -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & 4.65 \\
+  1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 2.05 \\
    \bottomrule
 \end{tabular}
 \endgroup
 \end{table}
 #+END_EXPORT
 
+Table \ref{tab:plackett} presents a Plackett-Burman design for 8 2-level factors
+$x_1,\dots,x_8$, and the observed response $\mathbf{Y}$. We also add 3 ``dummy''
+factors $d_1,\dots,d_3$ to complete the 12 columns needed to construct a
+Plackett-Burman design for 8 factors. If we trust our initial assumption and fit
+different linear models to this data, we can identify factor main effects by
+comparing the relative fit each model. The results of this process, called
+Analysis of Variance (ANOVA), is shown in Figure [[fig:main_effects]].
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width .95\columnwidth
+#+CAPTION: Main effects plot obtained from ANOVA using the design and observed response $\mathbf{Y}$
+#+NAME: fig:main_effects
+[[./img/main_effects.pdf]]
+#+END_CENTER
+
+#+BEGIN_EXPORT latex
+\begin{figure}
+{\small
+\begin{align*}
+\mathbf{Y} = \bordermatrix{~ & \bm{\beta} \cr & -1.5 \cr & 1.3 \cr & 3.1 \cr & -1.4 \cr & 0.35 \cr & 0.6 } \bordermatrix{~ & \mathbf{X} \cr & x_1, x_3, x_5, x_7, x_{8}^{2}, x_1x_3} + \epsilon
+\end{align*}
+}
+\caption{Real model used to obtain the data on Table \ref{tab:plackett}}
+\end{figure}
+#+END_EXPORT
+
 #+HEADER: :results graphics output :session *R* :exports none :eval no-export
 #+HEADER: :file ./img/main_effects.pdf
-#+HEADER: :width 8 :height 4
+#+HEADER: :width 12 :height 4
 #+BEGIN_SRC R
 library(extrafont)
 
+names(design) <- c("x1", "x2", "x3",
+                   "x4", "x5", "x6",
+                   "x7", "x8", "d1",
+                   "d2", "d3", "Y")
+
+regression <- lm(Y ~ ., data = design)
+
 par(family = 'serif')
-par(mar = c(0.5,0.5,0.5,0.5))
-p <- MEPlot(regression, main = NULL, pch = 16, lwd = 1, cex.xax = 1, cex.main = 1, cex.axis = 1)
-p
+MEPlot(regression, main = NULL, pch = 19,
+       lwd = 0, cex.xax = 2.9, cex.main = 3.1,
+       cex.axis = 1)
 #+END_SRC
 
 #+RESULTS:
 [[file:./img/main_effects.pdf]]
 
-*** Analysis of Variance (ANOVA)
+#+HEADER: :results output latex :session *R* :exports none :eval no-export
+#+BEGIN_SRC R
+library(xtable)
+
+options(warn = -1)
+names(design) <- c("x1", "x2", "x3", "x4", "x5", "x6", "x7", "Y")
+
+regression <- aov(Y ~ ., data = design)
+#s_regression <- as.data.frame(summary.lm(regression)[[1]])
+#s_regression <- s_regression[1:7, c("Sum Sq", "Mean Sq")]
+
+cap <- "Shortened ANOVA table for the fit of the naive model"
+x <- xtable(regression, caption = cap, digits = 2)
+align(x) <- xalign(x)
+options(warn = 0)
+print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE, caption.placement = "top")
+#+END_SRC
+
+#+RESULTS:
 #+BEGIN_EXPORT latex
-\begin{figure}
-{\normalsize
-\begin{align*}
-\mathbf{Y} = \bm{\beta}\mathbf{X} + \bm{\epsilon}
-\end{align*}
-}
-\caption{Linear model assumed in main-effect analysis of screening designs}
-\end{figure}
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Fri Oct  5 18:29:40 2018
+\begin{table}[ht]
+\centering
+\caption{Shortened ANOVA table for the fit of the naive model}
+\begingroup\small
+\begin{tabular}{lrrrrr}
+  \toprule
+ & Df & Sum Sq & Mean Sq & F value & Pr($>$F) \\
+  \midrule
+x1 & 1.00 & 2.88 & 2.88 &  &  \\
+  x2 & 1.00 & 0.00 & 0.00 &  &  \\
+  x3 & 1.00 & 9.68 & 9.68 &  &  \\
+  x4 & 1.00 & 0.18 & 0.18 &  &  \\
+  x5 & 1.00 & 19.22 & 19.22 &  &  \\
+  x6 & 1.00 & 0.00 & 0.00 &  &  \\
+  x7 & 1.00 & 3.92 & 3.92 &  &  \\
+  Residuals & 0.00 & 0.00 &  &  &  \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\end{table}
 #+END_EXPORT
-**** Optimizing the Rosenbrock Function                         :noexport:
+*** Optimizing the Rosenbrock Function                           :noexport:
 #+CAPTION: Defining the Rosenbrock function in =R=
 #+BEGIN_figure
-#+HEADER: :results output :session *R* :exports code
+#+HEADER: :results output :session *R* :exports code :eval no-export
 #+BEGIN_SRC R
 rosenbrock <- function(x, y) {
     return(((1.0 - x) ^ 2) + (100.0 * ((y - (x ^ 2)) ^ 2)))
@@ -1225,7 +1460,7 @@ best D-Efficiency. Our current approach is based on D-Optimal designs.
 \begin{figure}
 {\scriptsize
 \begin{align*}
-\texttt{time\_per\_pixel} \thicksim & \; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} \; + \\
+\texttt{time\_per\_pixel} \sim & \; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} \; + \\
 & \; \texttt{vector\_length} + \texttt{lws\_y} + 1 / \texttt{lws\_y} \; + \\
 & \; \texttt{load\_overlap} + \texttt{temporary\_size} \; + \\
 & \; \texttt{elements\_number} + 1 / \texttt{elements\_number} \; + \\
@@ -1251,7 +1486,7 @@ best D-Efficiency. Our current approach is based on D-Optimal designs.
 |------+-----------------------------|
 
 *** Results
-#+HEADER: :results output latex :session *R* :exports results
+#+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
 library(xtable)
 
@@ -1347,6 +1582,13 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 | =correlation= | Correlation computation         |      21 | $4.5 \times 10^{17}$ |
 |---------------+---------------------------------+---------+----------------------|
 *** Experimental Methodology
+**** Effect of Sampling in D-Optimal Designs
+
+#+BEGIN_CENTER
+#+CAPTION: Effect of a small initial candidate set on constructing D-Optimal designs
+#+ATTR_LATEX: :width .75\columnwidth
+[[./img/dopt_comparison.pdf]]
+#+END_CENTER
 *** Results
 #+BEGIN_CENTER
 #+CAPTION: Results
