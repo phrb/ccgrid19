@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #+STARTUP: overview indent inlineimages logdrawer
 
-#+TITLE: A Design of Experiments Approach to Autotuning under Tight Budget Constraints
+#+TITLE: Autotuning under Tight Budget Constraints: @@latex: \\@@ A Transparent Design of Experiments Approach
 #+LANGUAGE:    en
 #+TAGS: noexport(n) Stats(S)
 #+TAGS: Teaching(T) R(R) OrgMode(O) Python(P)
@@ -59,11 +59,11 @@
 
 #+LATEX_HEADER: \author{\IEEEauthorblockN{Pedro Bruel\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},
 #+LATEX_HEADER: Arnaud Legrand\IEEEauthorrefmark{1},
-#+LATEX_HEADER: Jean-Marc Vincent\IEEEauthorrefmark{1},
-#+LATEX_HEADER: Brice Videau\IEEEauthorrefmark{1} and
+#+LATEX_HEADER: Brice Videau\IEEEauthorrefmark{1},
+#+LATEX_HEADER: Jean-Marc Vincent\IEEEauthorrefmark{1}, and
 #+LATEX_HEADER: Alfredo Goldman\IEEEauthorrefmark{2}}
 #+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{1}University of Grenoble Alpes, CNRS, INRIA, LIG - Grenoble, France\\
-#+LATEX_HEADER: Email: \{arnaud.legrand, brice.videau\}@imag.fr}
+#+LATEX_HEADER: Email: \{arnaud.legrand, brice.videau, jean-marc.vincent\}@imag.fr}
 #+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{2}University of São Paulo - São Paulo, Brazil\\
 #+LATEX_HEADER: Email: \{phrb, gold\}@ime.usp.br}}
 
@@ -731,24 +731,37 @@ sample_size <- 50
 pre_sample_size <- 30 * sample_size
 search_space_size <- 100
 
-objective_data <- expand.grid(seq(0, 100, 1),
-                              seq(0, 100, 1))
+center_x1 <- (search_space_size / 2) - 30
+center_x2 <- (search_space_size / 2) - 30
+
+get_cost <- function(data) {
+    return(((data$x1 - center_x1) ^ 2) + ((data$x2 - center_x2) ^ 2))
+}
+
+objective_data <- expand.grid(seq(0, search_space_size, 1),
+                              seq(0, search_space_size, 1))
 names(objective_data) <- c("x1", "x2")
 
-sima_samples <- 20
+sima_samples <- 15
 
-plot(x = c(0, 100, 50, 100, 0), y = c(0, 100, 50, 0, 100))
+dev.off()
+
+plot(x = c(0, 100, center_x1, 100, 0), y = c(0, 100, center_x2, 0, 100))
 fake_sima_data <- as.data.frame(locator(n = sima_samples, type = "l"))
 names(fake_sima_data) <- c("x1", "x2")
 dev.off()
 
 fake_sima_data$run <- c(rep(1, nrow(fake_sima_data)))
 fake_sima_data$name <- rep("Simulated Annealing", nrow(fake_sima_data))
+
+fake_sima_data$cost <- get_cost(fake_sima_data)
+fake_sima_data$min <- fake_sima_data$cost == min(fake_sima_data$cost)
+
 data <- fake_sima_data
 
 descent_samples <- 20
 
-plot(x = c(0, 100, 50, 100, 0), y = c(0, 100, 50, 0, 100))
+plot(x = c(0, 100, center_x1, 100, 0), y = c(0, 100, center_x2, 0, 100))
 fake_descent_data <- as.data.frame(locator(n = descent_samples, type = "l"))
 names(fake_descent_data) <- c("x1", "x2")
 dev.off()
@@ -761,37 +774,75 @@ for(i in 2:paths){
 
 fake_descent_data$run <- fake_runs
 fake_descent_data$name <- rep("Gradient Descent", nrow(fake_descent_data))
+
+fake_descent_data$cost <- get_cost(fake_descent_data)
+fake_descent_data$min <- fake_descent_data$cost == min(fake_descent_data$cost)
+
 data <- bind_rows(data, fake_descent_data)
 
-objective_data$Y <- ((objective_data$x1 - (search_space_size / 3)) ^ 2) + ((objective_data$x2 - (search_space_size / 1.5)) ^ 2)
+objective_data$Y <- get_cost(objective_data)
 
 rs_data <- data.frame(x1 = sample(0:search_space_size, sample_size, replace = T),
                       x2 = sample(0:search_space_size, sample_size, replace = T))
 rs_data$name <- rep("Random Sampling", nrow(rs_data))
+
+rs_data$cost <- get_cost(rs_data)
+rs_data$min <- rs_data$cost == min(rs_data$cost)
+
 data <- bind_rows(data, rs_data)
 
-lhs_data <- lhs.design(nruns = sample_size ,nfactors = 2, digits = 0, type = "maximin",
+lhs_data <- lhs.design(nruns = sample_size, nfactors = 2, digits = 0, type = "maximin",
                        factor.names = list(x1 = c(0, search_space_size), x2 = c(0, search_space_size)))
-lhs_data$name <- rep("Latin Hyper Square", nrow(lhs_data))
+lhs_data$name <- rep("Latin Hypercube Sampling", nrow(lhs_data))
+
+lhs_data$cost <- get_cost(lhs_data)
+lhs_data$min <- lhs_data$cost == min(lhs_data$cost)
+
 data <- bind_rows(data, lhs_data)
 
 full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
 names(full_factorial) <- c("x1", "x2")
-output <- optFederov(~., full_factorial, nTrials = sample_size)
+output <- optFederov(~ x1 + x2, full_factorial, nTrials = sample_size)
 dopt_data <- output$design
+
 dopt_data$name <- rep("DOpt. Linear Model", nrow(dopt_data))
+dopt_data$cost <- get_cost(dopt_data)
+dopt_data$min <- rep(FALSE, nrow(dopt_data))
+
+regression <- lm(cost ~ x1 + x2, data = dopt_data)
+prediction <- predict(regression, newdata = full_factorial)
+best <- full_factorial[prediction == min(prediction), ]
+
+best$cost <- min(prediction)
+best$name <- "DOpt. Linear Model"
+best$min <- TRUE
+
+dopt_data <- bind_rows(dopt_data, best)
 data <- bind_rows(data, dopt_data)
 
 full_factorial <- gen.factorial(c(search_space_size, search_space_size), center = FALSE)
 names(full_factorial) <- c("x1", "x2")
-output <- optFederov(~ . + I(x1 ^ 2) + I(x2 ^ 2), full_factorial, nTrials = sample_size)
-#output <- optFederov(~ . + quad(.), full_factorial, nTrials = sample_size)
+output <- optFederov(~ x1 + x2 + I(x1 ^ 2) + I(x2 ^ 2), full_factorial, nTrials = sample_size)
 doptq_data <- output$design
+
 doptq_data$name <- rep("DOpt. Quadratic Model", nrow(doptq_data))
+doptq_data$cost <- get_cost(doptq_data)
+doptq_data$min <- rep(FALSE, nrow(doptq_data))
+
+regression <- lm(cost ~ x1 + x2 + I(x1 ^ 2) + I(x2 ^ 2), data = doptq_data)
+prediction <- predict(regression, newdata = full_factorial)
+best <- full_factorial[prediction == min(prediction), ]
+
+best$cost <- min(prediction)
+best$name <- "DOpt. Quadratic Model"
+best$min <- TRUE
+
+doptq_data <- bind_rows(doptq_data, best)
 data <- bind_rows(data, doptq_data)
 #+END_SRC
 
 #+RESULTS:
+: Error in dev.off() : cannot shut down device 1 (the null device)
 : null device
 :           1
 : null device
@@ -799,10 +850,10 @@ data <- bind_rows(data, doptq_data)
 
 *** Plot
 #+HEADER: :results graphics output :session *R*
-#+HEADER: :file ./img/test_sampling_comparison.pdf :exports none :width 13 :height 10 :eval no-export
+#+HEADER: :file ./img/sampling_comparison.pdf :exports none :width 15 :height 11.5 :eval no-export
 #+BEGIN_SRC R
   library(extrafont)
-  data$facet <- factor(data$name, levels = c("Random Sampling", "Latin Hyper Square", "Gradient Descent", "Simulated Annealing", "DOpt. Linear Model", "DOpt. Quadratic Model"))
+  data$facet <- factor(data$name, levels = c("Random Sampling", "Latin Hypercube Sampling", "Gradient Descent", "Simulated Annealing", "DOpt. Linear Model", "DOpt. Quadratic Model"))
   ggplot(data, aes(x = x1, y = x2)) +
       scale_x_continuous(limits = c(-1, 101), expand = c(0, 0)) +
       scale_y_continuous(limits = c(-1, 101), expand = c(0, 0)) +
@@ -811,10 +862,15 @@ data <- bind_rows(data, doptq_data)
       facet_wrap(facet ~ ., ncol = 3) +
       #geom_raster(data = objective_data, aes(fill = Y), show.legend = FALSE) +
       #geom_contour(data = objective_data, aes(z = Y), colour = "white", linetype = 8) + #, breaks = 1 * (2 ^ (2:20))) +
-      geom_contour(data = objective_data, aes(z = Y), linetype = 1, colour = "black", alpha = 0.5, show.legend = FALSE, breaks = 1 * (2 ^ (4:20))) +
-      geom_path(data = subset(data, name %in% c("Gradient Descent", "Simulated Annealing")), aes(group = run), color = "black", alpha = 0.6) +
-      geom_point(shape = 19, size = 2, colour = "black", alpha = 0.6) +
+      geom_contour(data = objective_data, aes(z = Y), linetype = 1, colour = "black", alpha = 0.6, show.legend = FALSE, breaks = 1 * (2 ^ (4:20))) +
+      geom_path(data = subset(data, name %in% c("Gradient Descent", "Simulated Annealing")), aes(group = run), color = "black", alpha = 0.55, size = 1) +
+      geom_point(shape = 19, size = 3, colour = "black", alpha = 0.55) +
+      geom_jitter(data = subset(data, name %in% c("Gradient Descent")), color = "black", size = 3, shape = 4, alpha = 0.55, width = 8, height = 8) +
+      geom_jitter(data = subset(data, name %in% c("Gradient Descent")), color = "black", size = 3, shape = 4, alpha = 0.55, width = 8, height = 8) +
+      geom_jitter(data = subset(data, name %in% c("Gradient Descent")), color = "black", size = 3, shape = 4, alpha = 0.45, width = 8, height = 8) +
+      geom_jitter(data = subset(data, name %in% c("Gradient Descent")), color = "black", size = 3, shape = 4, alpha = 0.45, width = 8, height = 8) +
       scale_fill_distiller(palette = "Greys", direction = -1, limits = c(min(objective_data$Y) - 1000, max(objective_data$Y))) +
+      geom_point(data = subset(data, min == TRUE), color = "red", shape = 3, size = 9, alpha = 1, stroke = 2) +
       theme_bw(base_size = 30) +
       theme(panel.grid = element_blank(),
             text = element_text(family="Noto Serif"),
@@ -826,7 +882,7 @@ data <- bind_rows(data, doptq_data)
 #+END_SRC
 
 #+RESULTS:
-[[file:./img/test_sampling_comparison.pdf]]
+[[file:./img/sampling_comparison.pdf]]
 ** Sampling & D-Optimal Designs
 *** Generate Data
 #+HEADER: :results output :session *R* :exports none :eval no-export
@@ -1086,23 +1142,39 @@ library(xtable)
 
 set.seed(3138989)
 
+get_cost <- function(data) {
+    return((-1.5 * as.numeric(data$x1)) + (1.3 * as.numeric(data$x3)) +
+           (1.6 * as.numeric(data$x1) * as.numeric(data$x3)) +
+           (1.35 * as.numeric(data$x8) * as.numeric(data$x8)) +
+           (3.1 * as.numeric(data$x5)) + (-1.4 * as.numeric(data$x7)) +
+           rnorm(1, sd = 2))
+}
+
+objective_data <- expand.grid(seq(-1, 1, 0.25),
+                              seq(-1, 1, 0.25),
+                              seq(-1, 1, 0.25),
+                              seq(-1, 1, 0.25),
+                              seq(-1, 1, 0.25))
+
+names(objective_data) <- c("x1", "x3", "x5",
+                           "x7", "x8")
+
+objective_data$Y <- get_cost(objective_data)
+
 options(warn = -1)
-design <- pb(12, factor.names = c("x_1", "x_2", "x_3",
-                                  "x_4", "x_5", "x_6",
-                                  "x_7", "x_8", "d_1",
-                                  "d_2", "d_3"))
+design <- pb(12, factor.names = c("x1", "x2", "x3",
+                                  "x4", "x5", "x6",
+                                  "x7", "x8", "d1",
+                                  "d2", "d3"))
 options(warn = 0)
 
-design$Y <- (-1.5 * as.numeric(design$x_1)) + (1.3 * as.numeric(design$x_3)) +
-            (0.6 * as.numeric(design$x_1) * as.numeric(design$x_3)) +
-            (0.35 * as.numeric(design$x_8) * as.numeric(design$x_8)) +
-            (3.1 * as.numeric(design$x_5)) + (-1.4 * as.numeric(design$x_7)) +
-            rnorm(1, sd = 2)
+design$Y <- get_cost(design)
 
 names(design) <- c("$x_1$", "$x_2$", "$x_3$",
                    "$x_4$", "$x_5$", "$x_6$",
                    "$x_7$", "$x_8$", "$d_1$",
                    "$d_2$", "$d_3$", "$Y$")
+
 cap <- "Randomized Plackett-Burman design for factors $x_1, \\dots, x_8$, using 12 experiments and ``dummy'' factors $d_1, \\dots, d_3$, and computed response $\\mathbf{Y}$"
 tab <- xtable(design, caption = cap, label = "tab:plackett")
 align(tab) <- "ccccccccccccc"
@@ -1110,13 +1182,13 @@ print(tab, booktabs = TRUE,
       include.rownames = FALSE,
       caption.placement = "top",
       size = "\\scriptsize",
-      sanitize.text.function=function(x){x})
+      sanitize.text.function = function(x){x})
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Sat Oct  6 00:14:54 2018
+% Sat Oct  6 21:59:46 2018
 \begin{table}[ht]
 \centering
 \caption{Randomized Plackett-Burman design for factors $x_1, \dots, x_8$, using 12 experiments and ``dummy'' factors $d_1, \dots, d_3$, and computed response $\mathbf{Y}$}
@@ -1126,18 +1198,18 @@ print(tab, booktabs = TRUE,
   \toprule
 $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $x_8$ & $d_1$ & $d_2$ & $d_3$ & $Y$ \\
   \midrule
--1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & 1.90 \\
-  1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 4.10 \\
-  1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 6.60 \\
-  -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & 5.50 \\
-  1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 3.75 \\
-  -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & 0.50 \\
-  -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & 7.95 \\
-  1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 3.15 \\
-  1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 2.10 \\
-  -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & 4.85 \\
-  -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & 4.65 \\
-  1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 2.05 \\
+1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 7.81 \\
+  -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & 9.21 \\
+  1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 7.81 \\
+  1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 8.76 \\
+  -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & 3.21 \\
+  -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & 14.66 \\
+  1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 12.31 \\
+  -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & 4.61 \\
+  -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & 10.36 \\
+  1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 11.86 \\
+  1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 10.46 \\
+  -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & 11.56 \\
    \bottomrule
 \end{tabular}
 \endgroup
@@ -1161,9 +1233,13 @@ Analysis of Variance (ANOVA), is shown in Figure [[fig:main_effects]].
 
 #+BEGIN_EXPORT latex
 \begin{figure}
-{\small
+{\normalsize
 \begin{align*}
-\mathbf{Y} = \bordermatrix{~ & \bm{\beta} \cr & -1.5 \cr & 1.3 \cr & 3.1 \cr & -1.4 \cr & 0.35 \cr & 0.6 } \bordermatrix{~ & \mathbf{X} \cr & x_1, x_3, x_5, x_7, x_{8}^{2}, x_1x_3} + \epsilon
+\bordermatrix{ ~ & \mathbf{Y} \cr & y_1 \cr & \vdots \cr & y_{12}} \ \ =
+\bordermatrix{~ & \bm{\beta}^{\top} \cr & 0 \cr & -1.5 \cr & 1.3 \cr & 3.1 \cr & -1.4 \cr & 1.35 \cr & 1.6}
+\bordermatrix{~ & \mathbf{X} \cr & \mathbf{1} \cr & \mathbf{x_1} \cr & \mathbf{x_3} \cr & \mathbf{x_5}
+\cr & \mathbf{x_7} \cr & \mathbf{x_8^{2}} \cr & \mathbf{x_1x_3}} \ \ +
+\ \ \epsilon
 \end{align*}
 }
 \caption{Real model used to obtain the data on Table \ref{tab:plackett}}
@@ -1181,7 +1257,7 @@ names(design) <- c("x1", "x2", "x3",
                    "x7", "x8", "d1",
                    "d2", "d3", "Y")
 
-regression <- lm(Y ~ ., data = design)
+regression <- lm(Y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8, data = design)
 
 par(family = 'serif')
 MEPlot(regression, main = NULL, pch = 19,
@@ -1192,19 +1268,22 @@ MEPlot(regression, main = NULL, pch = 19,
 #+RESULTS:
 [[file:./img/main_effects.pdf]]
 
-#+HEADER: :results output latex :session *R* :exports none :eval no-export
+#+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
 library(xtable)
 
 options(warn = -1)
-names(design) <- c("x1", "x2", "x3", "x4", "x5", "x6", "x7", "Y")
+names(design) <- c("x1", "x2", "x3",
+                   "x4", "x5", "x6",
+                   "x7", "x8", "d1",
+                   "d2", "d3", "Y")
 
-regression <- aov(Y ~ ., data = design)
-#s_regression <- as.data.frame(summary.lm(regression)[[1]])
-#s_regression <- s_regression[1:7, c("Sum Sq", "Mean Sq")]
+regression <- aov(Y ~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8, data = design)
+s_regression <- as.data.frame(summary.aov(regression)[[1]])
+s_regression <- s_regression[1:8, c("F value", "Pr(>F)")]
 
 cap <- "Shortened ANOVA table for the fit of the naive model"
-x <- xtable(regression, caption = cap, digits = 2)
+x <- xtable(s_regression, caption = cap, digits = 3)
 align(x) <- xalign(x)
 options(warn = 0)
 print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE, caption.placement = "top")
@@ -1213,28 +1292,206 @@ print(x, size = "\\small", math.style.exponents = TRUE, booktabs = TRUE, caption
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Fri Oct  5 18:29:40 2018
+% Sat Oct  6 22:00:18 2018
 \begin{table}[ht]
 \centering
 \caption{Shortened ANOVA table for the fit of the naive model}
 \begingroup\small
-\begin{tabular}{lrrrrr}
+\begin{tabular}{lrr}
   \toprule
- & Df & Sum Sq & Mean Sq & F value & Pr($>$F) \\
+ & F value & Pr($>$F) \\
   \midrule
-x1 & 1.00 & 2.88 & 2.88 &  &  \\
-  x2 & 1.00 & 0.00 & 0.00 &  &  \\
-  x3 & 1.00 & 9.68 & 9.68 &  &  \\
-  x4 & 1.00 & 0.18 & 0.18 &  &  \\
-  x5 & 1.00 & 19.22 & 19.22 &  &  \\
-  x6 & 1.00 & 0.00 & 0.00 &  &  \\
-  x7 & 1.00 & 3.92 & 3.92 &  &  \\
-  Residuals & 0.00 & 0.00 &  &  &  \\
+x1          & 11.391 & 0.043 \\
+  x2          & 1.000 & 0.391 \\
+  x3          & 192.516 & 0.001 \\
+  x4          & 1.000 & 0.391 \\
+  x5          & 112.891 & 0.002 \\
+  x6          & 1.000 & 0.391 \\
+  x7          & 18.063 & 0.024 \\
+  x8          & 201.285 & 0.001 \\
    \bottomrule
 \end{tabular}
 \endgroup
 \end{table}
 #+END_EXPORT
+
+#+HEADER: :results output latex :session *R* :exports results :eval no-export
+#+BEGIN_SRC R
+library(xtable)
+library(dplyr)
+
+names(design) <- c("x1", "x2", "x3",
+                   "x4", "x5", "x6",
+                   "x7", "x8", "d1",
+                   "d2", "d3", "Y")
+
+design <- lapply(design, function(x){return(as.numeric(as.character(x)))})
+
+regression <- lm(Y ~ x1 + x3 + x5 + x7 + x8, data = design)
+prediction <- predict(regression, newdata = objective_data)
+
+comparison_data <- objective_data[prediction == min(prediction), ]
+comparison_data <- bind_rows(comparison_data, objective_data[objective_data$Y == min(objective_data$Y), ])
+rownames(comparison_data) <- c("Linear Model", "Global Minimum")
+
+names(comparison_data) <- c("$x_1$", "$x_3$", "$x_5$",
+                            "$x_7$", "$x_8$", "$Y$")
+
+cap <- "Comparison of the response $Y$ predicted by the linear model and the global minimum $Y$"
+x <- xtable(comparison_data, caption = cap, digits = c(1, 1, 1, 1, 1, 1, 3))
+align(x) <- xalign(x)
+options(warn = 0)
+print(x,
+      size = "\\footnotesize",
+      math.style.exponents = TRUE,
+      booktabs = TRUE,
+      include.rownames = TRUE,
+      sanitize.text.function = function(x){x},
+      caption.placement = "top")
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Sat Oct  6 23:07:26 2018
+\begin{table}[ht]
+\centering
+\caption{Comparison of the response $Y$ predicted by the linear model and the global minimum $Y$}
+\begingroup\footnotesize
+\begin{tabular}{lrrrrrr}
+  \toprule
+ & $x_1$ & $x_3$ & $x_5$ & $x_7$ & $x_8$ & $Y$ \\
+  \midrule
+Linear Model & -1.0 & -1.0 & -1.0 & 1.0 & -1.0 & 2.001 \\
+  Global Minimum & 1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -5.549 \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\end{table}
+#+END_EXPORT
+** D-Optimal Designs
+/D-Optimal designs/ are the class of designs that best fits our requirements of
+supporting multi-level factors and minimizing the number of experiments. The
+algorithms for constructing D-Optimal designs are relatively fast and have few
+restrictions.
+
+It is necessary to select a model that relates factors and responses to
+construct a D-Optimal design. The model selection can be based on previous
+experiments or on expert knowledge of the problem. Once a model is selected,
+algorithmic construction is performed by searching for the set of experiments
+that minimizes the /D-Optimality/ criterion, a measure of the /variance/ of the
+/estimators/ of the /regression coefficients/ associated with the selected
+model. This search is usually done by swapping experiments from the current
+candidate set with experiments from a pool of possible experiments, according to
+certain rules, until some stopping criterion is met. In the approach presented
+in this paper we used Fedorov's algorithm\nbsp{}\cite{fedorov1972theory} for
+constructing D-Optimal designs, implemented in =R= in the =AlgDesign= package.
+
+Considering that we are going to analyze the results of an experiments plan, the
+/D-Efficiency/ of a design is inversely proportional to the /geometric mean/ of
+the /eigenvalues/ of the plan's /covariance matrix/. A D-Optimal design has the
+best D-Efficiency. Our current approach is based on D-Optimal designs.
+
+#+HEADER: :results output latex :session *R* :exports results :eval no-export
+#+BEGIN_SRC R
+library(xtable)
+library(dplyr)
+library(AlgDesign)
+
+output <- optFederov(~ x1 + x3 + x5 + x7 + x8 + I(x8 ^ 2) + x1:x3,
+                     nTrials = 8,
+                     data = objective_data)
+
+dopt_design <- output$design
+
+dopt_regression <- lm(Y ~ x1 + x3 + x5 + x7 + x8 + I(x8 ^ 2) + x1:x3, data = dopt_design)
+dopt_prediction <- predict(dopt_regression, newdata = objective_data)
+
+dopt_data <- objective_data[dopt_prediction == min(dopt_prediction), ]
+names(dopt_data) <- c("$x_1$", "$x_3$", "$x_5$",
+                      "$x_7$", "$x_8$", "$Y$")
+
+names(dopt_design) <- c("$x_1$", "$x_3$", "$x_5$",
+                        "$x_7$", "$x_8$", "$Y$")
+
+cap <- "Comparison of the response $Y$ predicted by the linear model and the global minimum $Y$"
+x <- xtable(dopt_design, caption = cap, digits = c(1, 1, 1, 1, 1, 1, 3))
+align(x) <- xalign(x)
+options(warn = 0)
+print(x,
+      size = "\\footnotesize",
+      math.style.exponents = TRUE,
+      booktabs = TRUE,
+      include.rownames = FALSE,
+      sanitize.text.function = function(x){x},
+      caption.placement = "top")
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Sat Oct  6 23:07:45 2018
+\begin{table}[ht]
+\centering
+\caption{Comparison of the response $Y$ predicted by the linear model and the global minimum $Y$}
+\begingroup\footnotesize
+\begin{tabular}{rrrrrr}
+  \toprule
+$x_1$ & $x_3$ & $x_5$ & $x_7$ & $x_8$ & $Y$ \\
+  \midrule
+-1.0 & -1.0 & -1.0 & -1.0 & -1.0 & 4.801 \\
+  1.0 & -1.0 & 1.0 & 1.0 & -1.0 & 2.001 \\
+  1.0 & 1.0 & 1.0 & -1.0 & -0.2 & 9.335 \\
+  -1.0 & 1.0 & -1.0 & 1.0 & -0.2 & 0.135 \\
+  1.0 & -1.0 & -1.0 & -1.0 & 0.5 & -2.411 \\
+  -1.0 & -1.0 & 1.0 & 1.0 & 0.5 & 7.189 \\
+  -1.0 & 1.0 & 1.0 & -1.0 & 1.0 & 10.401 \\
+  1.0 & 1.0 & -1.0 & 1.0 & 1.0 & 1.601 \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\end{table}
+#+END_EXPORT
+
+#+HEADER: :results output latex :session *R* :exports results :eval no-export
+#+BEGIN_SRC R
+comparison_data <- bind_rows(dopt_data, comparison_data)
+rownames(comparison_data) <- c("Correct Model", "Linear Model", "Global Minimum")
+
+cap <- "Comparison of the response $Y$ predicted by the linear model and the global minimum $Y$"
+x <- xtable(comparison_data, caption = cap, digits = c(1, 1, 1, 1, 1, 1, 3))
+align(x) <- xalign(x)
+options(warn = 0)
+print(x,
+      size = "\\footnotesize",
+      math.style.exponents = TRUE,
+      booktabs = TRUE,
+      include.rownames = TRUE,
+      sanitize.text.function = function(x){x},
+      caption.placement = "top")
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Sat Oct  6 23:08:22 2018
+\begin{table}[ht]
+\centering
+\caption{Comparison of the response $Y$ predicted by the linear model and the global minimum $Y$}
+\begingroup\footnotesize
+\begin{tabular}{lrrrrrr}
+  \toprule
+ & $x_1$ & $x_3$ & $x_5$ & $x_7$ & $x_8$ & $Y$ \\
+  \midrule
+Correct Model & 1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -5.549 \\
+  Linear Model & -1.0 & -1.0 & -1.0 & 1.0 & -1.0 & 2.001 \\
+  Global Minimum & 1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -5.549 \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\end{table}
+#+END_EXPORT
+
 *** Optimizing the Rosenbrock Function                           :noexport:
 #+CAPTION: Defining the Rosenbrock function in =R=
 #+BEGIN_figure
@@ -1425,30 +1682,8 @@ technique are the direct generation of multi-level designs and a clearly defined
 optimality criterion. Since this construction relies on solving carefully
 formulated MIP problems, it presents strong restrictions on the size and shape
 of the designs that can be generated.
-** D-Optimal Designs
-/D-Optimal designs/ are the class of designs that best fits our requirements of
-supporting multi-level factors and minimizing the number of experiments. The
-algorithms for constructing D-Optimal designs are relatively fast and have few
-restrictions.
-
-It is necessary to select a model that relates factors and responses to
-construct a D-Optimal design. The model selection can be based on previous
-experiments or on expert knowledge of the problem. Once a model is selected,
-algorithmic construction is performed by searching for the set of experiments
-that minimizes the /D-Optimality/ criterion, a measure of the /variance/ of the
-/estimators/ of the /regression coefficients/ associated with the selected
-model. This search is usually done by swapping experiments from the current
-candidate set with experiments from a pool of possible experiments, according to
-certain rules, until some stopping criterion is met. In the approach presented
-in this paper we used Fedorov's algorithm\nbsp{}\cite{fedorov1972theory} for
-constructing D-Optimal designs, implemented in =R= in the =AlgDesign= package.
-
-Considering that we are going to analyze the results of an experiments plan, the
-/D-Efficiency/ of a design is inversely proportional to the /geometric mean/ of
-the /eigenvalues/ of the plan's /covariance matrix/. A D-Optimal design has the
-best D-Efficiency. Our current approach is based on D-Optimal designs.
-* Applying Design of Experiments to Autotuning
-** The DLMT Strategy
+** Applying Design of Experiments to Autotuning
+*** The DLMT Strategy
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width .8\columnwidth
 #+ATTR_ORG: :width 400
@@ -1589,7 +1824,7 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 #+ATTR_LATEX: :width .75\columnwidth
 [[./img/dopt_comparison.pdf]]
 #+END_CENTER
-*** Results
+*** Results                                                      :noexport:
 #+BEGIN_CENTER
 #+CAPTION: Results
 #+ATTR_LATEX: :float multicolumn :placement [p] :width .9\textwidth

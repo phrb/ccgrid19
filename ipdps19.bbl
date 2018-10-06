@@ -94,6 +94,10 @@ J.~Ansel, S.~Kamil, K.~Veeramachaneni, J.~Ragan-Kelley, J.~Bosboom, U.-M.
 R.~L. Plackett and J.~P. Burman, ``The design of optimum multifactorial
   experiments,'' \emph{Biometrika}, vol.~33, no.~4, pp. 305--325, 1946.
 
+\bibitem{fedorov1972theory}
+V.~V. Fedorov, \emph{Theory of optimal experiments}.\hskip 1em plus 0.5em minus
+  0.4em\relax Elsevier, 1972.
+
 \bibitem{addelman1961some}
 S.~Addelman and O.~Kempthorne, ``Some main-effect plans and orthogonal arrays
   of strength two,'' \emph{The Annals of Mathematical Statistics}, pp.
@@ -103,9 +107,5 @@ S.~Addelman and O.~Kempthorne, ``Some main-effect plans and orthogonal arrays
 U.~Grömping and R.~Fontana, ``An algorithm for generating good mixed level
   factorial designs,'' Beuth University of Applied Sciences, Berlin, Tech.
   Rep., 2018.
-
-\bibitem{fedorov1972theory}
-V.~V. Fedorov, \emph{Theory of optimal experiments}.\hskip 1em plus 0.5em minus
-  0.4em\relax Elsevier, 1972.
 
 \end{thebibliography}
