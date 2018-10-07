@@ -68,7 +68,25 @@
 #+LATEX_HEADER: Email: \{phrb, gold\}@ime.usp.br}}
 
 #+LATEX: \begin{abstract}
-Abstract
+A large quantity of resources is spent writing, porting, and optimizing
+scientific and industrial High Performance Computing applications. Autotuning
+techniques have become therefore fundamental to lower the costs of leveraging
+the improvements on execution time and power consumption provided by the latest
+software and hardware platforms. Despite this, the most popular autotuning
+techniques still require a large budget of costly experimental measurements to
+provide good results while still not providing exploitable knowledge about the
+problem after optimization. In this paper we present a user-transparent
+autotuning technique based on Design of Experiments that is capable of operating
+under tight budget constraints by significantly reducing the amount of
+measurements needed to find good optimizations. Our approach also enable users
+to make informed decisions on what optimizations to pursue and when to stop
+optimizing. We present experimental evaluations of our approach and show that,
+leveraging user decisions, it is capable of finding the global optimum of a GPU
+Laplacian kernel optimization using half of the measurement budget used by other
+common autotuning techniques. We also show that our approach is capable of using
+generic performance models to decrease the measurement budget needed to find
+speedups of up to 50$\times$, when compared to random sampling, for some
+applications from a more comprehensive autotuning benchmark.
 #+LATEX: \end{abstract}
 
 * Arnaud's Draft                                                   :noexport:

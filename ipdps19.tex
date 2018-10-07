@@ -1,4 +1,4 @@
-% Created 2018-10-07 Sun 00:57
+% Created 2018-10-07 Sun 23:46
 % Intended LaTeX compiler: pdflatex
 \documentclass[conference]{IEEEtran}
 
@@ -60,11 +60,29 @@ Email: \{phrb, gold\}@ime.usp.br}}
 
 \maketitle
 \begin{abstract}
-Abstract
+A large quantity of resources is spent writing, porting, and optimizing
+scientific and industrial High Performance Computing applications. Autotuning
+techniques have become therefore fundamental to lower the costs of leveraging
+the improvements on execution time and power consumption provided by the latest
+software and hardware platforms. Despite this, the most popular autotuning
+techniques still require a large budget of costly experimental measurements to
+provide good results while still not providing exploitable knowledge about the
+problem after optimization. In this paper we present a user-transparent
+autotuning technique based on Design of Experiments that is capable of operating
+under tight budget constraints by significantly reducing the amount of
+measurements needed to find good optimizations. Our approach also enable users
+to make informed decisions on what optimizations to pursue and when to stop
+optimizing. We present experimental evaluations of our approach and show that,
+leveraging user decisions, it is capable of finding the global optimum of a GPU
+Laplacian kernel optimization using half of the measurement budget used by other
+common autotuning techniques. We also show that our approach is capable of using
+generic performance models to decrease the measurement budget needed to find
+speedups of up to 50\(\times\), when compared to random sampling, for some
+applications from a more comprehensive autotuning benchmark.
 \end{abstract}
 
 \section{Introduction}
-\label{sec:org211ae4b}
+\label{sec:orgda5e46a}
 Optimizing code for objectives such as performance and power consumption is
 fundamental to the success and cost effectiveness of industrial and scientific
 endeavors in High Performance Computing. A considerable amount of highly
@@ -140,20 +158,20 @@ Despite using generic performance models for every SPAPT application, our
 approach was able to significantly decrease the budget used to find performance
 improvements.
 
-The rest of this paper is organized as follows. Section \ref{sec:org3995892} presents
+The rest of this paper is organized as follows. Section \ref{sec:org278d6e7} presents
 related work on source-to-source transformation, which is the main optimization
 target in SPAPT problems, on autotuning systems and on search space exploration
-strategies. Section \ref{sec:org02760db} presents a
+strategies. Section \ref{sec:org7269ac0} presents a
 detailed description of the implementation of our approach and its background.
 It discusses the Design of Experiments concepts we incorporate, and the ANOVA
-and linear regression algorithms we use in analysis steps. Section \ref{sec:orgbf6a4a1} presents our results with the GPU Laplacian Kernel and the SPAPT
-benchmark. Section \ref{sec:org2107c17} discusses our conclusions and future work.
+and linear regression algorithms we use in analysis steps. Section \ref{sec:orgdc80fb2} presents our results with the GPU Laplacian Kernel and the SPAPT
+benchmark. Section \ref{sec:org81e5da8} discusses our conclusions and future work.
 \section{Background}
-\label{sec:org3995892}
+\label{sec:org278d6e7}
 \subsection{Source-to-source Transformation}
-\label{sec:org6446bf6}
+\label{sec:org7d9f470}
 \subsection{Autotuning}
-\label{sec:orgd149ee4}
+\label{sec:orga0baa23}
 John Rice's Algorithm Selection framework~\cite{rice1976algorithm} is the
 precursor of autotuners in various problem domains. In 1997, the PHiPAC
 system~\cite{bilmes1997optimizing} used code generators and search scripts
@@ -183,7 +201,7 @@ framework~\cite{ansel2014opentuner} provides ensembles of techniques that
 search the same space in parallel, while exploration is managed by an
 implementation of a solver of the multi-armed bandit problem.
 \subsection{Search Space Exploration Strategies}
-\label{sec:org60311be}
+\label{sec:org741e773}
 \begin{center}
 \begin{figure}[htbp]
 \centering
@@ -192,7 +210,7 @@ implementation of a solver of the multi-armed bandit problem.
 \end{figure}
 \end{center}
 \section{Design of Experiments}
-\label{sec:orge7eaaa8}
+\label{sec:org01d3531}
 An \emph{experimental design} determines a selection of experiments whose objective
 is to identify the relationships between \emph{factors} and \emph{responses}. While
 factors and responses can refer to different concrete entities in other domains,
@@ -211,7 +229,7 @@ for the construction of efficient designs for factors with different numbers and
 types of levels, and present \emph{D-Optimal} designs, the technique we used in the
 approach presented in this paper.
 \subsection{Screening 2-Level Factors with Linear Models and ANOVA}
-\label{sec:org4b40c9a}
+\label{sec:orgbc082c1}
 Screening designs are used to identify the main effects of 2-level factors in
 the initial stages of studying a problem. Interactions are not considered at
 this stage, and screening designs are usually small. Identifying main effects
@@ -275,13 +293,13 @@ factors \(d_1,\dots,d_3\) to complete the 12 columns needed to construct a
 Plackett-Burman design for 8 factors. If we trust our initial assumption and fit
 different linear models to this data, we can identify factor main effects by
 comparing the relative fit each model. The results of this process, called
-Analysis of Variance (ANOVA), is shown in Figure \ref{fig:org4a281ab}.
+Analysis of Variance (ANOVA), is shown in Figure \ref{fig:org1e9acef}.
 
 \begin{center}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.95\columnwidth]{./img/main_effects.pdf}
-\caption{\label{fig:org4a281ab}
+\caption{\label{fig:org1e9acef}
 Main effects plot obtained from ANOVA using the design and observed response \(\mathbf{Y}\)}
 \end{figure}
 \end{center}
@@ -339,7 +357,7 @@ Linear Model & -1.0 & -1.0 & -1.0 & 1.0 & -1.0 & 2.001 \\
 \endgroup
 \end{table}
 \subsection{D-Optimal Designs}
-\label{sec:orgaebd2a0}
+\label{sec:org965371a}
 \emph{D-Optimal designs} are the class of designs that best fits our requirements of
 supporting multi-level factors and minimizing the number of experiments. The
 algorithms for constructing D-Optimal designs are relatively fast and have few
@@ -403,7 +421,7 @@ Correct Model & 1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -5.549 \\
 \endgroup
 \end{table}
 \subsection{Multi-Level Design Construction Techniques}
-\label{sec:org38e753d}
+\label{sec:org28ce24a}
 The application of Design of Experiments to autotuning problems requires design
 construction techniques that support factors of different types and number of
 possible values. Autotuning problems typically combine factors such as binary
@@ -441,18 +459,18 @@ optimality criterion. Since this construction relies on solving carefully
 formulated MIP problems, it presents strong restrictions on the size and shape
 of the designs that can be generated.
 \subsection{Applying Design of Experiments to Autotuning}
-\label{sec:org02760db}
+\label{sec:org7269ac0}
 \subsubsection{The DLMT Strategy}
-\label{sec:org7b21445}
+\label{sec:org4a991e2}
 \begin{center}
 \begin{center}
 \includegraphics[width=.8\columnwidth]{./img/doe_anova_strategy.pdf}
 \end{center}
 \end{center}
 \section{Performance Evaluation}
-\label{sec:orgbf6a4a1}
+\label{sec:orgdc80fb2}
 \subsection{Example on a GPU Laplacian Kernel}
-\label{sec:org9cc1814}
+\label{sec:org072f46f}
 \begin{figure}
 {\scriptsize
 \begin{align*}
@@ -486,7 +504,7 @@ DLMT & D-Optimal Designs\\
 \end{table}
 
 \subsubsection{Results}
-\label{sec:orgd80c12f}
+\label{sec:orgdc0c15e}
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
 % Thu Oct  4 17:04:18 2018
 \begin{table}[ht]
@@ -517,9 +535,9 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 \end{figure}
 \end{center}
 \subsection{Results on the SPAPT Benchmark}
-\label{sec:orge9595bd}
+\label{sec:org20cb75e}
 \subsubsection{The SPAPT Benchmark}
-\label{sec:orge74834d}
+\label{sec:org2c0f056}
 \begin{table}[ht]
 \caption{Set of applications we used from the SPAPT benchmark}
 \centering
@@ -548,10 +566,10 @@ Kernel & Operation & Factors & Size\\
 \end{tabular}
 \end{table}
 \subsubsection{Experimental Methodology}
-\label{sec:org7834d42}
+\label{sec:org6db5c21}
 \begin{enumerate}
 \item Effect of Sampling in D-Optimal Designs
-\label{sec:org4f5d59a}
+\label{sec:org7bce21e}
 
 \begin{center}
 \begin{figure}[htbp]
@@ -562,9 +580,9 @@ Kernel & Operation & Factors & Size\\
 \end{center}
 \end{enumerate}
 \section{Conclusion}
-\label{sec:org2107c17}
+\label{sec:org81e5da8}
 \section*{Acknowledgment}
-\label{sec:org80f18d4}
+\label{sec:org4b464bf}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 \end{document}
