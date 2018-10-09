@@ -1,8 +1,8 @@
-#### Autotuning under Budget Constraints: a Design of Experiments Approach
+### Autotuning under Tight Budget Constraints: a Transparent Design of Experiments Approach
 
 This paper was written and exported to `pdf` using [Emacs Org mode](https://orgmode.org/).
 
-##### Org Mode LaTex: Exporting IEEEtran
+#### Org Mode LaTex: Exporting IEEEtran
 
 After installing the IEEEtran template, add the following to your `Emacs`
 configuration to be able to export using the `org-ieeetran` class:
