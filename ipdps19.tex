@@ -1,4 +1,4 @@
-% Created 2018-10-07 Sun 23:46
+% Created 2018-10-09 Tue 23:33
 % Intended LaTeX compiler: pdflatex
 \documentclass[conference]{IEEEtran}
 
@@ -82,7 +82,7 @@ applications from a more comprehensive autotuning benchmark.
 \end{abstract}
 
 \section{Introduction}
-\label{sec:orgda5e46a}
+\label{sec:orgd5bafcc}
 Optimizing code for objectives such as performance and power consumption is
 fundamental to the success and cost effectiveness of industrial and scientific
 endeavors in High Performance Computing. A considerable amount of highly
@@ -137,8 +137,8 @@ In this paper we propose an autotuning strategy that leverages existing expert
 and approximate knowledge about a problem in the form of a performance model,
 and refines this initial model iteratively using empirical performance
 evaluations, statistical analysis and user input. Our strategy puts a heavy
-weight on decreasing the costs of autotuning by using efficient Design of
-Experiments strategies to minimize the number of experiments needed to find good
+weight on decreasing the costs of autotuning by using efficient \emph{Design of
+Experiments} strategies to minimize the number of experiments needed to find good
 optimizations. Each optimization iteration uses \emph{Analysis of Variance} (ANOVA)
 to help identify the relative significance of each configurable parameter to the
 performance observations. An architecture- and problem-specific performance
@@ -158,20 +158,20 @@ Despite using generic performance models for every SPAPT application, our
 approach was able to significantly decrease the budget used to find performance
 improvements.
 
-The rest of this paper is organized as follows. Section \ref{sec:org278d6e7} presents
+The rest of this paper is organized as follows. Section \ref{sec:org76d2813} presents
 related work on source-to-source transformation, which is the main optimization
 target in SPAPT problems, on autotuning systems and on search space exploration
-strategies. Section \ref{sec:org7269ac0} presents a
+strategies. Section \ref{sec:org4683d70} presents a
 detailed description of the implementation of our approach and its background.
 It discusses the Design of Experiments concepts we incorporate, and the ANOVA
-and linear regression algorithms we use in analysis steps. Section \ref{sec:orgdc80fb2} presents our results with the GPU Laplacian Kernel and the SPAPT
-benchmark. Section \ref{sec:org81e5da8} discusses our conclusions and future work.
+and linear regression algorithms we use in analysis steps. Section \ref{sec:org5034423} presents our results with the GPU Laplacian Kernel and the SPAPT
+benchmark. Section \ref{sec:orga32b94b} discusses our conclusions and future work.
 \section{Background}
-\label{sec:org278d6e7}
+\label{sec:org76d2813}
 \subsection{Source-to-source Transformation}
-\label{sec:org7d9f470}
+\label{sec:org83a221d}
 \subsection{Autotuning}
-\label{sec:orga0baa23}
+\label{sec:org7f1431b}
 John Rice's Algorithm Selection framework~\cite{rice1976algorithm} is the
 precursor of autotuners in various problem domains. In 1997, the PHiPAC
 system~\cite{bilmes1997optimizing} used code generators and search scripts
@@ -201,7 +201,7 @@ framework~\cite{ansel2014opentuner} provides ensembles of techniques that
 search the same space in parallel, while exploration is managed by an
 implementation of a solver of the multi-armed bandit problem.
 \subsection{Search Space Exploration Strategies}
-\label{sec:org741e773}
+\label{sec:org18896d2}
 \begin{center}
 \begin{figure}[htbp]
 \centering
@@ -210,7 +210,7 @@ implementation of a solver of the multi-armed bandit problem.
 \end{figure}
 \end{center}
 \section{Design of Experiments}
-\label{sec:org01d3531}
+\label{sec:org06d1187}
 An \emph{experimental design} determines a selection of experiments whose objective
 is to identify the relationships between \emph{factors} and \emph{responses}. While
 factors and responses can refer to different concrete entities in other domains,
@@ -228,8 +228,8 @@ traditional Design of Experiments methodology. We also discuss some techniques
 for the construction of efficient designs for factors with different numbers and
 types of levels, and present \emph{D-Optimal} designs, the technique we used in the
 approach presented in this paper.
-\subsection{Screening 2-Level Factors with Linear Models and ANOVA}
-\label{sec:orgbc082c1}
+\subsection{Screening \& Plackett-Burman Designs}
+\label{sec:orgf9fbd21}
 Screening designs are used to identify the main effects of 2-level factors in
 the initial stages of studying a problem. Interactions are not considered at
 this stage, and screening designs are usually small. Identifying main effects
@@ -240,7 +240,7 @@ in 1946. Despite having strong restrictions on the number of factors,
 Plackett-Burman designs enable the identification of main effects of \(n\) factors
 with \(n + 1\) experiments.
 
-\begin{figure}
+\begin{figure}[htpb]
 {\normalsize
 \begin{align*}
 \mathbf{Y} = \bm{\beta}\mathbf{X} + \epsilon
@@ -251,16 +251,46 @@ with \(n + 1\) experiments.
 \end{figure}
 
 Assuming a linear relationship between factors and the response is fundamental
-for the analysis of a Plackett-Burman design. For the following example,
-consider the linear relationship presented in Figure
+for the analysis of variance using a Plackett-Burman design. For the following
+example, consider the linear relationship presented in Figure
 \ref{fig:linear_assumption}, where \(\epsilon\) is the error term, \(\mathbf{Y}\) is
 the observed response, \(\mathbf{X} = \left(1, x_1,\dots,x_n\right)\) is the set
 of \(n\) 2-level factors, and \(\bm{\beta} = \left(\beta_0,\dots,\beta_n\right)\) is
 the set with the \emph{intercept} \(\beta_0\) and the corresponding \emph{model
 coefficients}.
 
+We now present an example to illustrate the screening methodology. Suppose we
+wish to minimize a performance metric \(Y\) of a problem with factors
+\(x_1,\dots,x_8\) assuming values in \([-1, -0.8, -0.6, \dots, 0.6, 0.8, 1]\). Each
+\(y_i \in Y\) is computed using the formula described in Figure
+\ref{fig:real_model}, but suppose that, for the purpose of this example, they
+are computed by a very expensive black-box procedure. To efficiently study this
+problem we decide to construct a Plackett-Burman design, which minimizes the
+experiments needed to identify relevant factors. The analysis of this design
+will enable us to decrease the dimension of the problem.
+
+\begin{figure}[htpb]
+{\normalsize
+\begin{align*}
+y_i =
+\bordermatrix{~ & \bm{\beta}^{\top} \cr & 0 \cr & -1.5 \cr & 1.3 \cr & 3.1 \cr & -1.4 \cr & 1.35 \cr & 1.6} \ \ \ \cdot
+\bordermatrix{~ & \mathbf{X}_i \cr & 1 \cr & x_1 \cr & x_3 \cr & x_5
+\cr & x_7 \cr & x_8^{2} \cr & x_1x_3} \ \ +
+\ \ \epsilon
+\end{align*}
+}
+\caption{Real model used to obtain the data on Table \ref{tab:plackett}}
+\label{fig:real_model}
+\end{figure}
+
+Table \ref{tab:plackett} presents the Plackett-Burman design we generated for
+our problem. In this design we have the 8 2-level factors \(x_1,\dots,x_8\), and
+the observed response \(\mathbf{Y}\). As is common when constructing screening
+designs, we had to add 3 ``dummy'' factors \(d_1,\dots,d_3\) to complete the 12
+columns needed to construct a Plackett-Burman design for 8 factors.
+
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Sat Oct  6 21:59:46 2018
+% Mon Oct  8 22:52:22 2018
 \begin{table}[ht]
 \centering
 \caption{Randomized Plackett-Burman design for factors $x_1, \dots, x_8$, using 12 experiments and ``dummy'' factors $d_1, \dots, d_3$, and computed response $\mathbf{Y}$}
@@ -270,207 +300,342 @@ coefficients}.
   \toprule
 $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $x_8$ & $d_1$ & $d_2$ & $d_3$ & $Y$ \\
   \midrule
-1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 7.81 \\
-  -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & 9.21 \\
-  1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 7.81 \\
-  1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 8.76 \\
-  -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & 3.21 \\
-  -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & 14.66 \\
-  1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 12.31 \\
-  -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & 4.61 \\
-  -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & 10.36 \\
-  1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 11.86 \\
-  1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 10.46 \\
-  -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & 11.56 \\
+1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 13.74 \\
+  -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & 10.19 \\
+  -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & 9.22 \\
+  1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 7.64 \\
+  1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 8.63 \\
+  -1 & 1 & 1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & 11.53 \\
+  -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & 2.09 \\
+  1 & 1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 9.02 \\
+  1 & -1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 10.68 \\
+  1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & -1 & -1 & 11.23 \\
+  -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & -1 & 5.33 \\
+  -1 & -1 & 1 & -1 & 1 & 1 & -1 & 1 & 1 & 1 & -1 & 14.79 \\
    \bottomrule
 \end{tabular}
 \endgroup
 \end{table}
 
-Table \ref{tab:plackett} presents a Plackett-Burman design for 8 2-level factors
-\(x_1,\dots,x_8\), and the observed response \(\mathbf{Y}\). We also add 3 ``dummy''
-factors \(d_1,\dots,d_3\) to complete the 12 columns needed to construct a
-Plackett-Burman design for 8 factors. If we trust our initial assumption and fit
-different linear models to this data, we can identify factor main effects by
-comparing the relative fit each model. The results of this process, called
-Analysis of Variance (ANOVA), is shown in Figure \ref{fig:org1e9acef}.
+We use our initial assumption shown in Figure \ref{fig:linear_assumption} to
+identify the most relevant factors by performing an ANOVA test. The resulting
+ANOVA table is shown in Table \ref{tab:anova_linear}, where the \emph{significance}
+of each factor can be interpreted from the F-test and P\((>\text{F})\) values.
+Table \ref{tab:anova_linear} uses ``\(*\)'', as is convention in the \texttt{R}
+language, to represent the significance values for each factor.
 
-\begin{center}
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=.95\columnwidth]{./img/main_effects.pdf}
-\caption{\label{fig:org1e9acef}
-Main effects plot obtained from ANOVA using the design and observed response \(\mathbf{Y}\)}
-\end{figure}
-\end{center}
-
-\begin{figure}
-{\normalsize
-\begin{align*}
-\bordermatrix{ ~ & \mathbf{Y} \cr & y_1 \cr & \vdots \cr & y_{12}} \ \ =
-\bordermatrix{~ & \bm{\beta}^{\top} \cr & 0 \cr & -1.5 \cr & 1.3 \cr & 3.1 \cr & -1.4 \cr & 1.35 \cr & 1.6}
-\bordermatrix{~ & \mathbf{X} \cr & \mathbf{1} \cr & \mathbf{x_1} \cr & \mathbf{x_3} \cr & \mathbf{x_5}
-\cr & \mathbf{x_7} \cr & \mathbf{x_8^{2}} \cr & \mathbf{x_1x_3}} \ \ +
-\ \ \epsilon
-\end{align*}
-}
-\caption{Real model used to obtain the data on Table \ref{tab:plackett}}
-\end{figure}
+We see on Table \ref{tab:anova_linear} that factors \((x_3,x_5,x_7,x_8)\) have at
+least one ``\(*\)'' of significance. For the purpose of this example, this is
+reason enough to include them in our linear model for the next step. We see that
+factor \(x_1\) has a significance mark of ``\(\cdot\)'', but comparing its F-test and
+P\((>\text{F})\) values we decide that they are fairly smaller than the values of
+factors that had no significance at all, and we keep this factor. Then, since we
+want to reduce the dimension of the problem, we decide in this example to not
+include (\(x_2,x_4,x_6)\) in our model due to their low significance.
 
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Sat Oct  6 22:00:18 2018
+% Mon Oct  8 22:52:26 2018
 \begin{table}[ht]
 \centering
-\caption{Shortened ANOVA table for the fit of the naive model}
+\caption{Shortened ANOVA table for the fit of the naive model, with significance intervals from the \texttt{R} language}
+\label{tab:anova_linear}
 \begingroup\small
-\begin{tabular}{lrr}
+\begin{tabular}{lrrl}
   \toprule
- & F value & Pr($>$F) \\
+ & F value & Pr$(<\text{F})$ & Significance \\
   \midrule
-x1          & 11.391 & 0.043 \\
-  x2          & 1.000 & 0.391 \\
-  x3          & 192.516 & 0.001 \\
-  x4          & 1.000 & 0.391 \\
-  x5          & 112.891 & 0.002 \\
-  x6          & 1.000 & 0.391 \\
-  x7          & 18.063 & 0.024 \\
-  x8          & 201.285 & 0.001 \\
+$x_1$ & 8.382 & 0.063 & $\cdot$ \\
+  $x_2$ & 0.370 & 0.586 &   \\
+  $x_3$ & 80.902 & 0.003 & $**$ \\
+  $x_4$ & 0.215 & 0.675 &   \\
+  $x_5$ & 46.848 & 0.006 & $**$ \\
+  $x_6$ & 5.154 & 0.108 &   \\
+  $x_7$ & 13.831 & 0.034 & $*$ \\
+  $x_8$ & 59.768 & 0.004 & $**$ \\
    \bottomrule
 \end{tabular}
 \endgroup
 \end{table}
 
+Moving forward, we will build a linear model using the \((x_1,x_3,x_5,x_7,x_8)\)
+factors, fit the model using the values of \(Y\) we obtained when running our
+design, and use the coefficients of this fitted model to predict the levels for
+each factor that minimize the real response. The prediction step will be run
+using a full factorial combination of the possible values of
+\((x_1,x_3,x_5,x_7,x_8\)), without running any new experiments. The levels of the
+selected factors with the best prediction on this data will be the output of
+this step.
+
+Table \ref{tab:linear_prediction_comparison} compares the prediction for \(Y\)
+from our linear model with the selected factors \((x_1,x_3,x_5,x_7,x_8)\) with the
+actual global minimum \(Y\) for this problem. Using 12 measurements and a simple
+linear model, the predicted best value of \(Y\) was around \(10\times\) larger than
+the global optimum. Note that the model predicted the correct levels for \(x_3\)
+and \(x_5\), and almost predicted correctly for \(x_7\). The linear model predicted
+wrong levels for \(x_1\), perhaps due to this factor's interaction with \(x_3\), and
+for \(x_8\). Arguably, it would be impossible to predict the correct level for
+\(x_8\) using this linear model, since we know a quadratic term composes the
+formula of \(Y\).
+
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Sat Oct  6 23:07:26 2018
+% Tue Oct  9 13:41:21 2018
 \begin{table}[ht]
 \centering
 \caption{Comparison of the response $Y$ predicted by the linear model and the global minimum $Y$}
+\label{tab:linear_prediction_comparison}
 \begingroup\footnotesize
 \begin{tabular}{lrrrrrr}
   \toprule
  & $x_1$ & $x_3$ & $x_5$ & $x_7$ & $x_8$ & $Y$ \\
   \midrule
-Linear Model & -1.0 & -1.0 & -1.0 & 1.0 & -1.0 & 2.001 \\
-  Global Minimum & 1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -5.549 \\
+Linear Model & -1.0 & -1.0 & -1.0 & 1.0 & -1.0 & -1.046 \\
+  Global Minimum & 1.0 & -1.0 & -1.0 & 0.8 & 0.0 & -9.934 \\
    \bottomrule
 \end{tabular}
 \endgroup
 \end{table}
+
+We can improve upon this result if we introduce some information about the
+problem and use a more flexible design construction technique. Next, we will
+discuss the construction of efficient designs using problem-specific formulas
+and continue the optimization of our example.
 \subsection{D-Optimal Designs}
-\label{sec:org965371a}
-\emph{D-Optimal designs} are the class of designs that best fits our requirements of
-supporting multi-level factors and minimizing the number of experiments. The
-algorithms for constructing D-Optimal designs are relatively fast and have few
-restrictions.
+\label{sec:org4e89297}
+The application of Design of Experiments to autotuning problems requires design
+construction techniques that support factors of different types and number of
+possible values. Autotuning problems typically combine factors such as binary
+flags, integer and floating point numerical values, and unordered enumerations
+of abstract values. Previously, to construct a Plackett-Burman design for our
+example we had to restrict our factors to the extremes of their levels in the
+interval \([-1, -0.8, -0.6,\dots,0.6, 0.8, 1]\), because such screening designs
+only support 2-level factors. Doing that makes it impossible to measure the
+significance of quadratic terms in the model, for example. Next we will continue
+optimizing our example by constructing \emph{D-Optimal designs} using a more flexible
+construction technique, that increases the number of levels we can screen for
+and enables detecting the significance of more complex model terms.
 
-It is necessary to select a model that relates factors and responses to
-construct a D-Optimal design. The model selection can be based on previous
-experiments or on expert knowledge of the problem. Once a model is selected,
-algorithmic construction is performed by searching for the set of experiments
-that minimizes the \emph{D-Optimality} criterion, a measure of the \emph{variance} of the
-\emph{estimators} of the \emph{regression coefficients} associated with the selected
-model. This search is usually done by swapping experiments from the current
-candidate set with experiments from a pool of possible experiments, according to
-certain rules, until some stopping criterion is met. In the approach presented
-in this paper we used Fedorov's algorithm~\cite{fedorov1972theory} for
-constructing D-Optimal designs, implemented in \texttt{R} in the \texttt{AlgDesign} package.
+The class of \emph{D-Optimal designs} is the best fit for our requirements of
+supporting multi-level factors while minimizing the number of experiments. The
+algorithms for constructing D-Optimal designs are relatively fast, simple, and
+have few restrictions. To construct a D-Optimal design it is necessary to choose
+an initial model, which can be done based on previous experiments or on expert
+knowledge of the problem.
 
-Considering that we are going to analyze the results of an experiments plan, the
-\emph{D-Efficiency} of a design is inversely proportional to the \emph{geometric mean} of
-the \emph{eigenvalues} of the plan's \emph{covariance matrix}. A D-Optimal design has the
-best D-Efficiency. Our current approach is based on D-Optimal designs.
+Once a model is selected, algorithmic construction is performed by searching for
+the set of experiments that minimizes \emph{D-Optimality}, a measure of the
+\emph{variance} of the \emph{estimators} for the \emph{regression coefficients} associated with
+the selected model. This search is usually done by swapping experiments from the
+current candidate set with experiments from a pool of possible experiments,
+according to certain rules, until some stopping criterion is met. In the example
+in this Section, as well as in the approach presented in this paper, we use
+Fedorov's algorithm~\cite{fedorov1972theory} for constructing D-Optimal
+designs, implemented in \texttt{R} in the \texttt{AlgDesign} package.
+
+Going back to our example, suppose that in addition to using our previous
+screening results we decide to hire an expert in our problem's domain. The
+expert confirms our initial assumptions that the factor \(x_1\) should be included
+in our model since it is usually relevant for this kind of problem and has a
+strong interaction with factor \(x_3\). She also mentions we should replace
+the linear term for \(x_8\) by a quadratic term for this factor.
+
+Using our previous screening and the domain knowledge provided by our expert, we
+choose a new performance model and use it to construct a D-Optimal design using
+Fedorov's algorithm. Since we need enough degrees of freedom to fit our model,
+we construct the design with 12 experiments shown in Table \ref{tab:d_optimal}.
 
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Sat Oct  6 23:07:45 2018
+% Tue Oct  9 13:01:01 2018
 \begin{table}[ht]
 \centering
-\caption{Comparison of the response $Y$ predicted by the linear model and the global minimum $Y$}
+\caption{D-Optimal design constructed for the factors $(x_1,x_3,x_5,x_7,x_8)$ and computed response $Y$}
+\label{tab:d_optimal}
 \begingroup\footnotesize
 \begin{tabular}{rrrrrr}
   \toprule
 $x_1$ & $x_3$ & $x_5$ & $x_7$ & $x_8$ & $Y$ \\
   \midrule
--1.0 & -1.0 & -1.0 & -1.0 & -1.0 & 4.801 \\
-  1.0 & -1.0 & 1.0 & 1.0 & -1.0 & 2.001 \\
-  1.0 & 1.0 & 1.0 & -1.0 & -0.2 & 9.335 \\
-  -1.0 & 1.0 & -1.0 & 1.0 & -0.2 & 0.135 \\
-  1.0 & -1.0 & -1.0 & -1.0 & 0.5 & -2.411 \\
-  -1.0 & -1.0 & 1.0 & 1.0 & 0.5 & 7.189 \\
-  -1.0 & 1.0 & 1.0 & -1.0 & 1.0 & 10.401 \\
-  1.0 & 1.0 & -1.0 & 1.0 & 1.0 & 1.601 \\
+-1.0 & -1.0 & -1.0 & -1.0 & -1.0 & 2.455 \\
+  1.0 & -1.0 & -1.0 & -1.0 & -1.0 & -4.881 \\
+  1.0 & -1.0 & 1.0 & -1.0 & -1.0 & 2.128 \\
+  -1.0 & 1.0 & -1.0 & 1.0 & -1.0 & -2.042 \\
+  -1.0 & -1.0 & 1.0 & 1.0 & -1.0 & 4.609 \\
+  1.0 & 1.0 & 1.0 & 1.0 & -1.0 & 4.163 \\
+  1.0 & 1.0 & -1.0 & -1.0 & 0.0 & 0.862 \\
+  -1.0 & -1.0 & 1.0 & -1.0 & 0.0 & 6.453 \\
+  -1.0 & 1.0 & 1.0 & -1.0 & 0.0 & 5.703 \\
+  -1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -2.708 \\
+  1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -9.019 \\
+  1.0 & -1.0 & 1.0 & 1.0 & 0.0 & -2.187 \\
    \bottomrule
 \end{tabular}
 \endgroup
 \end{table}
 
+Our current performance model was constructed by the screening experiment we ran
+on the previous step, and domain knowledge provided by our hired expert. We are
+now going to fit this model using the results of the experiments in our
+D-Optimal design. Table \ref{tab:correct_fit} shows the model fit table and
+compares the estimated and real model coefficients. This example illustrates
+that the Design of Experiments approach can achieve close model estimations
+using few resources, provided are able to use user input to identify relevant
+factors and knowledge about the problem domain to tweak the model.
+
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Sat Oct  6 23:08:22 2018
+% Tue Oct  9 13:20:13 2018
 \begin{table}[ht]
 \centering
-\caption{Comparison of the response $Y$ predicted by the linear model and the global minimum $Y$}
+\caption{Correct model fit comparing real and estimated coefficients, with significance intervals from the \texttt{R} language}
+\label{tab:correct_fit}
+\begingroup\small
+\begin{tabular}{lrrrrl}
+  \toprule
+ & Real & Estimated & t value & Pr$(>|\text{t}|)$ & Signif. \\
+  \midrule
+Intercept & 0.000 & 0.278 & 1.192 & 0.287 &   \\
+  $x_1$ & -1.500 & -1.378 & -8.116 & 0.000 & *** \\
+  $x_3$ & 1.300 & 1.283 & 7.558 & 0.001 & *** \\
+  $x_5$ & 3.100 & 3.017 & 18.851 & 0.000 & *** \\
+  $x_7$ & -1.400 & -1.659 & -10.365 & 0.000 & *** \\
+  I($x_8^2$) & 1.350 & 1.222 & 3.816 & 0.012 & * \\
+  $x_1$:$x_3$ & 1.600 & 1.718 & 10.124 & 0.000 & *** \\
+   \bottomrule
+\end{tabular}
+\endgroup
+\end{table}
+
+Table \ref{tab:prediction_comparisons} compares the global minimum in this
+example with the predictions made by our initial linear model from the screening
+step and our improved model from this step. Using screening, D-Optimal designs,
+and domain knowledge we found an optimization within \(10\%\) of the global
+optimum computing \(Y\) only 24 times. We were able to do that by first reducing
+the dimension of the problem when we eliminated irrelevant factors in the
+screening step. We then constructed a more careful exploration of this new
+problem subspace, helped by domain knowledge provided by an expert.
+
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Tue Oct  9 13:41:52 2018
+\begin{table}[ht]
+\centering
+\caption{Comparison of the response $Y$ predicted by our models and the global minimum $Y$}
+\label{tab:prediction_comparisons}
 \begingroup\footnotesize
 \begin{tabular}{lrrrrrr}
   \toprule
  & $x_1$ & $x_3$ & $x_5$ & $x_7$ & $x_8$ & $Y$ \\
   \midrule
-Correct Model & 1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -5.549 \\
-  Linear Model & -1.0 & -1.0 & -1.0 & 1.0 & -1.0 & 2.001 \\
-  Global Minimum & 1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -5.549 \\
+Correct Model & 1.00 & -1.00 & -1.00 & 1.00 & 0.00 & -9.019 \\
+  Linear Model & -1.00 & -1.00 & -1.00 & 1.00 & -1.00 & -1.046 \\
+  Global Minimum & 1.00 & -1.00 & -1.00 & 0.80 & 0.00 & -9.934 \\
    \bottomrule
 \end{tabular}
 \endgroup
 \end{table}
-\subsection{Multi-Level Design Construction Techniques}
-\label{sec:org28ce24a}
-The application of Design of Experiments to autotuning problems requires design
-construction techniques that support factors of different types and number of
-possible values. Autotuning problems typically combine factors such as binary
-flags, integer and floating point numerical values, and unordered enumerations
-of abstract values. Minimizing the number of experiments needed to find good
-optimizations is a also a fundamental requirement since we are interested in
-autotuning for scenarios with tight budget constraints.
 
-The design construction techniques that fit these requirements are limited.
-Designs that simply test all possible factor combinations, or \emph{full factorial
-designs}, would provide complete information about the global minimum but are
-unfeasible for most autotuning problems. In the \emph{2-level screening with random
-level sampling} technique, factors with more than two unordered levels are
-sampled at two random levels. This enables using small design such as the
-Plackett-Burman~\cite{plackett1946design} screening design. Advantages are
-the small design size and good estimation capability for main effects.
-Incapability of estimating interactions is a disadvantage of this strategy, but
-the main drawback is the lack of information for levels not selected in the
-initial screening.
+We are able to explain the performance improvements we obtained in each step of
+the process, because we finish steps with a performance model and a performance
+prediction. Each factor is included or removed using information obtained in
+statistical tests or expert knowledge. If we need to optimize this problem
+again, for a different architecture or with larger input, for example, we are
+able to start exploring the search space with a less naive model.
 
-In \emph{contractive replacement}, an initial 2-level design is used to generate
-mixed-level designs by re-encoding columns into a new single column representing
-a multi-level factor. The contractive replacement of
-Addelman-Kempthorne~\cite{addelman1961some} is a strategy of this kind.
-Advantages of this technique are the small design sizes and the ability to
-estimate main effects. Additionally, the contractive replacement technique
-preserves orthogonality. Due to strict requirements on initial designs, not all
-2-level designs can be contracted.
+The process of screening for factor significance using ANOVA and fitting a
+new model using acquired knowledge is essentially a step in the transparent
+Design of Experiments approach we present in the next Section.
+\section{Autotuning with Design of Experiments}
+\label{sec:org4683d70}
+In this Section we discuss in detail our iterative Design of Experiments
+approach to autotuning. At the start of the process it is necessary to define
+the factors and levels that compose the search space of the target problem,
+select an initial performance model, and generate an experimental design. Then,
+as discussed in the previous Section, we identify relevant factors by running an
+ANOVA test on the results. This enables selecting and fitting a new performance
+model, which is used for predicting levels for each relevant factor. The process
+can then restart, generating a new design for the new problem subspace. Informed
+decisions made by the user play a central role in each iteration, guiding and
+speeding up the process. Figure \ref{fig:org8ff4408} presents an overview of
+our approach.
 
-The \emph{direct generation} algorithm presented by Grömping and
-Fontana~\cite{ulrike2018algorithm} enables the generation of multi-level
-designs by solving Mixed Integer Problems (MIP). The advantages of this
-technique are the direct generation of multi-level designs and a clearly defined
-optimality criterion. Since this construction relies on solving carefully
-formulated MIP problems, it presents strong restrictions on the size and shape
-of the designs that can be generated.
-\subsection{Applying Design of Experiments to Autotuning}
-\label{sec:org7269ac0}
-\subsubsection{The DLMT Strategy}
-\label{sec:org4a991e2}
+The first step of our approach is to define which are the target factors and
+which levels of each factor are worth exploring. Then, the user must select an
+initial performance model. Compilers typically expose many 2-level factors in
+the form of configuration flags. The performance model for a single flag can
+only be a linear term, since there are only 2 values to measure. Interactions
+between flags can also be considered in an initial model. Numerical factors are
+also common, such as block sizes for CUDA programs or loop unrolling amounts.
+Deciding which levels to include for these kinds of factors requires a more
+careful analysis. For example, if we suspect the performance model has a
+quadratic term for a certain factor, we must include at least three of its
+levels. We can always consider the entire valid range of numerical factors.
+Other compiler parameters such as \texttt{-O(0,1,2,3)} have no clear ordering
+between their levels. These are categorical factors, and must be treated
+differently when constructing designs and analyzing the results.
+
 \begin{center}
-\begin{center}
-\includegraphics[width=.8\columnwidth]{./img/doe_anova_strategy.pdf}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.95\columnwidth]{./img/doe_anova_strategy.pdf}
+\caption{\label{fig:org8ff4408}
+Overview of the Design of Experiments approach to autotuning proposed in this paper}
+\end{figure}
 \end{center}
-\end{center}
+
+We decided to use D-Optimal designs because their construction techniques enable
+mixing categorical and numerical factors in the same screening design, while
+biasing sampling according to a performance model. This enables the autotuner to
+exploit global search space structures if we use the right model. When
+constructing a D-Optimal design the user can require that specific points in the
+search space are included, or that others are not. Algorithms for constructing
+D-Optimal designs are capable of adapting to these requirements by optimizing a
+starting design. Before settling on D-Optimal designs, we explored other design
+construction techniques such as the
+Plackett-Burman~\cite{plackett1946design} screening designs shown in the
+previous Section, the \emph{contractive replacement} technique of
+Addelman-Kempthorne~\cite{addelman1961some} and the \emph{direct generation}
+algorithm by Grömping and Fontana~\cite{ulrike2018algorithm}. These
+techniques have strong requirements on design size and level mixing, so we opted
+for a more flexible technique that would enable exploring a more comprehensive
+class of autotuning problems.
+
+After the design is constructed we run each selected experiment. This step can
+be done in parallel since experiments are independent. Runtime failures are
+common in this step due to problems such as incorrect output. The user can
+decide whether to construct a new design using the successfully completed
+experiments or to continue to the analysis step if enough experiments succeed.
+
+The next four steps of an iteration, shown in Figure \ref{fig:org8ff4408},
+were discussed in detail in the previous Section. User input is fundamental to
+the success of these steps. After running the ANOVA test, the user should apply
+domain knowledge to analyze the ANOVA table and determine which factors are
+relevant. Certain factors might not appear relevant but the user might still
+want to include them in the model to explore more of its levels, for example.
+Selecting the model after the ANOVA test also benefits from domain knowledge.
+The impact of the number of threads used by a parallel program on its
+performance is usually modeled using a quadratic term, for example.
+
+A central assumption of ANOVA is the \emph{homoscedasticity} of the response, which
+can be interpreted as requiring the observed error on measurements to be
+independent of factor levels and of the number of measurements. Fortunately, up
+to a point, there are statistical tests and corrections for lack of
+homoscedasticity, and our approach uses those before every ANOVA step.
+
+After the model is selected and fitted, prediction results will depend on the
+size of the data set available. If it is feasible to compute the fitted model on
+all possible factor combinations, we can be sure that the global optimum has a
+chance of being found. If the search space is too large to be generated, we have
+to adapt this step and run the prediction on a sample.
+
+The last step on an iteration is fixing factor levels to those predicted to have
+best performance. The user can also decide the level of trust that will be
+placed on the model and ANOVA at this step by allowing other levels. This step
+performs a reduction on the dimension of the problem by eliminating factors and
+decreasing the size of the search space. If we identify relevant parameters
+correctly, we will have restricted further search to better regions of the
+search space. In the next Section we present the performance of our approach in
+scenarios that differ on search space size, availability and complexity.
 \section{Performance Evaluation}
-\label{sec:orgdc80fb2}
+\label{sec:org5034423}
 \subsection{Example on a GPU Laplacian Kernel}
-\label{sec:org072f46f}
+\label{sec:org737675f}
 \begin{figure}
 {\scriptsize
 \begin{align*}
@@ -504,7 +669,7 @@ DLMT & D-Optimal Designs\\
 \end{table}
 
 \subsubsection{Results}
-\label{sec:orgdc0c15e}
+\label{sec:orgc77e2c1}
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
 % Thu Oct  4 17:04:18 2018
 \begin{table}[ht]
@@ -535,9 +700,9 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 \end{figure}
 \end{center}
 \subsection{Results on the SPAPT Benchmark}
-\label{sec:org20cb75e}
+\label{sec:org2217fc7}
 \subsubsection{The SPAPT Benchmark}
-\label{sec:org2c0f056}
+\label{sec:orgc1621c1}
 \begin{table}[ht]
 \caption{Set of applications we used from the SPAPT benchmark}
 \centering
@@ -566,10 +731,10 @@ Kernel & Operation & Factors & Size\\
 \end{tabular}
 \end{table}
 \subsubsection{Experimental Methodology}
-\label{sec:org6db5c21}
+\label{sec:org1b53b88}
 \begin{enumerate}
 \item Effect of Sampling in D-Optimal Designs
-\label{sec:org7bce21e}
+\label{sec:orgfbcc247}
 
 \begin{center}
 \begin{figure}[htbp]
@@ -580,9 +745,9 @@ Kernel & Operation & Factors & Size\\
 \end{center}
 \end{enumerate}
 \section{Conclusion}
-\label{sec:org81e5da8}
+\label{sec:orga32b94b}
 \section*{Acknowledgment}
-\label{sec:org4b464bf}
+\label{sec:org6756959}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 \end{document}
