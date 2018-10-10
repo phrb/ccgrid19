@@ -84,8 +84,8 @@ optimizing. We present experimental evaluations of our approach and show that,
 leveraging user decisions, it is capable of finding the global optimum of a GPU
 Laplacian kernel optimization using half of the measurement budget used by other
 common autotuning techniques. We also show that our approach is capable of using
-generic performance models to decrease the measurement budget needed to find
-speedups of up to 50$\times$, when compared to random sampling, for some
+generic performance models to decrease the measurement budget, when compared to
+random sampling, needed to find speedups of up to 50$\times$ for some
 applications from a more comprehensive autotuning benchmark.
 #+LATEX: \end{abstract}
 
@@ -510,9 +510,8 @@ git clone https://github.com/phrb/dlmt_spapt_experiments.git || (cd dlmt_spapt_e
 : Already up to date.
 
 *** Generate pdf
-#+HEADER: :results graphics output :session *R* :eval no-export
-#+HEADER: :file ./img/iteration_best_comparison.pdf
-#+HEADER: :width 11 :height 16
+**** Loading Data
+#+HEADER: :results output :session *R* :eval no-export
 #+BEGIN_SRC R
 library(ggplot2)
 library(plyr)
@@ -577,25 +576,100 @@ plot_data <- data %>%
 rs_sample <- data[data$technique == "RS", c("application", "technique", "cost_mean")]
 dlmt_sample <- data[data$technique == "DLMT", c("application", "technique", "cost_mean")]
 
+complete_plot_data <- plot_data
+#+END_SRC
+
+#+RESULTS:
+: There were 50 or more warnings (use warnings() to see the first 50)
+**** Back-to-back Histograms
+#+HEADER: :results graphics output :session *R* :eval no-export
+#+HEADER: :file ./img/split_histograms.pdf
+#+HEADER: :width 14 :height 7
+#+BEGIN_SRC R
+data <- complete_plot_data
+
+data <- data[data$application %in% c("bicgkernel", "mm", "tensor", "gesummv",
+                                                    "lu", "mvt", "seidel", "jacobi",
+                                                    "gemver", "atax", "stencil3d", "dgemv3",
+                                                    "adi", "trmm"), ]
+
+data$facet <- factor(data$application, levels = c("bicgkernel", "mm", "tensor", "gesummv",
+                                                            "lu", "mvt", "seidel", "jacobi",
+                                                            "gemver", "atax", "stencil3d", "dgemv3",
+                                                            "adi", "trmm"))
+
+data <- data[data$cost_mean < 12, ]
+
+nbins <- 12
+
+ggplot(data) +
+       facet_wrap(facet ~ ., scale = "free", ncol = 5) +
+       geom_histogram(data = subset(data, technique == "DLMT"), aes(x = cost_mean, y = ..ndensity.., fill = technique), bins = nbins) +
+       geom_histogram(data = subset(data, technique == "RS"), aes(x = cost_mean, y = -..ndensity.., fill = technique), bins = nbins) +
+       #scale_x_log10(labels = scales::trans_format("log10", scales::math_format(10^.x))) +
+       ggtitle("") +
+       xlab("Cost") +
+       ylab("") +
+       geom_vline(aes(xintercept = mean_cost_baseline), linetype = 8, color = "black") +
+       coord_flip() +
+       theme_bw(base_size = 21) +
+       theme(legend.position = "bottom",
+             legend.direction = "horizontal",
+             legend.title = element_blank(),
+             text = element_text(family = "serif"),
+             strip.background = element_rect(fill = "white"),
+             axis.text.x = element_blank(),
+             axis.ticks.x = element_blank(),
+             plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm"))  +
+       scale_fill_brewer(palette = "Set1")
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/split_histograms.pdf]]
+**** Iterations where best was found
+#+HEADER: :results graphics output :session *R* :eval no-export
+#+HEADER: :file ./img/iteration_best_comparison.pdf
+#+HEADER: :width 14 :height 7
+#+BEGIN_SRC R
+#plot_data$facet <- factor(plot_data$application, levels = c("bicgkernel", "mm", "tensor", "gesummv",
+#                                                            "lu", "mvt", "seidel", "jacobi",
+#                                                            "gemver", "atax", "stencil3d", "dgemv3",
+#                                                            "adi", "trmm", "hessian", "fdtd",
+#                                                            "correlation"))
+
+plot_data <- plot_data[plot_data$application %in% c("bicgkernel", "mm", "tensor", "gesummv",
+                                                    "lu", "mvt", "seidel", "jacobi",
+                                                    "gemver", "atax", "stencil3d", "dgemv3",
+                                                    "adi", "trmm"), ]
+
+plot_data$facet <- factor(plot_data$application, levels = c("bicgkernel", "mm", "tensor", "gesummv",
+                                                            "lu", "mvt", "seidel", "jacobi",
+                                                            "gemver", "atax", "stencil3d", "dgemv3",
+                                                            "adi", "trmm"))
+
 ggplot(plot_data, aes(min_run_cost, best_iteration, color = technique)) +
-    facet_wrap(application ~ ., ncol = 2) +
-    geom_jitter(data = rs_sample, aes(x = cost_mean, y = 300), pch = 19, alpha = 0.1, height = 85, width = 0) +
-    geom_jitter(data = dlmt_sample, aes(x = cost_mean, y = 100), pch = 19, alpha = 0.1, height = 85, width = 0) +
+    facet_wrap(facet ~ ., ncol = 5) +
+    #geom_jitter(data = rs_sample, aes(x = cost_mean, y = 300), pch = 19, alpha = 0.1, height = 85, width = 0) +
+    #geom_jitter(data = dlmt_sample, aes(x = cost_mean, y = 100), pch = 19, alpha = 0.1, height = 85, width = 0) +
     geom_point(size = 2, pch = 19) +
     stat_ellipse(type = "t", linetype = 13) +
     geom_vline(aes(xintercept = mean_cost_baseline), linetype = 8, color = "black") +
-    scale_x_continuous(trans = "log10") +
+    #scale_x_continuous(trans = "log10") +
+    #scale_x_log10(breaks = scales::trans_breaks("log10", function(x) 10^x),
+    #              labels = scales::trans_format("log10", scales::math_format(10^.x))) +
+    scale_x_log10(labels = scales::trans_format("log10", scales::math_format(10^.x))) +
     #coord_flip() +
+    annotation_logticks(sides = "b") +
     ggtitle("") +
     ylab("Iteration where Best was Found") +
     xlab("Best Cost") +
-    theme_bw(base_size = 14) +
+    theme_bw(base_size = 21) +
     theme(legend.position = "bottom",
           legend.direction = "horizontal",
           legend.title = element_blank(),
-          text = element_text(family="Noto Serif"),
+          text = element_text(family = "serif"),
           strip.background = element_rect(fill = "white"),
-          plot.margin = unit(c(0.2, 0.2, 0.2, 0.2), "cm"))  +
+          plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm"))  +
     scale_color_brewer(palette = "Set1")
 #+END_SRC
 
@@ -1025,24 +1099,25 @@ very large class.
 
 Search strategies based on meta-heuristics, gradient descent and machine
 learning require a large number of measurements to be effective, and are usually
-incapable of providing knowledge about search spaces to users. At the end of
-each autotuning session it is difficult to decide if and where further
-exploration is warranted, and impossible to know which parameters are
-responsible for the observed improvements. After exploring a search space, it is
-impossible to confidently deduce its global properties since its was explored
-with unknown biases.
+incapable of providing knowledge about search spaces to users. Since these
+strategies are not transparent, at the end of each autotuning session it is
+difficult to decide if and where further exploration is warranted, and
+impossible to know which parameters are responsible for the observed
+improvements. After exploring a search space, it is impossible to confidently
+deduce its global properties since its was explored with unknown biases.
 
 In this paper we propose an autotuning strategy that leverages existing expert
 and approximate knowledge about a problem in the form of a performance model,
 and refines this initial model iteratively using empirical performance
 evaluations, statistical analysis and user input. Our strategy puts a heavy
 weight on decreasing the costs of autotuning by using efficient /Design of
-Experiments/ strategies to minimize the number of experiments needed to find good
-optimizations. Each optimization iteration uses /Analysis of Variance/ (ANOVA)
-to help identify the relative significance of each configurable parameter to the
-performance observations. An architecture- and problem-specific performance
-model is built iteratively and with user input, enabling informed decisions on
-which regions of the search space are worth exploring.
+Experiments/ strategies to minimize the number of experiments needed to find
+good optimizations. Each optimization iteration uses /Analysis of Variance/
+(ANOVA) and linear model fits to identify promising subspaces and the relative
+significance of each configurable parameter to the performance observations. An
+architecture- and problem-specific performance model is built iteratively and
+with user input, enabling informed decisions on which regions of the search
+space are worth exploring.
 
 We present the performance of our approach on a Laplacian Kernel for GPUs where
 the search space, global optimum and performance model approximation are known.
@@ -1067,7 +1142,12 @@ and linear regression algorithms we use in analysis steps. Section [[Performance
 Evaluation]] presents our results with the GPU Laplacian Kernel and the SPAPT
 benchmark. Section [[Conclusion]] discusses our conclusions and future work.
 * Background
-** Source-to-source Transformation
+** Search Space Exploration Strategies
+#+BEGIN_CENTER
+#+CAPTION: Exploration of the search space defined by $x^2 + y^2$, using a fixed budget of 50 points
+#+ATTR_LATEX: :width .95\columnwidth
+[[./img/sampling_comparison.pdf]]
+#+END_CENTER
 ** Autotuning
 John Rice's Algorithm Selection framework\nbsp{}\cite{rice1976algorithm} is the
 precursor of autotuners in various problem domains. In 1997, the PHiPAC
@@ -1097,12 +1177,6 @@ algorithms to algorithm configuration and parameter tuning. The OpenTuner
 framework\nbsp{}\cite{ansel2014opentuner} provides ensembles of techniques that
 search the same space in parallel, while exploration is managed by an
 implementation of a solver of the multi-armed bandit problem.
-** Search Space Exploration Strategies
-#+BEGIN_CENTER
-#+CAPTION: Exploration of the search space defined by $x^2 + y^2$, using a fixed budget of 50 points
-#+ATTR_LATEX: :width .95\columnwidth
-[[./img/sampling_comparison.pdf]]
-#+END_CENTER
 * Design of Experiments
 An /experimental design/ determines a selection of experiments whose objective
 is to identify the relationships between /factors/ and /responses/. While
@@ -1146,22 +1220,22 @@ with $n + 1$ experiments.
 
 Assuming a linear relationship between factors and the response is fundamental
 for the analysis of variance using a Plackett-Burman design. For the following
-example, consider the linear relationship presented in Figure
-\ref{fig:linear_assumption}, where $\epsilon$ is the error term, $\mathbf{Y}$ is
-the observed response, $\mathbf{X} = \left(1, x_1,\dots,x_n\right)$ is the set
-of $n$ 2-level factors, and $\bm{\beta} = \left(\beta_0,\dots,\beta_n\right)$ is
-the set with the /intercept/ $\beta_0$ and the corresponding /model
-coefficients/.
+example, consider the linear relationship presented in
+Figure\nbsp{}\ref{fig:linear_assumption}, where $\epsilon$ is the error term,
+$\mathbf{Y}$ is the observed response, $\mathbf{X} = \left(1,
+x_1,\dots,x_n\right)$ is the set of $n$ 2-level factors, and $\bm{\beta} =
+\left(\beta_0,\dots,\beta_n\right)$ is the set with the /intercept/ $\beta_0$
+and the corresponding /model coefficients/.
 
 We now present an example to illustrate the screening methodology. Suppose we
 wish to minimize a performance metric $Y$ of a problem with factors
 $x_1,\dots,x_8$ assuming values in $[-1, -0.8, -0.6, \dots, 0.6, 0.8, 1]$. Each
-$y_i \in Y$ is computed using the formula described in Figure
-\ref{fig:real_model}, but suppose that, for the purpose of this example, they
-are computed by a very expensive black-box procedure. To efficiently study this
-problem we decide to construct a Plackett-Burman design, which minimizes the
-experiments needed to identify relevant factors. The analysis of this design
-will enable us to decrease the dimension of the problem.
+$y_i \in Y$ is computed using the formula described in
+Figure\nbsp{}\ref{fig:real_model}, but suppose that, for the purpose of this
+example, they are computed by a very expensive black-box procedure. To
+efficiently study this problem we decide to construct a Plackett-Burman design,
+which minimizes the experiments needed to identify relevant factors. The
+analysis of this design will enable us to decrease the dimension of the problem.
 
 #+BEGIN_EXPORT latex
 \begin{figure}[htpb]
@@ -1174,12 +1248,12 @@ y_i =
 \ \ \epsilon
 \end{align*}
 }
-\caption{Real model used to obtain the data on Table \ref{tab:plackett}}
+\caption{Real model used to obtain the data on Table\ref{tab:plackett}}
 \label{fig:real_model}
 \end{figure}
 #+END_EXPORT
 
-Table \ref{tab:plackett} presents the Plackett-Burman design we generated for
+Table\nbsp{}\ref{tab:plackett} presents the Plackett-Burman design we generated for
 our problem. In this design we have the 8 2-level factors $x_1,\dots,x_8$, and
 the observed response $\mathbf{Y}$. As is common when constructing screening
 designs, we had to add 3 ``dummy'' factors $d_1,\dots,d_3$ to complete the 12
@@ -1266,14 +1340,14 @@ $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $x_8$ & $d_1$ & $d_2$ & 
 \end{table}
 #+END_EXPORT
 
-We use our initial assumption shown in Figure \ref{fig:linear_assumption} to
+We use our initial assumption shown in Figure\nbsp{}\ref{fig:linear_assumption} to
 identify the most relevant factors by performing an ANOVA test. The resulting
-ANOVA table is shown in Table \ref{tab:anova_linear}, where the /significance/
+ANOVA table is shown in Table\nbsp{}\ref{tab:anova_linear}, where the /significance/
 of each factor can be interpreted from the F-test and P$(>\text{F})$ values.
-Table \ref{tab:anova_linear} uses ``$*$'', as is convention in the \texttt{R}
+Table\nbsp{}\ref{tab:anova_linear} uses ``$*$'', as is convention in the \texttt{R}
 language, to represent the significance values for each factor.
 
-We see on Table \ref{tab:anova_linear} that factors $(x_3,x_5,x_7,x_8)$ have at
+We see on Table\nbsp{}\ref{tab:anova_linear} that factors $(x_3,x_5,x_7,x_8)$ have at
 least one ``$*$'' of significance. For the purpose of this example, this is
 reason enough to include them in our linear model for the next step. We see that
 factor $x_1$ has a significance mark of ``\cdot'', but comparing its F-test and
@@ -1375,7 +1449,7 @@ $(x_1,x_3,x_5,x_7,x_8$), without running any new experiments. The levels of the
 selected factors with the best prediction on this data will be the output of
 this step.
 
-Table \ref{tab:linear_prediction_comparison} compares the prediction for $Y$
+Table\nbsp{}\ref{tab:linear_prediction_comparison} compares the prediction for $Y$
 from our linear model with the selected factors $(x_1,x_3,x_5,x_7,x_8)$ with the
 actual global minimum $Y$ for this problem. Using 12 measurements and a simple
 linear model, the predicted best value of $Y$ was around $10\times$ larger than
@@ -1487,7 +1561,7 @@ the linear term for $x_8$ by a quadratic term for this factor.
 Using our previous screening and the domain knowledge provided by our expert, we
 choose a new performance model and use it to construct a D-Optimal design using
 Fedorov's algorithm. Since we need enough degrees of freedom to fit our model,
-we construct the design with 12 experiments shown in Table \ref{tab:d_optimal}.
+we construct the design with 12 experiments shown in Table\nbsp{}\ref{tab:d_optimal}.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
@@ -1609,7 +1683,7 @@ $x_1$ & 199.361 & 0.000 & $***$ \\
 Our current performance model was constructed by the screening experiment we ran
 on the previous step, and domain knowledge provided by our hired expert. We are
 now going to fit this model using the results of the experiments in our
-D-Optimal design. Table \ref{tab:correct_fit} shows the model fit table and
+D-Optimal design. Table\nbsp{}\ref{tab:correct_fit} shows the model fit table and
 compares the estimated and real model coefficients. This example illustrates
 that the Design of Experiments approach can achieve close model estimations
 using few resources, provided are able to use user input to identify relevant
@@ -1669,7 +1743,7 @@ Intercept & 0.000 & 0.278 & 1.192 & 0.287 &   \\
 \end{table}
 #+END_EXPORT
 
-Table \ref{tab:prediction_comparisons} compares the global minimum in this
+Table\nbsp{}\ref{tab:prediction_comparisons} compares the global minimum in this
 example with the predictions made by our initial linear model from the screening
 step and our improved model from this step. Using screening, D-Optimal designs,
 and domain knowledge we found an optimization within $10\%$ of the global
@@ -1971,7 +2045,44 @@ correctly, we will have restricted further search to better regions of the
 search space. In the next Section we present the performance of our approach in
 scenarios that differ on search space size, availability and complexity.
 * Performance Evaluation
-** Example on a GPU Laplacian Kernel
+In this Section we present performance evaluations of our approach in two
+scenarios.
+** GPU Laplacian Kernel
+We first evaluated the performance of our approach in a Laplacian Kernel
+implemented using BOAST\nbsp{}\cite{videau2017boast} and targeting the Nvidia
+K40c GPU. The objective was to minimize the /time to compute each pixel/ by
+finding the best level combination for the factors listed in Table
+[[tab:gpu_laplacian_factors]]. Considering only factors and levels, the size of the
+search space is $1.9\times10^5$ but removing points that fail at runtime yields
+a search space of size $2.3\times10^4$. The complete search space took 154 hours
+to be evaluated on /Debian Jessie/, using an /Intel Xeon E5-2630v2/ CPU,
+\texttt{gcc} version \texttt{4.8.3} and Nvidia driver version \texttt{340.32}.
+
+#+ATTR_LATEX: :booktabs t :align ll :font \footnotesize :float t :placement [ht]
+#+NAME: tab:gpu_laplacian_factors
+#+CAPTION: Parameters of the Laplacian Kernel
+|-------------------------------+-------------------------------|
+| Factor                        | Levels                        |
+|-------------------------------+-------------------------------|
+| \texttt{vector\_length}       | $2^0,\dots,2^4$               |
+| \texttt{load\_overlap}        | \textit{true}, \textit{false} |
+| \texttt{temporary\_size}      | $2,4$                         |
+| \texttt{elements\_number}     | $1,\dots,24$                  |
+| \texttt{y\_component\_number} | $1,\dots,6$                   |
+| \texttt{threads\_number}      | $2^5,\dots,2^{10}$            |
+| \texttt{lws\_y}               | $2^0,\dots,2^{10}$            |
+|-------------------------------+-------------------------------|
+
+We applied domain knowledge to construct the initial performance model shown in
+Figure\nbsp{}\ref{fig:gpu_laplacian_performance_model}. This performance model
+was used by the Iterative Linear Model (LM) algorithm and by our D-Optimal
+Design approach (DLMT). The LM algorithm is identical to our approach, described
+Section\nbsp{}[[Autotuning with Design of Experiments]], except for the design
+generation step, where it uses a fixed-size random sample of the search space
+instead of generating designs. We compared the performance of our approach with
+the algorithms listed in Table\nbsp{}[[tab:gpu_laplacian_algorithms]], using a
+budget of /at most/ 125 measurements and 1000 repetitions.
+
 #+BEGIN_EXPORT latex
 \begin{figure}
 {\scriptsize
@@ -1984,11 +2095,13 @@ scenarios that differ on search space size, availability and complexity.
 \end{align*}
 }
 \caption{Initial performance model used by LM and DLMT}
+\label{fig:gpu_laplacian_performance_model}
 \end{figure}
 #+END_EXPORT
 
 #+ATTR_LATEX: :booktabs t :align ll :font \footnotesize :float t :placement [ht]
-#+CAPTION: Algorithms compared in the GPU Laplacian Kernel
+#+NAME: tab:gpu_laplacian_algorithms
+#+CAPTION: Search algorithms compared in the GPU Laplacian Kernel
 |------+-----------------------------|
 |      | Algorithm                   |
 |------+-----------------------------|
@@ -2001,7 +2114,13 @@ scenarios that differ on search space size, availability and complexity.
 | DLMT | D-Optimal Designs           |
 |------+-----------------------------|
 
-*** Results
+Table\nbsp{}\ref{tab:gpu_laplacian_compare_budget} shows
+the mean, minimum and maximum /slowdowns/ in comparison with global minimum
+for each algorithm. It also shows the mean and maximum budget used by
+each algorithm. Figure\nbsp{}[[fig:gpu_laplacian_comparison_histogram]] presents
+histograms for the slowdowns found by each of the 1000 repetitions. Arrows
+indicate the maximum slowdown found by each algorithm.
+
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
 library(xtable)
@@ -2032,28 +2151,29 @@ summaries <- data.frame(RS = c(as.data.frame(unclass(summary(df_all_methods[df_a
                                     mean(df_all_methods[df_all_methods$method == "DLMT",]$point_number),
                                     max(df_all_methods[df_all_methods$method == "DLMT",]$point_number)))
 
-rownames(summaries) <- c(rownames(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "RS", ]$slowdown)))), "Mean Points", "Max Points")
+rownames(summaries) <- c(rownames(as.data.frame(unclass(summary(df_all_methods[df_all_methods$method == "RS", ]$slowdown)))), "Mean Budget", "Max. Budget")
 summaries <- t(summaries)
-summaries <- summaries[ , c("Mean", "Min.", "Max.", "Mean Points", "Max Points")]
+summaries <- summaries[ , c("Mean", "Min.", "Max.", "Mean Budget", "Max. Budget")]
 
 cap <- "Slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions"
-x <- xtable(summaries, caption = cap, digits = 2)
+x <- xtable(summaries, caption = cap, digits = 2, label = "tab:gpu_laplacian_compare_budget")
 align(x) <- xalign(x)
 display(x) <- display(x)
-print(x, size = "\\small", booktabs = TRUE, math.style.exponents = TRUE, caption.placement = "top")
+print(x, size = "\\footnotesize", booktabs = TRUE, math.style.exponents = TRUE, caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Thu Oct  4 17:04:18 2018
+% Wed Oct 10 16:43:05 2018
 \begin{table}[ht]
 \centering
-\caption{Comparison of slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
-\begingroup\small
+\caption{Slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
+\label{tab:gpu_laplacian_compare_budget}
+\begingroup\footnotesize
 \begin{tabular}{lrrrrr}
   \toprule
- & Mean & Min. & Max. & Mean Points & Max Points \\
+ & Mean & Min. & Max. & Mean Budget & Max. Budget \\
   \midrule
 RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
   LHS & 1.17 & 1.00 & 1.52 & 98.92 & 125.00 \\
@@ -2068,14 +2188,41 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 \end{table}
 #+END_EXPORT
 
+All algorithms performed well in this application, with only Greedy Search (GS)
+not being able to find slowdowns smaller than 4$\times$ in some runs. As
+expected, other search algorithms had results similar to Random Sampling (RS).
+The LM algorithm was able to find the global minimum on most runs, but some runs
+found slowdowns of almost $4\times$. Our approach was able to find the global
+minimum in all of the 1000 runs while using /at most/ less than half of the
+allotted budget.
+
 #+BEGIN_CENTER
+#+NAME: fig:gpu_laplacian_comparison_histogram
 #+CAPTION: Histograms of 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions
 #+ATTR_LATEX: :float t :placement [ht] :width .9\columnwidth
 [[./img/comparison_histogram.pdf]]
 #+END_CENTER
-** Results on the SPAPT Benchmark
-*** The SPAPT Benchmark
+
+This application provides ideal conditions for using our approach. where the
+performance model is approximately known and the complete valid search space is
+small enough to be stored and used for prediction. The global minimum also
+appears to not be isolated in a region of points with bad performance, since our
+approach was able to exploit search space geometry. Next we will analyze the
+performance of our approach in a larger and more comprehensive scenario.
+** SPAPT Benchmark
+The SPAPT\nbsp{}\cite{balaprakash2012spapt} benchmark provides parametrized
+kernels from different High Performance Computing domains. The kernels, shown in
+Table\nbsp{}[[tab:spapt_apps]], are implemented using the code annotation and
+transformation tools provided by Orio\nbsp{}\cite{hartono2009annotation}. Search
+space sizes are overall larger than in the Laplacian Kernel example. Kernel factors
+are either integers in a range, such as loop unrolling and register tiling amounts,
+or binary flags that control parallelization and vectorization, for example.
+
+We used the Random Sampling (RS) implementation available in Orio and
+implemented our approach (DLMT) in the system.
+
 #+ATTR_LATEX: :booktabs t :align llll :font \scriptsize :float t :placement [ht]
+#+NAME: tab:spapt_apps
 #+CAPTION: Set of applications we used from the SPAPT benchmark
 |---------------+---------------------------------+---------+----------------------|
 | Kernel        | Operation                       | Factors | Size                 |
@@ -2097,21 +2244,20 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 | =stencil3d=   | 3-D stencil computation         |      29 | $9.7 \times 10^{27}$ |
 | =correlation= | Correlation computation         |      21 | $4.5 \times 10^{17}$ |
 |---------------+---------------------------------+---------+----------------------|
-*** Experimental Methodology
-**** Effect of Sampling in D-Optimal Designs
 
 #+BEGIN_CENTER
-#+CAPTION: Effect of a small initial candidate set on constructing D-Optimal designs
-#+ATTR_LATEX: :width .75\columnwidth
-[[./img/dopt_comparison.pdf]]
+#+NAME: fig:split_histograms
+#+CAPTION: Histograms of explored search spaces
+#+ATTR_LATEX: :float multicolumn :placement [p] :width .9\textwidth
+[[./img/split_histograms.pdf]]
 #+END_CENTER
-*** Results                                                      :noexport:
+
 #+BEGIN_CENTER
-#+CAPTION: Results
+#+NAME: fig:iteration_best_comparison
+#+CAPTION: Cost of best point found on each run against the iteration where it was found
 #+ATTR_LATEX: :float multicolumn :placement [p] :width .9\textwidth
 [[./img/iteration_best_comparison.pdf]]
 #+END_CENTER
-\clearpage
 * Conclusion
 * Acknowledgment
 :PROPERTIES:

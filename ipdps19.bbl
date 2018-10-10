@@ -108,4 +108,17 @@ U.~Grömping and R.~Fontana, ``An algorithm for generating good mixed level
   factorial designs,'' Beuth University of Applied Sciences, Berlin, Tech.
   Rep., 2018.
 
+\bibitem{videau2017boast}
+B.~Videau, K.~Pouget, L.~Genovese, T.~Deutsch, D.~Komatitsch, F.~Desprez, and
+  J.-F. M{\'e}haut, ``Boast: A metaprogramming framework to produce portable
+  and efficient computing kernels for hpc applications,'' \emph{The
+  International Journal of High Performance Computing Applications}, p.
+  1094342017718068, 2017.
+
+\bibitem{hartono2009annotation}
+A.~Hartono, B.~Norris, and P.~Sadayappan, ``Annotation-based empirical
+  performance tuning using orio,'' in \emph{Parallel \& Distributed Processing,
+  2009. IPDPS 2009. IEEE International Symposium on}.\hskip 1em plus 0.5em
+  minus 0.4em\relax IEEE, 2009, pp. 1--11.
+
 \end{thebibliography}
