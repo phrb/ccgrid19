@@ -94,9 +94,31 @@ J.~Ansel, S.~Kamil, K.~Veeramachaneni, J.~Ragan-Kelley, J.~Bosboom, U.-M.
 R.~L. Plackett and J.~P. Burman, ``The design of optimum multifactorial
   experiments,'' \emph{Biometrika}, vol.~33, no.~4, pp. 305--325, 1946.
 
+\bibitem{gromping2014frf2}
+\BIBentryALTinterwordspacing
+U.~Gr"omping, ``{R} package {FrF2} for creating and analyzing fractional
+  factorial 2-level designs,'' \emph{Journal of Statistical Software}, vol.~56,
+  no.~1, pp. 1--56, 2014. [Online]. Available:
+  \url{http://www.jstatsoft.org/v56/i01/}
+\BIBentrySTDinterwordspacing
+
+\bibitem{team2018rlanguage}
+\BIBentryALTinterwordspacing
+{R Core Team}, \emph{R: A Language and Environment for Statistical Computing},
+  R Foundation for Statistical Computing, Vienna, Austria, 2018. [Online].
+  Available: \url{https://www.R-project.org/}
+\BIBentrySTDinterwordspacing
+
 \bibitem{fedorov1972theory}
 V.~V. Fedorov, \emph{Theory of optimal experiments}.\hskip 1em plus 0.5em minus
   0.4em\relax Elsevier, 1972.
+
+\bibitem{wheeler2014algdesign}
+\BIBentryALTinterwordspacing
+B.~Wheeler, \emph{AlgDesign: Algorithmic Experimental Design}, 2014, r package
+  version 1.1-7.3. [Online]. Available:
+  \url{https://CRAN.R-project.org/package=AlgDesign}
+\BIBentrySTDinterwordspacing
 
 \bibitem{addelman1961some}
 S.~Addelman and O.~Kempthorne, ``Some main-effect plans and orthogonal arrays
@@ -107,6 +129,14 @@ S.~Addelman and O.~Kempthorne, ``Some main-effect plans and orthogonal arrays
 U.~Grömping and R.~Fontana, ``An algorithm for generating good mixed level
   factorial designs,'' Beuth University of Applied Sciences, Berlin, Tech.
   Rep., 2018.
+
+\bibitem{fox2011car}
+\BIBentryALTinterwordspacing
+J.~Fox and S.~Weisberg, \emph{An {R} Companion to Applied Regression},
+  2nd~ed.\hskip 1em plus 0.5em minus 0.4em\relax Thousand Oaks {CA}: Sage,
+  2011. [Online]. Available:
+  \url{http://socserv.socsci.mcmaster.ca/jfox/Books/Companion}
+\BIBentrySTDinterwordspacing
 
 \bibitem{videau2017boast}
 B.~Videau, K.~Pouget, L.~Genovese, T.~Deutsch, D.~Komatitsch, F.~Desprez, and
