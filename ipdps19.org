@@ -69,7 +69,7 @@
 #+LATEX_HEADER: Brice Videau\IEEEauthorrefmark{1},
 #+LATEX_HEADER: Jean-Marc Vincent\IEEEauthorrefmark{1}, and
 #+LATEX_HEADER: Alfredo Goldman\IEEEauthorrefmark{2}}
-#+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{1}University of Grenoble Alpes, CNRS, INRIA, Grenoble INP, LIG -- 38000 Grenoble, France\\
+#+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{1}University of Grenoble Alpes, CNRS, Inria, Grenoble INP, LIG -- 38000 Grenoble, France\\
 #+LATEX_HEADER: Email: \{arnaud.legrand, brice.videau, jean-marc.vincent\}@imag.fr}
 #+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{2}University of São Paulo -- São Paulo, Brazil\\
 #+LATEX_HEADER: Email: \{phrb, gold\}@ime.usp.br}}
@@ -579,29 +579,18 @@ plot_data <- data %>%
              mutate(mean_cost_baseline = mean(cost_baseline)) %>%
              ungroup()
 
+plot_data <- plot_data %>%
+             distinct(experiment_id, .keep_all = TRUE) %>%
+             group_by(application, technique) %>%
+             mutate(label_center_x = mean(cost_mean)) %>%
+             mutate(label_center_y = mean(best_iteration)) %>%
+             ungroup()
+
 complete_plot_data <- plot_data
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:plyr’:
-
-    arrange, count, desc, failwith, id, mutate, rename, summarise,
-    summarize
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-Registering fonts with R
-There were 50 or more warnings (use warnings() to see the first 50)
-#+end_example
+: There were 50 or more warnings (use warnings() to see the first 50)
 **** Back-to-back Histograms
 #+HEADER: :results graphics output :session *R* :eval no-export
 #+HEADER: :file ./img/split_histograms.pdf
@@ -643,13 +632,14 @@ p1 <- ggplot(hist_data) +
        #scale_x_log10(labels = scales::trans_format("log10", scales::math_format(10^.x))) +
        ggtitle("") +
        xlab("Cost") +
-       ylab("") +
+       ylab("Count") +
+       scale_size_manual("", values = 0.45) +
        guides(fill = guide_legend(reverse = TRUE)) +
-       geom_vline(aes(xintercept = mean_cost_baseline), linetype = 8, color = "black") +
+       geom_vline(aes(xintercept = mean_cost_baseline, size = "-O3"), linetype = 8, color = "black") +
        coord_flip() +
        theme_bw(base_size = 18) +
-       theme(legend.position = "bottom",
-             legend.direction = "horizontal",
+       theme(legend.position = c(0.91, 0.15),
+             legend.direction = "vertical",
              legend.title = element_blank(),
              text = element_text(family = "serif"),
              strip.background = element_rect(fill = "white"),
@@ -715,6 +705,7 @@ grid.draw(new_plot)
 #+HEADER: :file ./img/iteration_best_comparison.pdf
 #+HEADER: :width 14 :height 7
 #+BEGIN_SRC R
+library(ggrepel)
 it_data <- complete_plot_data
 it_data$facet <- factor(it_data$application, levels = c("hessian", "fdtd", "correlation",
                                                         "gemver", "atax", "stencil3d", "dgemv3",
@@ -733,17 +724,22 @@ p1 <- ggplot(it_data, aes(min_run_cost, best_iteration, color = technique)) +
     facet_wrap(facet ~ ., ncol = 6) +
     geom_point(size = 2, pch = 19) +
     stat_ellipse(type = "t", linetype = 13) +
-    geom_vline(aes(xintercept = mean_cost_baseline), linetype = 8, color = "black") +
+    #geom_label_repel(data = . %>% group_by(application) %>%
+    #                              filter(technique == "RS") %>%
+    #                              filter(best_iteration == min(best_iteration)),
+    #                 aes(label = technique, x = label_center_x, y = label_center_y), show.legend = FALSE) +
+    geom_vline(aes(xintercept = mean_cost_baseline, size = "-O3"), linetype = 8, color = "black") +
     scale_x_log10(labels = scales::trans_format("log10", scales::math_format(10^.x))) +
     scale_y_continuous(limits = c(-10, 400), breaks = c(0, 200, 400)) +
+    scale_size_manual("", values = 0.45) +
     annotation_logticks(sides = "b") +
     ggtitle("") +
     ylab("Iteration where Best was Found") +
     xlab("Best Cost") +
     guides(color = guide_legend(reverse = TRUE)) +
     theme_bw(base_size = 18) +
-    theme(legend.position = "bottom",
-          legend.direction = "horizontal",
+    theme(legend.position = c(0.91, 0.15),
+          legend.direction = "vertical",
           legend.title = element_blank(),
           text = element_text(family = "serif"),
           strip.background = element_rect(fill = "white"),
@@ -2137,8 +2133,8 @@ ANOVA test on the results. This enables selecting and fitting a new performance
 model, which is used for predicting levels for each relevant factor. The process
 can then restart, generating a new design for the new problem subspace with the
 remaining factors. Informed decisions made by the user play a central role in
-each iteration, guiding and speeding up the process. Figure
-[[fig:doe_anova_strategy]] presents an overview of our approach.
+each iteration, guiding and speeding up the process.
+Figure\nbsp{}[[fig:doe_anova_strategy]] presents an overview of our approach.
 
 The first step of our approach is to define which are the target factors and
 which levels of each factor are worth exploring. Then, the user must select an
@@ -2225,14 +2221,14 @@ In this Section we present performance evaluations of our approach in two
 scenarios.
 ** GPU Laplacian Kernel
 We first evaluated the performance of our approach in a Laplacian Kernel
-implemented using BOAST\nbsp{}\cite{videau2017boast} and targeting the Nvidia
-K40c GPU. The objective was to minimize the /time to compute each pixel/ by
+implemented using BOAST\nbsp{}\cite{videau2017boast} and targeting the /Nvidia
+K40c/ GPU. The objective was to minimize the /time to compute each pixel/ by
 finding the best level combination for the factors listed in Table
 [[tab:gpu_laplacian_factors]]. Considering only factors and levels, the size of the
 search space is $1.9\times10^5$ but removing points that fail at runtime yields
 a search space of size $2.3\times10^4$. The complete search space took 154 hours
 to be evaluated on /Debian Jessie/, using an /Intel Xeon E5-2630v2/ CPU,
-\texttt{gcc} version \texttt{4.8.3} and Nvidia driver version \texttt{340.32}.
+\texttt{gcc} version \texttt{4.8.3} and /Nvidia/ driver version \texttt{340.32}.
 
 #+ATTR_LATEX: :booktabs t :align ll :font \footnotesize :float t :placement [ht]
 #+NAME: tab:gpu_laplacian_factors
@@ -2257,7 +2253,7 @@ Section\nbsp{}[[Autotuning with Design of Experiments]], except for the design
 generation step, where it uses a fixed-size random sample of the search space
 instead of generating designs. We compared the performance of our approach with
 the algorithms listed in Table\nbsp{}[[tab:gpu_laplacian_algorithms]], using a
-budget of /at most/ 125 measurements and 1000 repetitions.
+budget of /at most/ 125 measurements, over 1000 repetitions.
 
 #+BEGIN_EXPORT latex
 {\scriptsize
@@ -2288,12 +2284,14 @@ budget of /at most/ 125 measurements and 1000 repetitions.
 | DLMT | D-Optimal Designs           |
 |------+-----------------------------|
 
+Since we measured the entire valid search space, we could use the /slowdown/
+relative to the /global minimum/ to compare the performance of algorithms.
 Table\nbsp{}\ref{tab:gpu_laplacian_compare_budget} shows the mean, minimum and
-maximum /slowdowns/, in comparison to the global minimum, for each algorithm. It
+maximum slowdowns in comparison to the global minimum, for each algorithm. It
 also shows the mean and maximum budget used by each algorithm.
-Figure\nbsp{}[[fig:gpu_laplacian_comparison_histogram]] presents histograms for the
-slowdowns found by each of the 1000 repetitions. Arrows point the maximum
-slowdown found by each algorithm.
+Figure\nbsp{}[[fig:gpu_laplacian_comparison_histogram]] presents histograms with the
+real count of the slowdowns found by each of the 1000 repetitions. Arrows point
+the maximum slowdown found by each algorithm.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
@@ -2377,38 +2375,39 @@ allotted budget.
 
 #+BEGIN_CENTER
 #+NAME: fig:gpu_laplacian_comparison_histogram
-#+CAPTION: Histograms of 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions
+#+CAPTION: Counts of the slowdowns in relation to the global minimum for 7 optimization methods on the Laplacian Kernel, using a budget of 125 points over 1000 repetitions
 #+ATTR_LATEX: :float t :placement [ht] :width .9\columnwidth
 [[./img/comparison_histogram.pdf]]
 #+END_CENTER
 
-This kernel provides ideal conditions for using our approach, where the
+We implemented a simple approach for the prediction step in this problem,
+choosing the best value of our fitted models on the complete set of valid level
+combinations. This was possible for this problem since all valid combinations
+were known and fit in memory. For problems were the search space is too large to
+be generated, we would have to either adapt this step and run the prediction on
+a sample, or minimize the model using the strategies we mentioned the previous
+Section.
+
+This kernel provided ideal conditions for using our approach, where the
 performance model is approximately known and the complete valid search space is
 small enough to be stored and used for prediction. The global minimum also
 appears to not be isolated in a region of points with bad performance, since our
-approach was able to exploit search space geometry. Next we will analyze the
-performance of our approach in a larger and more comprehensive scenario.
+approach was able to exploit search space geometry. We will now present a
+performance evaluation of our approach in a larger and more comprehensive
+benchmark.
 ** SPAPT Benchmark
-The SPAPT\nbsp{}\cite{balaprakash2012spapt} benchmark provides parametrized
+The SPAPT\nbsp{}\cite{balaprakash2012spapt} benchmark provides parametrized CPU
 kernels from different High Performance Computing domains. The kernels, shown in
-\todo{valid size}Table\nbsp{}[[tab:spapt_apps]], are implemented using the code annotation and
-transformation tools provided by Orio\nbsp{}\cite{hartono2009annotation}. Search
-space sizes are overall larger than in the Laplacian Kernel example. Kernel factors
-are either integers in a range, such as loop unrolling and register tiling amounts,
-or binary flags that control parallelization and vectorization, for example.
-
-We used the Random Sampling (RS) implementation available in Orio and
-implemented our approach (DLMT) in the system.
-
-\todo{!}After the model is selected and fitted, prediction results will depend
-on the size of the data set available. If it is feasible to compute the fitted
-model on all possible factor combinations, we can be sure that the global
-optimum has a chance of being found. If the search space is too large to be
-generated, we have to adapt this step and run the prediction on a sample.
+\todo{valid size}Table\nbsp{}[[tab:spapt_apps]], are implemented using the code
+annotation and transformation tools provided by
+Orio\nbsp{}\cite{hartono2009annotation}. Search space sizes are overall larger
+than in the Laplacian Kernel example. Kernel factors are either integers in an
+interval, such as loop unrolling and register tiling amounts, or binary flags
+that control parallelization and vectorization, for example.
 
 #+ATTR_LATEX: :booktabs t :align llll :font \scriptsize :float t :placement [ht]
 #+NAME: tab:spapt_apps
-#+CAPTION: Set of kernels we used from the SPAPT benchmark
+#+CAPTION: Kernels from the SPAPT benchmark used in this evaluation
 |---------------+---------------------------------+---------+----------------------|
 | Kernel        | Operation                       | Factors | Size                 |
 |---------------+---------------------------------+---------+----------------------|
@@ -2430,23 +2429,104 @@ generated, we have to adapt this step and run the prediction on a sample.
 | =correlation= | Correlation computation         |      21 | $4.5 \times 10^{17}$ |
 |---------------+---------------------------------+---------+----------------------|
 
+We used the Random Sampling (RS) implementation available in Orio and integrated
+an implementation of our approach (DLMT) to the system. The global minima are
+not known for any of the problems, and problem search spaces are too large to
+allow complete measurements. Therefore, we used the performance of each
+application compiled with \texttt{gcc}'s \texttt{-O3}, with no code
+transformations, as a /baseline/ for computing the /speedups/ achieved by each
+strategy. We performed 10 autotuning repetitions for each kernel using random
+sampling and our approach, using a budget of /at most/ 400 measurements. Our
+approach was also only allowed to perform 4 of iterations shown in
+Figure\nbsp{}[[fig:doe_anova_strategy]]. Experiments were performed using
+Grid5000\nbsp{}\cite{balouek2013adding}, on /Debian Jessie/, using an /Intel
+Xeon E5-2630v3/ CPU and \texttt{gcc} version \texttt{6.3.0}.
+
+Similar to the previous example, we automated factor elimination based on ANOVA
+tests so that a comprehensive evaluation could be performed. We also did not
+tailor starting performance models, which were the same for all kernels.
+Starting models had a linear term for each factor with two or more levels, plus
+quadratic and cubic terms for factors with sufficient levels. Although
+automation and identical starting models might have limited the improvements at
+each step of our application, our results show that it still succeeded in
+decreasing the budget needed to find significant speedups for some kernels.
+
+Figure\nbsp{}[[fig:iteration_best_comparison]] presents the speedup found by each
+run of RS and DLMT, plotted against the algorithm iteration where that speedup
+was found. We divided the kernels into 3 groups according to the results. The
+group where no algorithm found any speedups contains 3 kernels and is marked
+with /green/ headers. The group where both algorithms found similar speedups, in
+similar iterations, contains 6 kernels and is marked with /red/ headers. The
+group where DLMT found similar speedups using a significantly smaller budget
+than RS contains 8 kernels and is marked in /blue/ headers. Ellipses delimit the
+95% confidence intervals for the averages of iterations and speedups, and a
+dashed line marks the \texttt{-03} baseline. In comparison to RS, our approach
+significantly decreased the average number of iterations needed to find speedups
+for the 8 kernels in the blue group.
+
+Figure\nbsp{}[[fig:split_histograms]] shows the search space exploration performed
+by RS and DLMT. It uses the same color groups as
+Figure\nbsp{}[[fig:iteration_best_comparison]], and shows the counts of the speedups
+that where found during all repetitions of the experiments. Histogram areas
+corresponding to DLMT are usually smaller because it usually stopped earlier due
+to the 4-iteration limit, while RS always performed all 400 allotted
+measurements. We see that the frequency of configurations with high speedups is
+larger for DLMT overall, even for kernels on the red group. Our approach also
+spent less of the budget exploring configurations with small speedups or
+slowdowns, in comparison with RS.
+
+Our approach used a generic starting performance model for all kernels but,
+since it iteratively eliminates factors and model terms based on ANOVA tests,
+was still able to exploit global search space structures for kernels in the red
+and blue groups. Even in this automated setting, the results with SPAPT kernels
+illustrate the ability our approach has to reduce the budget needed to find good
+speedups by efficiently exploring search spaces.
+
+#+BEGIN_CENTER
+#+NAME: fig:iteration_best_comparison
+#+CAPTION: Cost of best point found on each run, and the iteration where
+#+CAPTION: it was found. RS and DLMT found no speedups with similar budget
+#+CAPTION: for kernels with /green/ headers, and similar speedups with
+#+CAPTION: similar budget for kernels with /red/ headers. DLMT found similar
+#+CAPTION: speedups with smaller budget for kernels with /blue/ headers.
+#+CAPTION: Ellipses delimit the 95% confidence intervals for the averages of iterations and speedups.
+#+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
+[[./img/iteration_best_comparison.pdf]]
+#+END_CENTER
+
 #+BEGIN_CENTER
 #+NAME: fig:split_histograms
-#+CAPTION: Histograms of explored search spaces
+#+CAPTION: Histograms of explored search spaces, showing the real count of measured configurations.
+#+CAPTION: Kernels are group in the same way as in Figure\nbsp{}[[fig:iteration_best_comparison]].
+#+CAPTION: DLMT spent less measurements than RS in configurations with smaller speedups or slowdowns,
+#+CAPTION: even for kernels in the red group.
 #+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
 [[./img/split_histograms.pdf]]
 #+END_CENTER
 
-#+BEGIN_CENTER
-#+NAME: fig:iteration_best_comparison
-#+CAPTION: Cost of best point found on each run against the iteration where it was found
-#+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
-[[./img/iteration_best_comparison.pdf]]
-#+END_CENTER
 * Conclusion
+We presented in this paper a transparent Design of Experiments approach for
+program autotuning under tight budget constraints. We discussed the underlying
+concepts that enable our approach to significantly reduce the measurement budget
+needed to find good optimizations consistently over different kernels exposing
+configuration parameters of source-to-source transformations.
+
+Our approach outperformed six other search heuristics, always finding the global
+optimum of the search space defined by the optimization of a Laplacian kernel
+for GPUs, while using at most half of the allotted budget. In a more
+comprehensive evaluation using kernels from the SPAPT benchmark, our approach
+was able to find the same speedups as a random sampling heuristic while using up
+to $10\times$ less measurements. We also show that our approach explored search
+spaces more efficiently, even for kernels where it performed similarly to random
+sampling.
 * Acknowledgment
 :PROPERTIES:
 :UNNUMBERED: t
 :END:
+Experiments presented in this paper were carried out using the Grid'5000
+testbed, supported by a scientific interest group hosted by Inria and including
+CNRS, RENATER and several Universities as well as other organizations.
+This work was partly funded by CAPES, /Coordenação de Aperfeiçoamento de Pessoal
+de Nível Superior/, Brazil, funding code 001.
 #+LATEX: \bibliographystyle{IEEEtran}
 #+LATEX: \bibliography{references}
