@@ -30,10 +30,69 @@ P.~M. Knijnenburg, T.~Kisuki, and M.~F. O'Boyle, ``Combined selection of tile
   sizes and unroll factors using iterative compilation,'' \emph{The Journal of
   Supercomputing}, vol.~24, no.~1, pp. 43--67, 2003.
 
+\bibitem{balaprakash2011can}
+P.~Balaprakash, S.~M. Wild, and P.~D. Hovland, ``Can search algorithms save
+  large-scale automatic performance tuning?'' in \emph{ICCS}, 2011, pp.
+  2136--2145.
+
+\bibitem{balaprakash2012experimental}
+------, ``An experimental study of global and local search algorithms in
+  empirical performance tuning,'' in \emph{International Conference on High
+  Performance Computing for Computational Science}.\hskip 1em plus 0.5em minus
+  0.4em\relax Springer, 2012, pp. 261--269.
+
+\bibitem{beckingsale2017apollo}
+D.~Beckingsale, O.~Pearce, I.~Laguna, and T.~Gamblin, ``Apollo: Reusable models
+  for fast, dynamic tuning of input-dependent code,'' in \emph{The 31th IEEE
+  International Parallel and Distributed Processing Symposium}, 2017.
+
+\bibitem{falch2017machine}
+T.~L. Falch and A.~C. Elster, ``Machine learning-based auto-tuning for enhanced
+  performance portability of opencl applications,'' \emph{Concurrency and
+  Computation: Practice and Experience}, vol.~29, no.~8, 2017.
+
+\bibitem{balaprakash2016automomml}
+P.~Balaprakash, A.~Tiwari, S.~M. Wild, and P.~D. Hovland, ``{AutoMOMML:
+  Automatic Multi-objective Modeling with Machine Learning},'' in \emph{High
+  Performance Computing: 31st International Conference, ISC High Performance
+  2016, Frankfurt, Germany, June 19-23, 2016, Proceedings}, M.~J. Kunkel,
+  P.~Balaji, and J.~Dongarra, Eds.\hskip 1em plus 0.5em minus 0.4em\relax
+  Springer International Publishing, 2016, pp. 219--239.
+
 \bibitem{balaprakash2012spapt}
 P.~Balaprakash, S.~M. Wild, and B.~Norris, ``Spapt: Search problems in
   automatic performance tuning,'' \emph{Procedia Computer Science}, vol.~9, pp.
   1959--1968, 2012.
+
+\bibitem{hartono2009annotation}
+A.~Hartono, B.~Norris, and P.~Sadayappan, ``Annotation-based empirical
+  performance tuning using orio,'' in \emph{Parallel \& Distributed Processing,
+  2009. IPDPS 2009. IEEE International Symposium on}.\hskip 1em plus 0.5em
+  minus 0.4em\relax IEEE, 2009, pp. 1--11.
+
+\bibitem{videau2017boast}
+B.~Videau, K.~Pouget, L.~Genovese, T.~Deutsch, D.~Komatitsch, F.~Desprez, and
+  J.-F. M{\'e}haut, ``Boast: A metaprogramming framework to produce portable
+  and efficient computing kernels for hpc applications,'' \emph{The
+  International Journal of High Performance Computing Applications}, p.
+  1094342017718068, 2017.
+
+\bibitem{tiwari2009scalable}
+A.~Tiwari, C.~Chen, J.~Chame, M.~Hall, and J.~K. Hollingsworth, ``A scalable
+  auto-tuning framework for compiler optimization,'' in \emph{Parallel \&
+  Distributed Processing, 2009. IPDPS 2009. IEEE International Symposium
+  on}.\hskip 1em plus 0.5em minus 0.4em\relax IEEE, 2009, pp. 1--12.
+
+\bibitem{yi2007poet}
+Q.~Yi, K.~Seymour, H.~You, R.~Vuduc, and D.~Quinlan, ``Poet: Parameterized
+  optimizations for empirical tuning,'' in \emph{Parallel and Distributed
+  Processing Symposium, 2007. IPDPS 2007. IEEE International}.\hskip 1em plus
+  0.5em minus 0.4em\relax IEEE, 2007, pp. 1--8.
+
+\bibitem{ansel2009petabricks}
+J.~Ansel, C.~Chan, Y.~L. Wong, M.~Olszewski, Q.~Zhao, A.~Edelman, and
+  S.~Amarasinghe, \emph{PetaBricks: a language and compiler for algorithmic
+  choice}.\hskip 1em plus 0.5em minus 0.4em\relax ACM, 2009, vol.~44, no.~6.
 
 \bibitem{rice1976algorithm}
 J.~R. Rice, ``The algorithm selection problem,'' in \emph{Advances in Computers
@@ -72,11 +131,6 @@ H.~Jordan, P.~Thoman, J.~J. Durillo, S.~Pellegrini, P.~Gschwandtner,
   parallel codes,'' in \emph{High Performance Computing, Networking, Storage
   and Analysis (SC), 2012 International Conference for}.\hskip 1em plus 0.5em
   minus 0.4em\relax IEEE, 2012, pp. 1--12.
-
-\bibitem{ansel2009petabricks}
-J.~Ansel, C.~Chan, Y.~L. Wong, M.~Olszewski, Q.~Zhao, A.~Edelman, and
-  S.~Amarasinghe, \emph{PetaBricks: a language and compiler for algorithmic
-  choice}.\hskip 1em plus 0.5em minus 0.4em\relax ACM, 2009, vol.~44, no.~6.
 
 \bibitem{hutter2009paramils}
 F.~Hutter, H.~H. Hoos, K.~Leyton-Brown, and T.~St{\"u}tzle, ``Paramils: an
@@ -138,19 +192,6 @@ J.~Fox and S.~Weisberg, \emph{An {R} Companion to Applied Regression},
   \url{http://socserv.socsci.mcmaster.ca/jfox/Books/Companion}
 \BIBentrySTDinterwordspacing
 
-\bibitem{videau2017boast}
-B.~Videau, K.~Pouget, L.~Genovese, T.~Deutsch, D.~Komatitsch, F.~Desprez, and
-  J.-F. M{\'e}haut, ``Boast: A metaprogramming framework to produce portable
-  and efficient computing kernels for hpc applications,'' \emph{The
-  International Journal of High Performance Computing Applications}, p.
-  1094342017718068, 2017.
-
-\bibitem{hartono2009annotation}
-A.~Hartono, B.~Norris, and P.~Sadayappan, ``Annotation-based empirical
-  performance tuning using orio,'' in \emph{Parallel \& Distributed Processing,
-  2009. IPDPS 2009. IEEE International Symposium on}.\hskip 1em plus 0.5em
-  minus 0.4em\relax IEEE, 2009, pp. 1--11.
-
 \bibitem{balouek2013adding}
 D.~Balouek, A.~Carpen~Amarie, G.~Charrier, F.~Desprez, E.~Jeannot,
   E.~Jeanvoine, A.~L{\`e}bre, D.~Margery, N.~Niclausse, L.~Nussbaum,
@@ -160,5 +201,9 @@ D.~Balouek, A.~Carpen~Amarie, G.~Charrier, F.~Desprez, E.~Jeannot,
   Information Science, I.~I. Ivanov, M.~van Sinderen, F.~Leymann, and T.~Shan,
   Eds.\hskip 1em plus 0.5em minus 0.4em\relax Springer International
   Publishing, 2013, vol. 367, pp. 3--20.
+
+\bibitem{bruel2018ipdps19}
+``Git repository with all paper data,'' \url{https://github.com/phrb/ipdps19},
+  accessed: 2018-10-14.
 
 \end{thebibliography}
