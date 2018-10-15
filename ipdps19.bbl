@@ -144,6 +144,12 @@ J.~Ansel, S.~Kamil, K.~Veeramachaneni, J.~Ragan-Kelley, J.~Bosboom, U.-M.
   conference on Parallel architectures and compilation}.\hskip 1em plus 0.5em
   minus 0.4em\relax ACM, 2014, pp. 303--316.
 
+\bibitem{carnell2018lhs}
+\BIBentryALTinterwordspacing
+R.~Carnell, \emph{lhs: Latin Hypercube Samples}, 2018, r package version 0.16.
+  [Online]. Available: \url{https://CRAN.R-project.org/package=lhs}
+\BIBentrySTDinterwordspacing
+
 \bibitem{plackett1946design}
 R.~L. Plackett and J.~P. Burman, ``The design of optimum multifactorial
   experiments,'' \emph{Biometrika}, vol.~33, no.~4, pp. 305--325, 1946.
@@ -205,5 +211,11 @@ D.~Balouek, A.~Carpen~Amarie, G.~Charrier, F.~Desprez, E.~Jeannot,
 \bibitem{bruel2018ipdps19}
 ``Git repository with all paper data,'' \url{https://github.com/phrb/ipdps19},
   accessed: 2018-10-14.
+
+\bibitem{bruel2017autotuninghls}
+P.~Bruel, A.~Goldman, S.~R. Chalamalasetti, and D.~Milojicic, ``Autotuning
+  high-level synthesis for fpgas using opentuner and legup,'' in
+  \emph{International Conference on Reconfigurable Computing and FPGAs
+  (ReConFig)}, 2017.
 
 \end{thebibliography}

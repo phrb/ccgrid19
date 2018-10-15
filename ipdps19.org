@@ -38,6 +38,8 @@
 #+LATEX_HEADER: \usepackage{ragged2e}
 #+LATEX_HEADER: \usepackage{todonotes}
 #+LATEX_HEADER: \usepackage{tabularx}
+#+LATEX_HEADER: \usepackage{boxedminipage}
+#+LATEX_HEADER: \usepackage[all]{nowidow}
 
 #+LATEX_HEADER: \lstset{ %
 #+LATEX_HEADER:   backgroundcolor={},
@@ -64,35 +66,39 @@
 #+LATEX_HEADER: \graphicspath{{./img/}}
 #+LATEX_HEADER: \renewcommand*{\UrlFont}{\ttfamily\smaller\relax}
 
-#+LATEX_HEADER: \author{\IEEEauthorblockN{Pedro Bruel\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},
-#+LATEX_HEADER: Arnaud Legrand\IEEEauthorrefmark{1},
+#+LATEX_HEADER: \author{\IEEEauthorblockN{\scalebox{.95}{Pedro Bruel\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},
+#+LATEX_HEADER: Steven Quinito Masnada\IEEEauthorrefmark{3},
 #+LATEX_HEADER: Brice Videau\IEEEauthorrefmark{1},
-#+LATEX_HEADER: Jean-Marc Vincent\IEEEauthorrefmark{1}, and
-#+LATEX_HEADER: Alfredo Goldman\IEEEauthorrefmark{2}}
-#+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{1}University of Grenoble Alpes, CNRS, Inria, Grenoble INP, LIG -- 38000 Grenoble, France\\
-#+LATEX_HEADER: Email: \{arnaud.legrand, brice.videau, jean-marc.vincent\}@imag.fr}
-#+LATEX_HEADER: \IEEEauthorblockA{\IEEEauthorrefmark{2}University of São Paulo -- São Paulo, Brazil\\
-#+LATEX_HEADER: Email: \{phrb, gold\}@ime.usp.br}}
+#+LATEX_HEADER: Arnaud Legrand\IEEEauthorrefmark{1},
+#+LATEX_HEADER: Jean-Marc Vincent\IEEEauthorrefmark{1},
+#+LATEX_HEADER: Alfredo Goldman\IEEEauthorrefmark{2}}}
+#+LATEX_HEADER: \smallskip
+#+LATEX_HEADER: \IEEEauthorblockA{\begin{minipage}[t]{.2\linewidth}\centering\IEEEauthorrefmark{2}University of São Paulo \\ São Paulo, Brazil\\
+#+LATEX_HEADER: \small\{phrb, gold\}@ime.usp.br\null\vspace{-15pt}\end{minipage}\hfill
+#+LATEX_HEADER: \begin{minipage}[t]{.28\linewidth}\centering \IEEEauthorrefmark{3}University of Grenoble Alpes \\ Inria, CNRS, Grenoble INP, LJK \\ 38000 Grenoble, France\\
+#+LATEX_HEADER: \small steven.quinito-masnada@inria.fr\null\vspace{-15pt}\end{minipage}\hfill
+#+LATEX_HEADER: \begin{minipage}[t]{.45\linewidth}\centering\IEEEauthorrefmark{1}University of Grenoble Alpes \\ CNRS, Inria, Grenoble INP, LIG \\ 38000 Grenoble, France\\
+#+LATEX_HEADER: \small\{arnaud.legrand, brice.videau, jean-marc.vincent\}@imag.fr\null\vspace{-15pt}\end{minipage}}}
 
 #+LATEX: \begin{abstract}
-A large quantity of resources is spent writing, porting, and optimizing
-scientific and industrial High Performance Computing applications. Autotuning
-techniques have become therefore fundamental to lower the costs of leveraging
-the improvements on execution time and power consumption provided by the latest
-software and hardware platforms. Yet, most popular autotuning techniques still
-require a large budget of costly experimental measurements to provide good
-results while rarely providing exploitable knowledge about the problem after
-optimization. In this paper we present a user-transparent autotuning technique
-based on Design of Experiments that operates under tight budget constraints by
-significantly reducing the amount of measurements needed to find good
-optimizations. Our approach also enable users to make informed decisions on what
-optimizations to pursue and when to stop optimizing. We present experimental
-evaluations of our approach and show that, leveraging user decisions, it is
-capable of finding the global optimum of a GPU Laplacian kernel optimization
-using half of the measurement budget used by other common autotuning techniques.
-We also show that our approach is capable of finding speedups of up to
-$50\times$ for some kernels from the SPAPT benchmark using up to $10\times$ less
-measurements than random sampling.
+A large amount of resources is spent writing, porting, and optimizing scientific
+and industrial High Performance Computing applications, which makes autotuning
+techniques fundamental to lower the cost of leveraging the improvements on
+execution time and power consumption provided by the latest software and
+hardware platforms. Despite the need for economy, most autotuning techniques
+still require a large budget of costly experimental measurements to provide good
+results, while rarely providing exploitable knowledge after optimization. The
+contribution of this paper is a user-transparent autotuning technique based on
+Design of Experiments that operates under tight budget constraints by
+significantly reducing the measurements needed to find good optimizations. Our
+approach enables users to make informed decisions on which optimizations to
+pursue and when to stop. We present an experimental evaluation of our approach
+and show it is capable of leveraging user decisions to find the best global
+configuration of a GPU Laplacian kernel using half of the measurement budget
+used by other common autotuning techniques. We show that our approach is also
+capable of finding speedups of up to \boldmath$50\times$, compared to =gcc='s
+=-O3=, for some kernels from the SPAPT benchmark, using up to
+\boldmath$10\times$ less measurements than random sampling.
 #+LATEX: \end{abstract}
 
 * Arnaud's Draft                                                   :noexport:
@@ -637,6 +643,11 @@ hist_data[hist_data$facet %in% c("bicgkernel", "mm", "tensor", "gesummv", "lu", 
 
 hist_data$header <- factor(hist_data$header, levels = c("A", "B", "C"))
 
+levels(hist_data$facet) <- c("[0] hessian", "[0] fdtd", "[0] correlation",
+                             "[=] gemver", "[=] atax", "[=] stencil3d", "[=] dgemv3",
+                             "[=] adi", "[=] trmm", "[+] bicgkernel", "[+] mm", "[+] tensor", "[+] gesummv",
+                             "[+] lu", "[+] mvt", "[+] seidel", "[+] jacobi")
+
 hist_data <- hist_data[hist_data$cost_mean < 12, ]
 
 nbins <- 42
@@ -665,7 +676,8 @@ p1 <- ggplot(hist_data) +
              axis.ticks.x = element_blank(),
              plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")
              )  +
-       scale_fill_brewer(palette = "Set1")
+       #scale_fill_brewer(palette = "Set1")
+       scale_fill_grey(start = 0.3, end = 0.7)
 
 dummy <- ggplot(data = hist_data, aes(x = cost_mean, y = cost_mean)) +
                 facet_wrap(facet ~ ., scale = "free", ncol = 6) +
@@ -682,7 +694,8 @@ dummy <- ggplot(data = hist_data, aes(x = cost_mean, y = cost_mean)) +
                       axis.ticks.x = element_blank(),
                       plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")
                       )  +
-                scale_fill_brewer(palette = "Pastel2")
+                scale_fill_brewer(palette = "Pastel2", direction = -1)
+                #scale_fill_grey()
 
 g1 <- ggplotGrob(p1)
 g2 <- ggplotGrob(dummy)
@@ -724,6 +737,7 @@ grid.draw(new_plot)
 #+HEADER: :width 14 :height 7
 #+BEGIN_SRC R
 library(ggrepel)
+library(utf8)
 
 it_data <- complete_plot_data
 it_data$facet <- factor(it_data$application, levels = c("hessian", "fdtd", "correlation",
@@ -738,6 +752,11 @@ it_data[it_data$facet %in% c("gemver", "atax", "stencil3d", "dgemv3", "adi", "tr
 it_data[it_data$facet %in% c("bicgkernel", "mm", "tensor", "gesummv", "lu", "mvt", "seidel", "jacobi"), "header"] <- "C"
 
 it_data$header <- factor(it_data$header, levels = c("A", "B", "C"))
+
+levels(it_data$facet) <- c("[0] hessian", "[0] fdtd", "[0] correlation",
+                           "[=] gemver", "[=] atax", "[=] stencil3d", "[=] dgemv3",
+                           "[=] adi", "[=] trmm", "[+] bicgkernel", "[+] mm", "[+] tensor", "[+] gesummv",
+                           "[+] lu", "[+] mvt", "[+] seidel", "[+] jacobi")
 
 p1 <- ggplot(it_data, aes(min_run_cost, best_iteration, color = technique)) +
     facet_wrap(facet ~ ., ncol = 6) +
@@ -763,7 +782,8 @@ p1 <- ggplot(it_data, aes(min_run_cost, best_iteration, color = technique)) +
           text = element_text(family = "serif"),
           strip.background = element_rect(fill = "white"),
           plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm"))  +
-    scale_color_brewer(palette = "Set1")
+    #scale_color_brewer(palette = "Set1")
+    scale_color_grey(start = 0.3, end = 0.7)
 
 dummy <- ggplot(data = it_data, aes(x = min_run_cost, y = best_iteration)) +
                 facet_wrap(facet ~ ., scale = "free", ncol = 6) +
@@ -776,7 +796,8 @@ dummy <- ggplot(data = it_data, aes(x = min_run_cost, y = best_iteration)) +
                       legend.title = element_blank(),
                       plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm")
                       )  +
-                scale_fill_brewer(palette = "Pastel2")
+                scale_fill_brewer(palette = "Pastel2", direction = -1)
+                #scale_fill_grey()
 
 g1 <- ggplotGrob(p1)
 g2 <- ggplotGrob(dummy)
@@ -848,6 +869,7 @@ ggplot(rosenbrock_data, aes(x, y, z = Y)) +
 #+BEGIN_SRC R :results output graphics  :session *R*
 library(ggplot2)
 library(plyr)
+library(extrafont)
 
 df_all_methods <- read.csv("./data/complete_1000.csv", strip.white = T, header = T)
 df_all_methods$method <- factor(df_all_methods$method, levels = c("RS","LHS","GS","GSR","GA","LM", "LMB", "LMBT", "RQ", "DOPT", "DLM", "DLMT"))
@@ -875,11 +897,11 @@ ggplot(df_all_methods) +
     geom_rect(data = df_err, aes(xmin = mean-err, xmax = mean + err, ymin = 0, ymax = 1000, fill = "red"), alpha = 0.3) +
     geom_vline(aes(xintercept = median), df_median, color = "darkgreen", linetype = 3) +
     geom_vline(aes(xintercept = mean), df_mean, color = "red", linetype = 2) +
-    labs(y = "Frequency", x = "Slowdown compared to the optimal solution") +
+    labs(y = "Count", x = "Slowdown compared to the optimal solution") +
     scale_fill_discrete(name = "", breaks = c("red"), labels = c("Mean error")) +
     ggtitle("") +
     theme(legend.position = "none",
-          text = element_text(family="Noto Serif"),
+          text = element_text(family="serif"),
           strip.background = element_rect(fill = "white"))
 #+END_SRC
 
@@ -964,16 +986,16 @@ center_x1 <- (search_space_size / 2) - 30
 center_x2 <- (search_space_size / 2) - 30
 
 get_cost <- function(data) {
-    return(((data$x1 - center_x1) ^ 2) + ((data$x2 - center_x2) ^ 2))
+    return(((data$x1 - center_x1) ^ 2) + ((data$x2 - center_x2) ^ 2) + ((abs((data$x1 - center_x1) * (data$x2 - center_x2)))**.7 * sin((data$x1 - center_x1) * (data$x2 - center_x2))))
 }
 
 objective_data <- expand.grid(seq(0, search_space_size, 1),
                               seq(0, search_space_size, 1))
 names(objective_data) <- c("x1", "x2")
 
-sima_samples <- 15
+objective_data$Y <- get_cost(objective_data)
 
-dev.new()
+sima_samples <- 15
 
 plot(x = c(0, 100, center_x1, 100, 0), y = c(0, 100, center_x2, 0, 100))
 fake_sima_data <- as.data.frame(locator(n = sima_samples, type = "l"))
@@ -1008,8 +1030,6 @@ fake_descent_data$cost <- get_cost(fake_descent_data)
 fake_descent_data$min <- fake_descent_data$cost == min(fake_descent_data$cost)
 
 data <- bind_rows(data, fake_descent_data)
-
-objective_data$Y <- get_cost(objective_data)
 
 rs_data <- data.frame(x1 = sample(0:search_space_size, sample_size, replace = T),
                       x2 = sample(0:search_space_size, sample_size, replace = T))
@@ -1072,6 +1092,8 @@ data <- bind_rows(data, doptq_data)
 
 #+RESULTS:
 #+begin_example
+Want to understand how all the pieces fit together? See the R for Data
+Science book: http://r4ds.had.co.nz/
 Loading required package: FrF2
 Loading required package: DoE.base
 Loading required package: grid
@@ -1102,11 +1124,6 @@ The following objects are masked from ‘package:stats’:
 The following objects are masked from ‘package:base’:
 
     intersect, setdiff, setequal, union
-Error in dev.off() : cannot shut down device 1 (the null device)
-null device
-          1
-null device
-          1
 #+end_example
 
 *** Plot
@@ -1132,9 +1149,9 @@ null device
       geom_jitter(data = subset(data, name %in% c("Gradient Descent")), color = "black", size = 3, shape = 4, alpha = 0.45, width = 8, height = 8) +
       scale_fill_distiller(palette = "Greys", direction = -1, limits = c(min(objective_data$Y) - 1000, max(objective_data$Y))) +
       geom_point(data = subset(data, min == TRUE), color = "red", shape = 3, size = 12, alpha = 1, stroke = 2) +
-      theme_bw(base_size = 30) +
+      theme_bw(base_size = 35) +
       theme(panel.grid = element_blank(),
-            text = element_text(family="Noto Serif"),
+            text = element_text(family="serif"),
             strip.background = element_rect(fill = "white"),
             axis.text.x = element_blank(),
             axis.ticks.x = element_blank(),
@@ -1237,23 +1254,23 @@ decrease the cost and time needed to adopt efficient hardware and software.
 Typical autotuning targets include algorithm selection, source-to-source
 transformations and compiler configuration.
 
-Autotuning can be studied as a search problem, where the objective is to
-minimize single or multiple software of hardware metrics. The exploration of the
-search spaces defined by configurations and optimizations present interesting
-challenges to search strategies. These search spaces grow exponentially with the
-number of considered configuration parameters and their possible values. They
-are also difficult to extensively explore due to the often prohibitive costs of
-hardware utilization and program compilation and execution times. Developing
-autotuning strategies capable of producing good optimizations while minimizing
-resource utilization is therefore essential. The capability of acquiring
-knowledge about an optimization problem is also a desired feature of an
-autotuning strategy, since this knowledge can decrease the cost of subsequent
-optimizations of the same application or for the same hardware.
+Autotuning can be studied as a search problem where the objective is to minimize
+software of hardware metrics. The exploration of the search spaces defined by
+code and compiler configurations and optimizations presents interesting
+challenges. These search spaces grow exponentially with the number of parameters
+and their possible values. They are also difficult to extensively explore due to
+the often prohibitive costs of hardware utilization, program compilation and
+execution times. Developing autotuning strategies capable of producing good
+optimizations while minimizing resource utilization is therefore essential. The
+capability of acquiring knowledge about an optimization problem is also a
+desired feature of an autotuning strategy, since this knowledge can decrease the
+cost of subsequent optimizations of the same application or for the same
+hardware.
 
 It is common and usually effective to use search meta-heuristics such as genetic
 algorithms and simulated annealing in autotuning. These strategies attempt to
-exploit local properties, but are generally incapable of fully exploiting global
-search space structures. Seymour /et al./\nbsp{}\cite{seymour2008comparison},
+exploit local search space properties, but are generally incapable of exploiting
+global structures. Seymour /et al./\nbsp{}\cite{seymour2008comparison},
 Knijnenburg /et al./\nbsp{}\cite{knijnenburg2003combined}, and Balaprakash /et
 al./\nbsp{}\cite{balaprakash2011can,balaprakash2012experimental} report that
 these strategies are not more effective than a naive uniform random sample of
@@ -1265,68 +1282,65 @@ search spaces with complex local structures. Automated machine learning
 autotuning
 strategies\nbsp{}\cite{beckingsale2017apollo,falch2017machine,balaprakash2016automomml}
 are promising in building models for predicting important optimization
-parameters, but still rely on a sizable data set for training. Large data sets
-are fundamental to strategies based on machine learning since they select models
-from a generally very large class.
+parameters, but still rely on a sizable data set for training.
 
 Search strategies based on meta-heuristics, gradient descent and machine
 learning require a large number of measurements to be effective, and are usually
 incapable of providing knowledge about search spaces to users. Since these
 strategies are not transparent, at the end of each autotuning session it is
-difficult to decide if and where further exploration is warranted, and
-often impossible to know which parameters are responsible for the observed
+difficult to decide if and where further exploration is warranted, and often
+impossible to know which parameters are responsible for the observed
 improvements. After exploring a search space, it is impossible to confidently
-deduce its global properties since its was explored with unknown biases.
+deduce its global properties since its was automatically explored with unknown
+biases.
 
 The contribution of this paper is an autotuning strategy that leverages existing
-expert and approximate knowledge about a problem in the form of a performance
-model, and refines this initial model iteratively using empirical performance
-evaluations, statistical analysis and user input. Our strategy puts a heavy
-weight on decreasing the costs of autotuning by using efficient /Design of
-Experiments/ strategies to minimize the number of experiments needed to find
-good optimizations. Each optimization iteration uses /Analysis of Variance/
-(ANOVA) tests and /linear model regressions/ to identify promising subspaces and
-the relative significance of each configurable parameter to the performance
-observations. An architecture- and problem-specific performance model is built
-iteratively and with user input, which enables making informed decisions on
-which regions of the search space are worth exploring.
+knowledge about a problem by using a initial performance model, and refining it
+iteratively using performance measurements, statistical analysis, and user
+input. Our strategy places a heavy weight on decreasing autotuning costs by
+using a /Design of Experiments/ methodology to minimize the number of
+experiments needed to find good optimizations. Each iteration uses /Analysis of
+Variance/ (ANOVA) tests and /linear model regressions/ to identify promising
+subspaces and the relative significance of each parameter to observations. An
+architecture- and problem-specific performance model is built iteratively and
+with user input, which enables making informed decisions about which regions of the
+search space are worth exploring.
 
-We present the performance of our approach on a Laplacian Kernel for GPUs where
-the search space, global optimum and performance model approximation are known.
-The experimental budget on this kernel was tightly constrained. The speedups
-achieved and the budget utilization of our approach on this setting motivated a
-more comprehensive performance evaluation. We chose the /Search Problems in
-Automatic Performance Tuning/ (SPAPT)\nbsp{}\cite{balaprakash2012spapt}
-benchmark for this evaluation, where we obtained diverse results. Of the 17
-SPAPT kernels benchmarked, we found no speedups for 3 kernels, and random
-sampling was very effective for 7 others. Speedups were harder to find by
-sampling for the remaining 8 kernels, where our approach was able to find
-speedups of up to $50\times$ while using up to $10\times$ less measurements than
-random sampling, despite using the same generic performance model for every
-kernel.
+We evaluate the performance of our approach on optimizing a Laplacian Kernel for
+GPUs, where the search space, the global optimum and a performance model
+approximation are known. The budget of measurements was tightly constrained on
+this experiment. Speedups and budget utilization reduction achieved by our
+approach on this setting motivated a more comprehensive performance evaluation.
+We chose the /Search Problems in Automatic Performance Tuning/
+(SPAPT)\nbsp{}\cite{balaprakash2012spapt} benchmark suite for this evaluation,
+where we obtained diverse results. Out of the 17 SPAPT kernels benchmarked, no
+speedup could be found for 3 kernels, and random sampling was very effective for
+the others. For the remaining 8 kernels our approach found speedups of up to
+$50\times$, compared to =gcc='s =-O3= without code transformation, while using
+up to $10\times$ less measurements than random sampling.
 
 The rest of this paper is organized as follows. Section\nbsp{}[[Background]]
 presents related work on source-to-source transformation, which is the main
-optimization target in SPAPT problems, on autotuning systems and on search space
-exploration strategies. Section\nbsp{}[[Design of Experiments]] discusses Design of
-Experiments concepts and the ANOVA and linear regression methodology we use.
-Section\nbsp{}[[Autotuning with Design of Experiments]] presents a detailed
-description of the implementation of our approach. Section\nbsp{}[[Performance
-Evaluation]] presents our results with the GPU Laplacian Kernel and the SPAPT
-benchmark. Section\nbsp{}[[Conclusion]] discusses our conclusions and future work.
+optimization target in SPAPT kernels, on autotuning systems and on search space
+exploration strategies. Section\nbsp{}[[Design of Experiments]] discusses the Design
+of Experiments, ANOVA, and linear regression methodology we used to develop our
+approach. Section\nbsp{}[[Autotuning with Design of Experiments]] discusses the
+implementation of our approach in detail. Section\nbsp{}[[Performance Evaluation]]
+presents the results on the GPU Laplacian Kernel and on the SPAPT benchmark
+suite. Section\nbsp{}[[Conclusion]] discusses our conclusions and future work.
 * Background
 This Section presents the background and related work on source-to-source
 transformation, autotuning systems and search space exploration strategies.
 ** Source-to-Source Transformation
-Our approach is applicable to all autotuning domains that express optimization
-as a search problem, but the performance evaluations we present in
+Our approach can be applied to any autotuning domain that expresses optimization
+as a search problem, although the performance evaluations we present in
 Section\nbsp{}[[Performance Evaluation]] were obtained in the domain of
 source-to-source transformation. Several frameworks, compilers and autotuners
 provide tools to generate and optimize architecture-specific
 code\nbsp{}\cite{hartono2009annotation,videau2017boast,tiwari2009scalable,yi2007poet,ansel2009petabricks}.
 We used BOAST\nbsp{}\cite{videau2017boast} and
 Orio\nbsp{}\cite{hartono2009annotation} to perform source-to-source
-transformations optimizing parallelization on CPUs and GPUs, vectorization, loop
+transformations targeting parallelization on CPUs and GPUs, vectorization, loop
 transformations such as tiling and unrolling, and data structure size and
 copying.
 ** Autotuning
@@ -1359,46 +1373,40 @@ framework\nbsp{}\cite{ansel2014opentuner} provides ensembles of techniques that
 search the same space in parallel, while exploration is managed by a multi-armed
 bandit strategy.
 ** Search Space Exploration Strategies
-
-#+LATEX: \vspace{-15pt}
-
-#+BEGIN_CENTER
 #+NAME: fig:sampling_comparison
-#+CAPTION: Exploration of the search space defined by $z = x^2 + y^2$, using a fixed budget of 50 points. The red ``$+$'' represents the best point found by each strategy, and ``$\times$''s denote neighborhood exploration
+#+CAPTION: Exploration of the search space, using a fixed budget of 50 points. The red ``$+$'' represents the best point found by each strategy, and ``$\times$''s denote neighborhood exploration
 #+ATTR_LATEX: :width .95\columnwidth
 [[./img/sampling_comparison.pdf]]
-#+END_CENTER
 
-#+LATEX: \vspace{-23pt}
-
-Figure\nbsp{}[[fig:sampling_comparison]] shows contour plots of the search space
-defined by a function of the form $z = x^2 + y^2$, and the exploration of that
-search space by six different exploration strategies. For such a simple search
-space, even a uniform random sample is capable of finding points close to the
-optimum despite not leveraging the geometry of the search space. A Latin
-Hypercube sampling strategy covers the search space more evenly but still does
-not exploit geometry. Strategies based on neighborhood exploration such as
-simulated annealing and gradient descent are capable of exploiting local
-structures, but they get easily trapped in local minima and their performance is
-strongly dependent on the starting point. None of these strategies leverages
-global search space structure or provides transparent or exploitable knowledge
+Figure\nbsp{}[[fig:sampling_comparison]] shows the contour of a search space defined
+by a function of the form $z = x^2 + y^2 + \varepsilon$, where $\varepsilon$ is
+a local perturbation, and the exploration of that search space by six different
+strategies. In such a simple search space, even a uniform random sample can find
+points close to the optimum, despite not exploiting geometry. A Latin
+Hypercube\nbsp{}\cite{carnell2018lhs} sampling strategy covers the search space
+more evenly, but still does not exploit its geometry. Strategies based on
+neighborhood exploration such as simulated annealing and gradient descent can
+exploit local structures, but may get trapped in local minima. Their
+performance is strongly dependent on search starting point. These strategies do
+not leverage global search space structure, or provide exploitable knowledge
 after optimization.
 
-Measurement of the kernels optimized on the performance evaluations presented in
+Measurement of the kernels optimized on the performance evaluations in
 Section\nbsp{}[[Performance Evaluation]] can exceed 20 minutes, including the time
-to perform code transformation, compilation and execution. Measurements in other
-problem domains can take much longer to complete. This strengthen the motivation
+of code transformation, compilation, and execution. Measurements in other
+problem domains can take much longer to complete. This strengthens the motivation
 to consider search space exploration strategies capable of operating under tight
-budget constraints. These strategies, developed and improved by statisticians
-for a long time, can be grouped under the Design of Experiments label.
+budget constraints. These strategies have been developed and improved by
+statisticians for a long time, and can be grouped under the Design of
+Experiments term.
 
-Search space exploration techniques based on Design of Experiments
-methodologies, such as the D-Optimal sampling strategies shown on the two
-rightmost bottom panels of Figure\nbsp{}[[fig:sampling_comparison]], leverage
-previous knowledge about search spaces for efficient exploration. They also
-provide transparent analyses that explain results and enables focusing on
-interesting subspaces. In the next Section we present the Design of Experiments
-methodology used in this paper.
+The D-Optimal sampling strategies shown on the two rightmost bottom panels of
+Figure\nbsp{}[[fig:sampling_comparison]] are based on the Design of Experiments
+methodology, and leverage previous knowledge about search spaces for an
+efficient exploration. These strategies provide transparent analyses that
+enable focusing on interesting subspaces. In the next
+Section we present the Design of Experiments methodology used to implement our
+approach.
 * Design of Experiments
 An /experimental design/ determines a selection of experiments whose objective
 is to identify the relationships between /factors/ and /responses/. While
@@ -1436,56 +1444,49 @@ constructing a Plackett-Burman design we must identify /high/ and /low/ levels
 for each factor.
 
 Assuming a crude linear relationship between factors and the response is
-fundamental for running ANOVA tests using a Plackett-Burman design. For the
-following example, consider the linear relationship presented in
-Equation\nbsp{}\eqref{eq:linear_assumption}, where $\epsilon$ is the error term,
-$\mathbf{Y}$ is the observed response, $\mathbf{X} = \left\{1,
-x_1,\dots,x_n\right\}$ is the set of $n$ 2-level factors, and $\bm{\beta} =
-\left\{\beta_0,\dots,\beta_n\right\}$ is the set with the /intercept/ $\beta_0$
-and the corresponding /model coefficients/. ANOVA tests can rigorously compute
-the significance of each factor. We can think of that intuitively by noting that
-less relevant factors will have corresponding values in $\bm{\beta}$ close to
-zero.
-
-#+LATEX: \vspace{-15pt}
-
+fundamental for running ANOVA tests using a Plackett-Burman design. Consider the
+following linear relationship:
+#+LATEX: \vspace{-5pt}
 #+BEGIN_EXPORT latex
 {\normalsize
 \begin{align}
-\mathbf{Y} = \bm{\beta}\mathbf{X} + \epsilon
+\mathbf{Y} = \bm{\beta}\mathbf{X} + \varepsilon,
 %\caption{Linear model assumed in main-effect analysis of screening designs}
 \label{eq:linear_assumption}
 \end{align}
 }
 #+END_EXPORT
-
-#+LATEX: \vspace{-10pt}
+#+LATEX: \vspace{-1pt}
+where $\varepsilon$ is the error term, $\mathbf{Y}$ is the observed response,
+$\mathbf{X} = \left\{1, x_1,\dots,x_n\right\}$ is the set of $n$ 2-level
+factors, and $\bm{\beta} = \left\{\beta_0,\dots,\beta_n\right\}$ is the set with
+the /intercept/ $\beta_0$ and the corresponding /model coefficients/. ANOVA
+tests can rigorously compute the significance of each factor. We can think of
+that intuitively by noting that less relevant factors will have corresponding
+values in $\bm{\beta}$ close to zero.
 
 We now present an example to illustrate the screening methodology. Suppose we
 wish to minimize a performance metric $Y$ of a problem with factors
-$x_1,\dots,x_8$ assuming values in $\left\{-1, -0.8, -0.6, \dots, 0.6, 0.8,
-1\right\}$. Each $y_i \in Y$ is computed using
-Equation\nbsp{}\eqref{eq:real_model}, but suppose that, for the purpose of this
-example, they are computed by a very expensive black-box procedure. Note that
-not all factors are included in the real computation. In this scenario we can
-think of the error term $\epsilon$ as representing not only noise but our
-uncertainty regarding the model as well. Higher amplitudes of $\epsilon$ might
-make it harder to justify isolating factors with low significance.
-
-#+LATEX: \vspace{-10pt}
-
+$x_1,\dots,x_8$ assuming values are in $\left\{-1, -0.8, -0.6, \dots, 0.6, 0.8,
+1\right\}$. Each $y_i \in Y$ is computed using the following equation:
+#+LATEX: \vspace{-5pt}
 #+BEGIN_EXPORT latex
 {\normalsize
 \begin{align}
 \label{eq:real_model}
 y_i = & -1.5x_1 + 1.3x_3 + 3.1x_5 + \\
-& -1.4x_7 + 1.35x_8^2 + 1.6x_3x_5 + \epsilon \nonumber
+& -1.4x_7 + 1.35x_8^2 + 1.6x_3x_5 + \varepsilon. \nonumber
 \end{align}
 %\caption{Real model used to obtain the data on Table\ref{tab:plackett}}
 }
 #+END_EXPORT
-
-#+LATEX: \vspace{-10pt}
+#+LATEX: \vspace{-1pt}
+Suppose that, for the purpose of this example, they are computed by a very
+expensive black-box procedure. Note that factors $\{x_2,x_4,x_6\}$ have no
+influence. In this scenario we can think of the error term $\varepsilon$ as
+representing not only noise but our uncertainty regarding the model as well.
+Higher amplitudes of $\varepsilon$ might make it harder to justify isolating
+factors with low significance.
 
 To efficiently study this problem we decide to construct a Plackett-Burman
 design, which minimizes the experiments needed to identify relevant factors. The
@@ -1544,14 +1545,15 @@ print(tab, booktabs = TRUE,
       include.rownames = FALSE,
       caption.placement = "top",
       size = "\\scriptsize",
+      table.placement="b",
       sanitize.text.function = function(x){x})
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Fri Oct 12 13:46:15 2018
-\begin{table}[ht]
+% Mon Oct 15 18:04:00 2018
+\begin{table}[b]
 \centering
 \caption{Randomized Plackett-Burman design for factors $x_1, \dots, x_8$, using 12 experiments and ``dummy'' factors $d_1, \dots, d_3$, and computed response $\mathbf{Y}$}
 \label{tab:plackett}
@@ -1649,14 +1651,15 @@ print(x, size = "\\small",
       math.style.exponents = TRUE,
       booktabs = TRUE,
       sanitize.text.function = function(x){x},
+      table.placement="t",
       caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Fri Oct 12 13:58:03 2018
-\begin{table}[ht]
+% Mon Oct 15 18:04:10 2018
+\begin{table}[t]
 \centering
 \caption{Shortened ANOVA table for the fit of the naive model, with significance intervals from the \texttt{R} language}
 \label{tab:anova_linear}
@@ -1696,7 +1699,7 @@ Table\nbsp{}\ref{tab:linear_prediction_comparison} compares the prediction for
 $Y$ from our linear model with the selected factors
 $\left\{x_1,x_3,x_5,x_7,x_8\right\}$ with the actual global minimum $Y$ for this
 problem. Note that factors $\left\{x_2,x_4,x_6\right\}$ are included for the
-global minimum. This happens here because of the error term $\epsilon$,
+global minimum. This happens here because of the error term $\varepsilon$,
 but could also be interpreted as due to model uncertainty.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
@@ -1745,14 +1748,15 @@ print(x,
       sanitize.text.function = function(x){x},
       tabular.environment = "tabularx",
       width = "\\columnwidth",
+      table.placement="b",
       caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Fri Oct 12 14:06:43 2018
-\begin{table}[ht]
+% Mon Oct 15 18:04:58 2018
+\begin{table}[b]
 \centering
 \caption{Comparison of the response $Y$ predicted by the linear model and the true global minimum. Factors used in the model are bolded}
 \label{tab:linear_prediction_comparison}
@@ -1806,7 +1810,7 @@ the /variance/ of the /estimators/ for the /regression coefficients/ associated
 with the selected model. This search is usually done by swapping experiments
 from the current candidate set with experiments from a pool of possible
 experiments, according to certain rules, until some stopping criterion is met.
-In the example in this Section, as well as in the approach presented in this
+In the example in this section, as well as in the approach presented in this
 paper, we use Fedorov's algorithm\nbsp{}\cite{fedorov1972theory} for
 constructing D-Optimal designs, implemented in =R= in the =AlgDesign=
 package\nbsp{}\cite{wheeler2014algdesign}.
@@ -1858,14 +1862,15 @@ print(x,
       booktabs = TRUE,
       include.rownames = FALSE,
       sanitize.text.function = function(x){x},
+      table.placement="t",
       caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Fri Oct 12 14:08:40 2018
-\begin{table}[ht]
+% Mon Oct 15 18:05:40 2018
+\begin{table}[t]
 \centering
 \caption{D-Optimal design constructed for the factors $\left\{x_1,x_3,x_5,x_7,x_8\right\}$ and computed response $Y$}
 \label{tab:d_optimal}
@@ -1874,18 +1879,18 @@ print(x,
   \toprule
 $x_1$ & $x_3$ & $x_5$ & $x_7$ & $x_8$ & $Y$ \\
   \midrule
-1.0 & -1.0 & -1.0 & -1.0 & -1.0 & -4.881 \\
-  1.0 & 1.0 & -1.0 & -1.0 & -1.0 & 1.133 \\
-  -1.0 & -1.0 & 1.0 & 1.0 & -1.0 & 4.609 \\
-  -1.0 & 1.0 & 1.0 & 1.0 & -1.0 & 3.231 \\
-  -1.0 & -1.0 & -1.0 & -1.0 & 0.0 & 0.055 \\
-  1.0 & 1.0 & 1.0 & -1.0 & 0.0 & 7.132 \\
-  -1.0 & 1.0 & -1.0 & 1.0 & 0.0 & -3.305 \\
-  1.0 & -1.0 & 1.0 & 1.0 & 0.0 & -2.187 \\
-  -1.0 & -1.0 & 1.0 & -1.0 & 1.0 & 7.854 \\
-  -1.0 & 1.0 & 1.0 & -1.0 & 1.0 & 7.336 \\
-  1.0 & -1.0 & -1.0 & 1.0 & 1.0 & -8.205 \\
-  1.0 & 1.0 & -1.0 & 1.0 & 1.0 & -2.003 \\
+-1.0 & -1.0 & -1.0 & -1.0 & -1.0 & 2.455 \\
+  -1.0 & 1.0 & 1.0 & -1.0 & -1.0 & 6.992 \\
+  1.0 & -1.0 & -1.0 & 1.0 & -1.0 & -7.776 \\
+  1.0 & 1.0 & 1.0 & 1.0 & -1.0 & 4.163 \\
+  1.0 & 1.0 & -1.0 & -1.0 & 0.0 & 0.862 \\
+  -1.0 & 1.0 & 1.0 & -1.0 & 0.0 & 5.703 \\
+  1.0 & -1.0 & -1.0 & 1.0 & 0.0 & -9.019 \\
+  -1.0 & -1.0 & 1.0 & 1.0 & 0.0 & 2.653 \\
+  -1.0 & -1.0 & -1.0 & -1.0 & 1.0 & 1.951 \\
+  1.0 & -1.0 & 1.0 & -1.0 & 1.0 & 0.446 \\
+  -1.0 & 1.0 & -1.0 & 1.0 & 1.0 & -2.383 \\
+  1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 4.423 \\
    \bottomrule
 \end{tabular}
 \endgroup
@@ -1915,13 +1920,14 @@ print(x, size = "\\small",
       math.style.exponents = TRUE,
       booktabs = TRUE,
       sanitize.text.function = function(x){x},
+      table.placement="ht",
       caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Fri Oct 12 13:57:05 2018
+% Mon Oct 15 18:05:50 2018
 \begin{table}[ht]
 \centering
 \caption{Shortened ANOVA table for the fit of the naive model (0 ‘$***$’ 0.001 ‘$**$’ 0.01 ‘$*$’ 0.05 ‘$\cdot$’ 0.1 ‘ ’ 1)}
@@ -1930,13 +1936,13 @@ print(x, size = "\\small",
   \toprule
  & F value & Pr$(<\text{F})$ & Signif. \\
   \midrule
-$x_1$ & 21.670 & 0.010 & $**$ \\
-  $x_3$ & 56.734 & 0.002 & $**$ \\
-  $x_5$ & 237.937 & 0.000 & $***$ \\
-  $x_7$ & 41.510 & 0.003 & $**$ \\
-  $x_8$ & 0.087 & 0.783 &   \\
-  I($x_8^2$) & 11.199 & 0.029 & $*$ \\
-  $x_1$:$x_3$ & 53.043 & 0.002 & $**$ \\
+$x_1$ & 461.596 & 0.000 & $***$ \\
+  $x_3$ & 661.241 & 0.000 & $***$ \\
+  $x_5$ & 721.313 & 0.000 & $***$ \\
+  $x_7$ & 293.822 & 0.000 & $***$ \\
+  $x_8$ & 2.297 & 0.204 &   \\
+  I($x_8^2$) & 38.191 & 0.003 & $**$ \\
+  $x_1$:$x_3$ & 398.202 & 0.000 & $***$ \\
    \bottomrule
 \end{tabular}
 \endgroup
@@ -1947,7 +1953,7 @@ We are now going to fit this model using the results of the experiments in our
 D-Optimal design. Table\nbsp{}\ref{tab:correct_fit} shows the model fit table
 and compares the estimated and real model coefficients. This example illustrates
 that the Design of Experiments approach can achieve close model estimations
-using few resources, provided are able to use user input to identify relevant
+using few resources, provided it is able to use user input to identify relevant
 factors and knowledge about the problem domain to tweak the model.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
@@ -1975,13 +1981,14 @@ print(x, size = "\\small",
       math.style.exponents = TRUE,
       booktabs = TRUE,
       sanitize.text.function = function(x){x},
+      table.placement="ht",
       caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Fri Oct 12 14:08:45 2018
+% Mon Oct 15 18:06:01 2018
 \begin{table}[ht]
 \centering
 \caption{Correct model fit comparing real and estimated coefficients, with significance intervals from the \texttt{R} language}
@@ -1991,14 +1998,14 @@ print(x, size = "\\small",
   \toprule
  & Real & Estimated & t value & Pr$(>|\text{t}|)$ & Signif. \\
   \midrule
-Intercept & 0.000 & 0.424 & 2.384 & 0.076 & . \\
-  $x_1$ & -1.500 & -1.287 & -11.825 & 0.000 & *** \\
-  $x_3$ & 1.300 & 1.357 & 13.218 & 0.000 & *** \\
-  $x_5$ & 3.100 & 3.336 & 30.646 & 0.000 & *** \\
-  $x_7$ & -1.400 & -1.646 & -15.124 & 0.000 & *** \\
-  $x_8$ & 0.000 & 0.111 & 0.886 & 0.426 &   \\
-  $x_8^2$ & 1.350 & 0.710 & 3.263 & 0.031 & * \\
-  $x_1x_3$ & 1.600 & 1.684 & 15.468 & 0.000 & *** \\
+Intercept & 0.000 & 0.050 & 0.305 & 0.776 &   \\
+  $x_1$ & -1.500 & -1.452 & -14.542 & 0.000 & *** \\
+  $x_3$ & 1.300 & 1.527 & 15.292 & 0.000 & *** \\
+  $x_5$ & 3.100 & 2.682 & 26.857 & 0.000 & *** \\
+  $x_7$ & -1.400 & -1.712 & -17.141 & 0.000 & *** \\
+  $x_8$ & 0.000 & -0.175 & -1.516 & 0.204 &   \\
+  $x_8^2$ & 1.350 & 1.234 & 6.180 & 0.003 & ** \\
+  $x_1x_3$ & 1.600 & 1.879 & 19.955 & 0.000 & *** \\
    \bottomrule
 \end{tabular}
 \endgroup
@@ -2012,7 +2019,9 @@ and domain knowledge we found an optimization within $10\%$ of the global
 optimum computing $Y$ only 24 times. We were able to do that by first reducing
 the dimension of the problem when we eliminated irrelevant factors in the
 screening step. We then constructed a more careful exploration of this new
-problem subspace, helped by domain knowledge provided by an expert.
+problem subspace, helped by domain knowledge provided by an expert. Note that we
+could have reused some of the 12 experiments from the previous step to reduce
+the size of the new design even further.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
@@ -2041,13 +2050,14 @@ print(x,
       booktabs = TRUE,
       include.rownames = TRUE,
       sanitize.text.function = function(x){x},
+      table.placement="ht",
       caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Fri Oct 12 14:08:50 2018
+% Mon Oct 15 18:06:07 2018
 \begin{table}[ht]
 \centering
 \caption{Comparison of the response $Y$ predicted by our models and the true global minimum. Factors used in the models are bolded}
@@ -2074,11 +2084,14 @@ again, for a different architecture or with larger input, for example, we could
 start exploring the search space with a less naive model. We could also continue
 the optimization of this problem by further exploring levels of factors
 $\left\{x_2,x_4,x_6\right\}$. The significance of these factors could now be
-detectable by ANOVA tests since the other factors are now fixed.
+detectable by ANOVA tests since the other factors are now fixed. If we still
+cannot identify any significant factor, it might advisable to spend the
+remaining budget using another exploration strategy such as uniform random or
+lating hypercube sampling.
 
 The process of screening for factor significance using ANOVA and fitting a
 new model using acquired knowledge is essentially a step in the transparent
-Design of Experiments approach we present in the next Section.
+Design of Experiments approach we present in the next section.
 *** Optimizing the Rosenbrock Function                           :noexport:
 #+CAPTION: Defining the Rosenbrock function in =R=
 #+BEGIN_figure
@@ -2233,17 +2246,23 @@ x           & $7.5 \times 10^{-6}$ &   1 \\
 \end{table}
 #+END_EXPORT
 * Autotuning with Design of Experiments
-In this Section we discuss in detail our iterative Design of Experiments
+In this section we discuss in detail our iterative Design of Experiments
 approach to autotuning. At the start of the process it is necessary to define
 the factors and levels that compose the search space of the target problem,
 select an initial performance model, and generate an experimental design. Then,
-as discussed in the previous Section, we identify relevant factors by running an
+as discussed in the previous section, we identify relevant factors by running an
 ANOVA test on the results. This enables selecting and fitting a new performance
 model, which is used for predicting levels for each relevant factor. The process
 can then restart, generating a new design for the new problem subspace with the
 remaining factors. Informed decisions made by the user play a central role in
 each iteration, guiding and speeding up the process.
 Figure\nbsp{}[[fig:doe_anova_strategy]] presents an overview of our approach.
+
+#+NAME: fig:doe_anova_strategy
+#+CAPTION: Overview of the Design of Experiments approach to autotuning proposed in this paper
+#+ATTR_LATEX: :width .95\columnwidth :placement [b]\vspace{-.5cm}
+#+ATTR_ORG: :width 400
+[[./img/doe_anova_strategy.pdf]]
 
 The first step of our approach is to define which are the target factors and
 which levels of each factor are worth exploring. Then, the user must select an
@@ -2256,25 +2275,13 @@ Deciding which levels to include for these kinds of factors requires a more
 careful analysis. For example, if we suspect the performance model has a
 quadratic term for a certain factor, we should include at least three of its
 levels. The ordering between the levels of other compiler parameters, such as
-\texttt{-O(0,1,2,3)}, is not obviously translated to a numerical ordering.
-Factors like these are named /categorical/, and must be treated differently when
-constructing designs and analyzing the results.
-
-#+LATEX: \vspace{-20pt}
-
-#+BEGIN_CENTER
-#+NAME: fig:doe_anova_strategy
-#+CAPTION: Overview of the Design of Experiments approach to autotuning proposed in this paper
-#+ATTR_LATEX: :width .95\columnwidth
-#+ATTR_ORG: :width 400
-[[./img/doe_anova_strategy.pdf]]
-#+END_CENTER
-
-#+LATEX: \vspace{-27pt}
+\texttt{-O(0,1,2,3)}, is not obviously translated to a number. Factors like
+these are named /categorical/, and must be treated differently when constructing
+designs and analyzing the results.
 
 We decided to use D-Optimal designs because their construction techniques enable
 mixing categorical and numerical factors in the same screening design, while
-biasing sampling according to a performance model. This enables the autotuner to
+biasing sampling according to the performance model. This enables the autotuner to
 exploit global search space structures if we use the right model. When
 constructing a D-Optimal design the user can require that specific points in the
 search space are included, or that others are not. Algorithms for constructing
@@ -2282,7 +2289,7 @@ D-Optimal designs are capable of adapting to these requirements by optimizing a
 starting design. Before settling on D-Optimal designs, we explored other design
 construction techniques such as the
 Plackett-Burman\nbsp{}\cite{plackett1946design} screening designs shown in the
-previous Section, the /contractive replacement/ technique of
+previous section, the /contractive replacement/ technique of
 Addelman-Kempthorne\nbsp{}\cite{addelman1961some} and the /direct generation/
 algorithm by Grömping and Fontana\nbsp{}\cite{ulrike2018algorithm}. These
 techniques have strong requirements on design size and level mixing, so we opted
@@ -2296,14 +2303,16 @@ decide whether to construct a new design using the successfully completed
 experiments or to continue to the analysis step if enough experiments succeed.
 
 The next four steps of an iteration, shown in Figure [[fig:doe_anova_strategy]],
-were discussed in detail in the previous Section. User input is fundamental to
+were discussed in detail in the previous section. User input is fundamental to
 the success of these steps. After running the ANOVA test, the user should apply
 domain knowledge to analyze the ANOVA table and determine which factors are
-relevant. Certain factors might not appear relevant but the user might still
-want to include them in the model to explore more of its levels, for example.
-Selecting the model after the ANOVA test also benefits from domain knowledge.
-The impact of the number of threads used by a parallel program on its
-performance is usually modeled using a quadratic term, for example.
+relevant. Certain factors might not appear relevant, in which case the user
+should not include them in the regression model, but save them for further
+exploration. Selecting the model after the ANOVA test also benefits from domain
+knowledge. The impact of the number of threads used by a parallel program on its
+performance is usually modeled using an inverse term, which accounts for the
+speedup of adding more threads, plus a linear term, which accounts for the
+overhead of their management.
 
 A central assumption of ANOVA is the /homoscedasticity/ of the response, which
 can be interpreted as requiring the observed error on measurements to be
@@ -2327,11 +2336,12 @@ placed on the model and ANOVA at this step by allowing other levels. This step
 performs a reduction on the dimension of the problem by eliminating factors and
 decreasing the size of the search space. If we identify relevant parameters
 correctly, we will have restricted further search to better regions of the
-search space. In the next Section we present the performance of our approach in
+search space. In the next section we present the performance of our approach in
 scenarios that differ on search space size, availability and complexity.
 * Performance Evaluation
-In this Section we present performance evaluations of our approach in two
+In this section we present performance evaluations of our approach in two
 scenarios.
+#+LATEX: \vspace{-5pt}
 ** GPU Laplacian Kernel
 We first evaluated the performance of our approach in a Laplacian Kernel
 implemented using BOAST\nbsp{}\cite{videau2017boast} and targeting the /Nvidia
@@ -2343,17 +2353,32 @@ a search space of size $2.3\times10^4$. The complete search space took 154 hours
 to be evaluated on /Debian Jessie/, using an /Intel Xeon E5-2630v2/ CPU,
 \texttt{gcc} version \texttt{4.8.3} and /Nvidia/ driver version \texttt{340.32}.
 
-We applied domain knowledge to construct the initial performance model shown in
-Equation\nbsp{}\eqref{eq:gpu_laplacian_performance_model}. This performance model
-was used by the Iterative Linear Model (LM) algorithm and by our D-Optimal
-Design approach (DLMT). The LM algorithm is identical to our approach, described
-Section\nbsp{}[[Autotuning with Design of Experiments]], except for the design
-generation step, where it uses a fixed-size random sample of the search space
-instead of generating designs. We compared the performance of our approach with
-the algorithms listed in Table\nbsp{}[[tab:gpu_laplacian_algorithms]], using a
-budget of /at most/ 125 measurements, over 1000 repetitions.
+We applied domain knowledge to construct the following initial performance model:
+#+BEGIN_EXPORT latex
+\vspace{-2pt}
+\\\begin{minipage}{\linewidth}\scriptsize
+\begin{align}
+\label{eq:gpu_laplacian_performance_model}
+\texttt{time\_per\_pixel} \sim & \scriptsize\; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} \; + \nonumber \\
+& \scriptsize\; \texttt{vector\_length} + \texttt{lws\_y} + 1 / \texttt{lws\_y} \; + \nonumber \\
+& \scriptsize\; \texttt{load\_overlap} + \texttt{temporary\_size} \; + \\
+& \scriptsize\; \texttt{elements\_number} + 1 / \texttt{elements\_number} \; + \nonumber \\
+& \scriptsize\; \texttt{threads\_number} + 1 /\texttt{threads\_number} \nonumber
+\end{align}
+\vspace{2pt}
+\end{minipage}
+#+END_EXPORT
+This performance model was used by the Iterative Linear Model (LM) algorithm and
+by our D-Optimal Design approach (DLMT). The LM algorithm is identical to our
+approach, described Section\nbsp{}[[Autotuning with Design of Experiments]], except
+for the design generation step, where it uses a fixed-size random sample of the
+search space instead of generating D-Optimal designs. We compared the
+performance of our approach, LM and DLMT, with the following algorithms: uniform
+Random Sampling (RS), Latin Hypercube Sampling (LHS), Greedy Search (GS), Greedy
+Search with Restart (GSR), and Genetic Algorithm (GA), using a budget of /at
+most/ 125 measurements, over 1000 repetitions, whithout any expert intervention.
 
-#+ATTR_LATEX: :booktabs t :align ll :font \footnotesize :float t :placement [ht]
+#+ATTR_LATEX: :booktabs t :align ll :font \scriptsize :float t :placement [t]
 #+NAME: tab:gpu_laplacian_factors
 #+CAPTION: Parameters of the Laplacian Kernel
 |-------------------------------+-------------------------------|
@@ -2367,39 +2392,6 @@ budget of /at most/ 125 measurements, over 1000 repetitions.
 | \texttt{threads\_number}      | $2^5,\dots,2^{10}$            |
 | \texttt{lws\_y}               | $2^0,\dots,2^{10}$            |
 |-------------------------------+-------------------------------|
-
-#+LATEX: \vspace{-7pt}
-
-#+BEGIN_EXPORT latex
-{\scriptsize
-\begin{align}
-%\caption{Initial performance model used by LM and DLMT}
-\label{eq:gpu_laplacian_performance_model}
-\texttt{time\_per\_pixel} \sim & \; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} \; + \nonumber \\
-& \; \texttt{vector\_length} + \texttt{lws\_y} + 1 / \texttt{lws\_y} \; + \nonumber \\
-& \; \texttt{load\_overlap} + \texttt{temporary\_size} \; + \\
-& \; \texttt{elements\_number} + 1 / \texttt{elements\_number} \; + \nonumber \\
-& \; \texttt{threads\_number} + 1 /\texttt{threads\_number} \nonumber
-\end{align}
-}
-#+END_EXPORT
-
-#+LATEX: \vspace{-18pt}
-
-#+ATTR_LATEX: :booktabs t :align ll :font \footnotesize :float t :placement [ht]
-#+NAME: tab:gpu_laplacian_algorithms
-#+CAPTION: Search algorithms compared in the GPU Laplacian Kernel
-|------+-----------------------------|
-|      | Algorithm                   |
-|------+-----------------------------|
-| RS   | Random Sampling             |
-| LHS  | Latin Hyper Square Sampling |
-| GS   | Greedy Search               |
-| GSR  | Greedy Search w/ Restart    |
-| GA   | Genetic Algorithm           |
-| LM   | Iterative Linear Model      |
-| DLMT | D-Optimal Designs           |
-|------+-----------------------------|
 
 Since we measured the entire valid search space, we could use the /slowdown/
 relative to the /global minimum/ to compare the performance of algorithms.
@@ -2453,13 +2445,14 @@ print(x,
       booktabs = TRUE,
       add.to.row = list(pos = as.list(c(6)), command = c("\\rowcolor{red!25}")),
       math.style.exponents = TRUE,
+      table.placement = "ht",
       caption.placement = "top")
 #+END_SRC
 
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Fri Oct 12 15:27:06 2018
+% Mon Oct 15 18:00:57 2018
 \begin{table}[ht]
 \centering
 \caption{Slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
@@ -2482,32 +2475,26 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 \end{table}
 #+END_EXPORT
 
-All algorithms performed well in this kernel, with only Greedy Search (GS)
-not being able to find slowdowns smaller than 4$\times$ in some runs. As
+All algorithms performed relatively well in this kernel, with only Greedy Search
+(GS) not being able to find slowdowns smaller than 4$\times$ in some runs. As
 expected, other search algorithms had results similar to Random Sampling (RS).
 The LM algorithm was able to find the global minimum on most runs, but some runs
-found slowdowns of almost $4\times$. Our approach was able to find the global
-minimum in all of the 1000 runs while using /at most/ less than half of the
-allotted budget.
+could not find slowdowns smaller than $4\times$. Our approach was able to find
+the global minimum in all of the 1000 runs while using /at most/ less than half
+of the allotted budget.
 
 We implemented a simple approach for the prediction step in this problem,
 choosing the best value of our fitted models on the complete set of valid level
 combinations. This was possible for this problem since all valid combinations
 were known and fit in memory. For problems were the search space is too large to
 be generated, we would have to either adapt this step and run the prediction on
-a sample, or minimize the model using the strategies we mentioned the previous
-Section.
+a sample, or minimize the model using the differentiation strategies we mentioned
+in Section\nbsp{}[[Screening & Plackett-Burman Designs]].
 
-#+LATEX: \vspace{-10pt}
-
-#+BEGIN_CENTER
 #+NAME: fig:gpu_laplacian_comparison_histogram
-#+CAPTION: Counts of the slowdowns in relation to the global minimum for 7 optimization methods on the Laplacian Kernel, using a budget of 125 points over 1000 repetitions
-#+ATTR_LATEX: :float t :placement [ht] :width .9\columnwidth
+#+CAPTION: Distribution of slowdowns in relation to the global minimum for 7 optimization methods on the Laplacian Kernel, using a budget of 125 points over 1000 repetitions \vspace{-.5cm}
+#+ATTR_LATEX: :float t :placement [t]\vspace{-.5cm} :width .9\columnwidth
 [[./img/comparison_histogram.pdf]]
-#+END_CENTER
-
-#+LATEX: \vspace{-25pt}
 
 This kernel provided ideal conditions for using our approach, where the
 performance model is approximately known and the complete valid search space is
@@ -2524,22 +2511,23 @@ annotation and transformation tools provided by
 Orio\nbsp{}\cite{hartono2009annotation}. Search space sizes are overall larger
 than in the Laplacian Kernel example. Kernel factors are either integers in an
 interval, such as loop unrolling and register tiling amounts, or binary flags
-that control parallelization and vectorization, for example.
+that control parallelization and vectorization.
 
 We used the Random Sampling (RS) implementation available in Orio and integrated
 an implementation of our approach (DLMT) to the system. Based on previous
-studies\nbsp{balaprakash2011can,balaprakash2012experimental} with SPAPT kernels,
-we omitted the other Orio algorithms because we considered their performance to
-be similar to RS. The global minima are not known for any of the problems, and
-problem search spaces are too large to allow complete measurements. Therefore,
-we used the performance of each application compiled with \texttt{gcc}'s
-\texttt{-O3}, with no code transformations, as a /baseline/ for computing the
-/speedups/ achieved by each strategy. We performed 10 autotuning repetitions for
-each kernel using random sampling and our approach, using a budget of /at most/
-400 measurements. Our approach was also only allowed to perform 4 of iterations
-shown in Figure\nbsp{}[[fig:doe_anova_strategy]]. Experiments were performed using
-Grid5000\nbsp{}\cite{balouek2013adding}, on /Debian Jessie/, using an /Intel
-Xeon E5-2630v3/ CPU and \texttt{gcc} version \texttt{6.3.0}.
+studies\nbsp{}\cite{balaprakash2011can,balaprakash2012experimental} with SPAPT
+kernels, we omitted the other Orio algorithms because we considered their
+performance to be similar to RS. The global minima are not known for any of the
+problems, and problem search spaces are too large to allow complete
+measurements. Therefore, we used the performance of each application compiled
+with \texttt{gcc}'s \texttt{-O3}, with no code transformations, as a /baseline/
+for computing the /speedups/ achieved by each strategy. We performed 10
+autotuning repetitions for each kernel using random sampling and our approach,
+using a budget of /at most/ 400 measurements. Our approach was also allowed to
+perform only 4 of the iterations shown in Figure\nbsp{}[[fig:doe_anova_strategy]].
+Experiments were performed using Grid5000\nbsp{}\cite{balouek2013adding}, on
+/Debian Jessie/, using an /Intel Xeon E5-2630v3/ CPU and \texttt{gcc} version
+\texttt{6.3.0}.
 
 #+ATTR_LATEX: :booktabs t :align llll :font \scriptsize :float t :placement [ht]
 #+NAME: tab:spapt_apps
@@ -2565,7 +2553,6 @@ Xeon E5-2630v3/ CPU and \texttt{gcc} version \texttt{6.3.0}.
 | =correlation= | Correlation computation         |      21 | $4.5 \times 10^{17}$ |
 |---------------+---------------------------------+---------+----------------------|
 
-
 The time to measure each kernel varied from a few seconds to up to 20 minutes.
 We discovered in testing that some transformations caused the compiler to enter
 an internal optimization process that did not stop for over 12 hours. We did not
@@ -2575,77 +2562,81 @@ to be runtime failures.
 
 Similar to the previous example, we automated factor elimination based on ANOVA
 tests so that a comprehensive evaluation could be performed. We also did not
-tailor starting performance models, which were the same for all kernels.
-Starting models had a linear term for each factor with two or more levels, plus
+tailor initial performance models, which were the same for all kernels.
+Initial models had a linear term for each factor with two or more levels, plus
 quadratic and cubic terms for factors with sufficient levels. Although
-automation and identical starting models might have limited the improvements at
+automation and identical initial models might have limited the improvements at
 each step of our application, our results show that it still succeeded in
 decreasing the budget needed to find significant speedups for some kernels.
 
-Figure\nbsp{}[[fig:iteration_best_comparison]] presents the speedup found by each
-run of RS and DLMT, plotted against the algorithm iteration where that speedup
+Figure\nbsp{}[[fig:iteration_best_comparison]] presents the /speedup/ found by each
+run of RS and DLMT, plotted against the algorithm /iteration/ where that speedup
 was found. We divided the kernels into 3 groups according to the results. The
 group where no algorithm found any speedups contains 3 kernels and is marked
-with /green/ headers. The group where both algorithms found similar speedups, in
-similar iterations, contains 6 kernels and is marked with /red/ headers. The
+with /blue [0]/ headers. The group where both algorithms found similar speedups, in
+similar iterations, contains 6 kernels and is marked with /orange [=]/ headers. The
 group where DLMT found similar speedups using a significantly smaller budget
-than RS contains 8 kernels and is marked in /blue/ headers. Ellipses delimit the
-95% confidence intervals for the averages of iterations and speedups, and a
-dashed line marks the \texttt{-03} baseline. In comparison to RS, our approach
-significantly decreased the average number of iterations needed to find speedups
-for the 8 kernels in the blue group.
+than RS contains 8 kernels and is marked in /green [+]/ headers. Ellipses delimit an
+estimation of where 95% of the underlying distribution lies, and a dashed line
+marks the \texttt{-03} baseline. In comparison to RS, our approach significantly
+decreased the average number of iterations needed to find speedups for the 8
+kernels in the green group.
 
 Figure\nbsp{}[[fig:split_histograms]] shows the search space exploration performed
 by RS and DLMT. It uses the same color groups as
-Figure\nbsp{}[[fig:iteration_best_comparison]], and shows the counts of the speedups
-that where found during all repetitions of the experiments. Histogram areas
-corresponding to DLMT are usually smaller because it usually stopped earlier due
-to the 4-iteration limit, while RS always performed all 400 allotted
-measurements. We see that the frequency of configurations with high speedups is
-larger for DLMT overall, even for kernels on the red group. Our approach also
-spent less of the budget exploring configurations with small speedups or
-slowdowns, in comparison with RS.
+Figure\nbsp{}[[fig:iteration_best_comparison]], and shows the distribution, as a
+count, of the speedups that where found during all repetitions of the
+experiments. Histogram areas corresponding to DLMT are usually smaller because
+it usually stopped earlier due to the 4-iteration limit, while RS always
+performed all 400 allotted measurements. This is particularly visible in =lu=,
+=mvt=, =jacobi=.
 
-Our approach used a generic starting performance model for all kernels but,
+We can also observe that the frequency of configurations with high speedups is
+larger for DLMT overall, even for kernels on the orange group. This clearly
+noticeable in =gemver, =bicgkernel=, =mm= or =tensor=. This means that our
+approach spent less of the budget exploring configurations with small speedups
+or slowdowns, in comparison with RS.
+
+Finally, we can see in Figure\nbsp{}[[fig:iteration_best_comparison]] that the
+=jacobi= kernel presents an interesting behaviour, with what appears to be two
+local minima, into which both RS and DLMT may fall. Since DLMT uses a smaller
+budget, we could rerun it several times and avoid getting trapped in the worst
+local minimum.
+
+Our approach used a generic initial performance model for all kernels but,
 since it iteratively eliminates factors and model terms based on ANOVA tests,
 was still able to exploit global search space structures for kernels in the red
-and blue groups. Even in this automated setting, the results with SPAPT kernels
+and green groups. Even in this automated setting, the results with SPAPT kernels
 illustrate the ability our approach has to reduce the budget needed to find good
 speedups by efficiently exploring search spaces.
 
-#+BEGIN_CENTER
 #+NAME: fig:iteration_best_comparison
 #+CAPTION: Cost of best point found on each run, and the iteration where
 #+CAPTION: it was found. RS and DLMT found no speedups with similar budget
-#+CAPTION: for kernels with /green/ headers, and similar speedups with
-#+CAPTION: similar budget for kernels with /red/ headers. DLMT found similar
-#+CAPTION: speedups with smaller budget for kernels with /blue/ headers.
+#+CAPTION: for kernels with /blue [0]/ headers, and similar speedups with
+#+CAPTION: similar budget for kernels with /orange [=]/ headers. DLMT found similar
+#+CAPTION: speedups with smaller budget for kernels with /green [+]/ headers.
 #+CAPTION: Ellipses delimit the 95% confidence intervals for the averages of iterations and speedups.
 #+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
 [[./img/iteration_best_comparison.pdf]]
-#+END_CENTER
 
-#+BEGIN_CENTER
 #+NAME: fig:split_histograms
 #+CAPTION: Histograms of explored search spaces, showing the real count of measured configurations.
 #+CAPTION: Kernels are grouped in the same way as in Figure\nbsp{}[[fig:iteration_best_comparison]].
 #+CAPTION: DLMT spent less measurements than RS in configurations with smaller speedups or with slowdowns,
-#+CAPTION: even for kernels in the red group. DLMT also spent more time exploring configurations with
+#+CAPTION: even for kernels in the orange group. DLMT also spent more time exploring configurations with
 #+CAPTION: larger speedups.
 #+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
 [[./img/split_histograms.pdf]]
-#+END_CENTER
-
-#+LATEX: \vspace{-40pt}
 
 * Conclusion
 We presented in this paper a transparent Design of Experiments approach for
 program autotuning under tight budget constraints. We discussed the underlying
 concepts that enable our approach to significantly reduce the measurement budget
 needed to find good optimizations consistently over different kernels exposing
-configuration parameters of source-to-source transformations. We have made efforts
-to make our results, figures and analyses reproducible by hosting all our data
-publicly\nbsp{}\cite{bruel2018ipdps19}.
+configuration parameters of source-to-source transformations. We have made
+efforts to make our results, figures and analyses reproducible by hosting all
+our scripts and data publicly\nbsp{}\cite{bruel2018ipdps19}.
 
 Our approach outperformed six other search heuristics, always finding the global
 optimum of the search space defined by the optimization of a Laplacian kernel
@@ -2673,7 +2664,9 @@ significance.
 Decreasing the number of experiments needed to find optimizations is a desirable
 property for autotuners in problem domains other than source-to-source
 transformation. We intend to evaluate the performance of our approach in domains
-such as High-Level Synthesis for FPGAs and compiler configuration.
+such as High-Level Synthesis and compiler configuration for FPGAs, where search
+spaces can get as large as $10^{126}$, and in which we already have some
+autotuning experience\nbsp{}\cite{bruel2017autotuninghls}.
 * Acknowledgment
 :PROPERTIES:
 :UNNUMBERED: t
