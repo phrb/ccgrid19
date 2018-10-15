@@ -60,19 +60,19 @@ P.~Balaprakash, A.~Tiwari, S.~M. Wild, and P.~D. Hovland, ``{AutoMOMML:
   Springer International Publishing, 2016, pp. 219--239.
 
 \bibitem{balaprakash2012spapt}
-P.~Balaprakash, S.~M. Wild, and B.~Norris, ``Spapt: Search problems in
+P.~Balaprakash, S.~M. Wild, and B.~Norris, ``{SPAPT}: Search problems in
   automatic performance tuning,'' \emph{Procedia Computer Science}, vol.~9, pp.
   1959--1968, 2012.
 
 \bibitem{hartono2009annotation}
 A.~Hartono, B.~Norris, and P.~Sadayappan, ``Annotation-based empirical
-  performance tuning using orio,'' in \emph{Parallel \& Distributed Processing,
-  2009. IPDPS 2009. IEEE International Symposium on}.\hskip 1em plus 0.5em
-  minus 0.4em\relax IEEE, 2009, pp. 1--11.
+  performance tuning using {Orio},'' in \emph{Parallel \& Distributed
+  Processing, 2009. IPDPS 2009. IEEE International Symposium on}.\hskip 1em
+  plus 0.5em minus 0.4em\relax IEEE, 2009, pp. 1--11.
 
 \bibitem{videau2017boast}
 B.~Videau, K.~Pouget, L.~Genovese, T.~Deutsch, D.~Komatitsch, F.~Desprez, and
-  J.-F. M{\'e}haut, ``Boast: A metaprogramming framework to produce portable
+  J.-F. M{\'e}haut, ``{BOAST}: A metaprogramming framework to produce portable
   and efficient computing kernels for hpc applications,'' \emph{The
   International Journal of High Performance Computing Applications}, p.
   1094342017718068, 2017.
@@ -84,7 +84,7 @@ A.~Tiwari, C.~Chen, J.~Chame, M.~Hall, and J.~K. Hollingsworth, ``A scalable
   on}.\hskip 1em plus 0.5em minus 0.4em\relax IEEE, 2009, pp. 1--12.
 
 \bibitem{yi2007poet}
-Q.~Yi, K.~Seymour, H.~You, R.~Vuduc, and D.~Quinlan, ``Poet: Parameterized
+Q.~Yi, K.~Seymour, H.~You, R.~Vuduc, and D.~Quinlan, ``{POET}: Parameterized
   optimizations for empirical tuning,'' in \emph{Parallel and Distributed
   Processing Symposium, 2007. IPDPS 2007. IEEE International}.\hskip 1em plus
   0.5em minus 0.4em\relax IEEE, 2007, pp. 1--8.
@@ -100,22 +100,22 @@ J.~R. Rice, ``The algorithm selection problem,'' in \emph{Advances in Computers
 
 \bibitem{bilmes1997optimizing}
 J.~Bilmes, K.~Asanovic, C.-W. Chin, and J.~Demmel, ``Optimizing matrix multiply
-  using phipac: a portable, high-performance, ansi c coding methodology,'' in
+  using {PHiPAC}: a portable, high-performance, ansi c coding methodology,'' in
   \emph{Proceedings of International Conference on Supercomputing, Vienna,
   Austria}, 1997.
 
 \bibitem{dongarra1998automatically}
 J.~J. Dongarra and C.~R. Whaley, ``Automatically tuned linear algebra software
-  (atlas),'' \emph{Proceedings of SC}, vol.~98, 1998.
+  ({ATLAS}),'' \emph{Proceedings of SC}, vol.~98, 1998.
 
 \bibitem{vuduc2005oski}
-R.~Vuduc, J.~W. Demmel, and K.~A. Yelick, ``Oski: A library of automatically
+R.~Vuduc, J.~W. Demmel, and K.~A. Yelick, ``{OSKI}: A library of automatically
   tuned sparse matrix kernels,'' in \emph{Journal of Physics: Conference
   Series}, vol.~16, no.~1.\hskip 1em plus 0.5em minus 0.4em\relax IOP
   Publishing, 2005, p. 521.
 
 \bibitem{frigo1998fftw}
-M.~Frigo and S.~G. Johnson, ``Fftw: An adaptive software architecture for the
+M.~Frigo and S.~G. Johnson, ``{FFTW}: An adaptive software architecture for the
   fft,'' in \emph{Acoustics, Speech and Signal Processing, 1998. Proceedings of
   the 1998 IEEE International Conference on}, vol.~3.\hskip 1em plus 0.5em
   minus 0.4em\relax IEEE, 1998, pp. 1381--1384.
@@ -133,7 +133,7 @@ H.~Jordan, P.~Thoman, J.~J. Durillo, S.~Pellegrini, P.~Gschwandtner,
   minus 0.4em\relax IEEE, 2012, pp. 1--12.
 
 \bibitem{hutter2009paramils}
-F.~Hutter, H.~H. Hoos, K.~Leyton-Brown, and T.~St{\"u}tzle, ``Paramils: an
+F.~Hutter, H.~H. Hoos, K.~Leyton-Brown, and T.~St{\"u}tzle, ``{ParamILS}: an
   automatic algorithm configuration framework,'' \emph{Journal of Artificial
   Intelligence Research}, vol.~36, no.~1, pp. 267--306, 2009.
 
@@ -146,8 +146,8 @@ J.~Ansel, S.~Kamil, K.~Veeramachaneni, J.~Ragan-Kelley, J.~Bosboom, U.-M.
 
 \bibitem{carnell2018lhs}
 \BIBentryALTinterwordspacing
-R.~Carnell, \emph{lhs: Latin Hypercube Samples}, 2018, r package version 0.16.
-  [Online]. Available: \url{https://CRAN.R-project.org/package=lhs}
+R.~Carnell, \emph{lhs: Latin Hypercube Samples}, 2018, {R} package version
+  0.16. [Online]. Available: \url{https://CRAN.R-project.org/package=lhs}
 \BIBentrySTDinterwordspacing
 
 \bibitem{plackett1946design}
@@ -156,7 +156,7 @@ R.~L. Plackett and J.~P. Burman, ``The design of optimum multifactorial
 
 \bibitem{gromping2014frf2}
 \BIBentryALTinterwordspacing
-U.~Gr"omping, ``{R} package {FrF2} for creating and analyzing fractional
+U.~Grömping, ``{R} package {FrF2} for creating and analyzing fractional
   factorial 2-level designs,'' \emph{Journal of Statistical Software}, vol.~56,
   no.~1, pp. 1--56, 2014. [Online]. Available:
   \url{http://www.jstatsoft.org/v56/i01/}
@@ -175,8 +175,8 @@ V.~V. Fedorov, \emph{Theory of optimal experiments}.\hskip 1em plus 0.5em minus
 
 \bibitem{wheeler2014algdesign}
 \BIBentryALTinterwordspacing
-B.~Wheeler, \emph{AlgDesign: Algorithmic Experimental Design}, 2014, r package
-  version 1.1-7.3. [Online]. Available:
+B.~Wheeler, \emph{AlgDesign: Algorithmic Experimental Design}, 2014, {R}
+  package version 1.1-7.3. [Online]. Available:
   \url{https://CRAN.R-project.org/package=AlgDesign}
 \BIBentrySTDinterwordspacing
 
@@ -209,8 +209,8 @@ D.~Balouek, A.~Carpen~Amarie, G.~Charrier, F.~Desprez, E.~Jeannot,
   Publishing, 2013, vol. 367, pp. 3--20.
 
 \bibitem{bruel2018ipdps19}
-``Git repository with all paper data,'' \url{https://github.com/phrb/ipdps19},
-  accessed: 2018-10-14.
+P.~Bruel, ``Git repository with all scripts and data,''
+  \url{https://github.com/phrb/ipdps19}.
 
 \bibitem{bruel2017autotuninghls}
 P.~Bruel, A.~Goldman, S.~R. Chalamalasetti, and D.~Milojicic, ``Autotuning
