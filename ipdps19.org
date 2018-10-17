@@ -596,25 +596,7 @@ complete_plot_data <- plot_data
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:plyr’:
-
-    arrange, count, desc, failwith, id, mutate, rename, summarise,
-    summarize
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-Registering fonts with R
-There were 50 or more warnings (use warnings() to see the first 50)
-#+end_example
+: There were 50 or more warnings (use warnings() to see the first 50)
 **** Back-to-back Histograms
 #+HEADER: :results graphics output :session *R* :eval no-export
 #+HEADER: :file ./img/split_histograms.pdf
@@ -736,6 +718,8 @@ grid.draw(new_plot)
 #+HEADER: :file ./img/iteration_best_comparison.pdf
 #+HEADER: :width 14 :height 7
 #+BEGIN_SRC R
+library(grid)
+library(gtable)
 library(ggrepel)
 library(utf8)
 
@@ -2591,10 +2575,14 @@ visible in =lu=, =mvt=, and =jacobi=. We also observe that the quantity of
 configurations with high speedups found by DLMT is higher, even for kernels on
 the orange group. This is noticeable in =gemver=, =bicgkernel=, =mm= and
 =tensor=, and means that our approach spent less of the budget exploring
-configurations with small speedups or slowdowns, in comparison with RS. Finally,
-we see in Figure\nbsp{}[[fig:iteration_best_comparison]] that the =jacobi= kernel
-appears to have two pronounced local minima. Since DLMT uses a smaller budget,
-we could attempt a frequent restart strategy to avoid getting trapped.
+configurations with small speedups or slowdowns, in comparison with RS.
+
+# We removed this sentence after finding out hessian data was mixed with
+# jacobi data, fixed the problem, and generated figures again:
+#
+# Finally, we see in Figure\nbsp{}[[fig:iteration_best_comparison]] that the =jacobi= kernel
+# appears to have two pronounced local minima. Since DLMT uses a smaller budget,
+# we could attempt a frequent restart strategy to avoid getting trapped.
 
 Our approach used a generic initial performance model for all kernels, but
 since it iteratively eliminates factors and model terms based on ANOVA tests,
