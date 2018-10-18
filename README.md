@@ -1,8 +1,23 @@
-### Autotuning under Tight Budget Constraints: a Transparent Design of Experiments Approach
+## Autotuning under Tight Budget Constraints: a Transparent Design of Experiments Approach
 
-This paper was written and exported to `pdf` using [Emacs Org mode](https://orgmode.org/).
+This repository contains the scripts to generate the `pdf` and the figures in
+our IPDPS'19 submission. The data produced by our the experiments is stored in
+two other git repositories:
 
-#### Org Mode LaTex: Exporting IEEEtran
+- [GPU Laplacian Kernel](https://github.com/phrb/dopt_anova_experiments)
+- [SPAPT benchmark suite](https://github.com/phrb/dlmt_spapt_experiments)
+
+Our implementation of DLMT is publicly hosted in GitHub in the following files:
+
+- [Implementation in Python2 (Orio)](https://github.com/phrb/dlmt_spapt_experiments/blob/master/orio/orio/main/tuner/search/dlmt/dlmt.py)
+- [Implementation in R](https://github.com/phrb/dopt_anova_experiments/blob/master/src/dopt_anova_transform.r)
+
+This paper was written and exported to `pdf` using
+[Emacs Org mode](https://orgmode.org/),
+so you can clone the repositories, run our data analyses, and generate all
+images from Emacs.
+
+### Org Mode LaTex: Exporting IEEEtran
 
 After installing the IEEEtran template, add the following to your `Emacs`
 configuration to be able to export using the `org-ieeetran` class:
