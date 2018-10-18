@@ -520,6 +520,49 @@ git clone https://github.com/phrb/dlmt_spapt_experiments.git || (cd dlmt_spapt_e
 
 #+RESULTS:
 : Already up to date.
+*** Valid/Failed Configurations
+#+HEADER: :results output :session *R* :eval no-export
+#+BEGIN_SRC R
+library(dplyr)
+library(ggplot2)
+
+data_dir <- "dlmt_spapt_experiments/data/results"
+dlmt_valid_samples <- read.csv(paste(data_dir, "valid_samples.csv", sep = "/"),
+                               header = TRUE)
+data <- dlmt_valid_samples %>%
+        group_by(application) %>%
+        mutate(mean_valid = mean(valid), mean_sampled = mean(sampled)) %>%
+        mutate(mean_ratio = mean_valid / mean_sampled) %>%
+        ungroup()
+
+str(data)
+#+END_SRC
+
+#+RESULTS:
+: Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	1124 obs. of  6 variables:
+:  $ application : Factor w/ 15 levels "atax","bicgkernel",..: 1 1 1 1 1 1 1 1 1 1 ...
+:  $ valid       : int  10800 32400 10800 10800 32400 10800 32400 10800 32400 10800 ...
+:  $ sampled     : int  1523695 4653018 1528880 1557482 4601752 1545031 4603545 1543345 4656830 1547739 ...
+:  $ mean_valid  : num  17059 17059 17059 17059 17059 ...
+:  $ mean_sampled: num  2378032 2378032 2378032 2378032 2378032 ...
+:  $ mean_ratio  : num  0.00717 0.00717 0.00717 0.00717 0.00717 ...
+
+#+HEADER: :results graphics output :session *R* :eval no-export
+#+HEADER: :file ./img/valid_failed_dlmt_samples.pdf
+#+HEADER: :width 14 :height 7
+#+BEGIN_SRC R
+ggplot(data) + facet_wrap(application ~ ., ncol = 6, scale = "free") +
+               geom_point(aes(x = sampled, y = valid, alpha = 0.3), pch = 16) +
+               scale_y_continuous(labels = function(x) format(x, scientific = TRUE), breaks = scales::pretty_breaks(n = 3)) +
+               scale_x_continuous(labels = function(x) format(x, scientific = TRUE), breaks = scales::pretty_breaks(n = 2)) +
+               theme_bw(base_size = 12) +
+               theme(text = element_text(family = "sans"),
+                     strip.background = element_rect(fill = "white"),
+                     plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm"))
+#+END_SRC
+
+#+RESULTS:
+[[file:./img/valid_failed_dlmt_samples.pdf]]
 
 *** Generate pdf
 **** Loading Data
