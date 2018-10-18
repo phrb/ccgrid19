@@ -849,13 +849,23 @@ ggplot(rosenbrock_data, aes(x, y, z = Y)) +
 #+RESULTS:
 [[file:./img/rosenbrock.pdf]]
 ** GPU Laplacian Kernel
+*** Cloning/Pulling the Repository
+#+HEADER: :results output :eval no-export
+#+BEGIN_SRC shell
+git clone https://github.com/phrb/dopt_anova_experiments.git || (cd dopt_anova_experiments && git pull)
+#+END_SRC
+
+#+RESULTS:
+: Already up to date.
+
+*** Generate pdf
 #+HEADER: :file ./img/comparison_histogram.pdf :exports none :width 7 :height 8 :eval no-export
 #+BEGIN_SRC R :results output graphics  :session *R*
 library(ggplot2)
 library(plyr)
 library(extrafont)
 
-df_all_methods <- read.csv("./data/complete_1000.csv", strip.white = T, header = T)
+df_all_methods <- read.csv("./dopt_anova_experiments/data/complete_1000.csv", strip.white = T, header = T)
 df_all_methods$method <- factor(df_all_methods$method, levels = c("RS","LHS","GS","GSR","GA","LM", "LMB", "LMBT", "RQ", "DOPT", "DLM", "DLMT"))
 df_all_methods <- subset(df_all_methods, method %in% c("RS", "LHS", "GS", "GSR", "GA", "LM", "DLMT"))
 
@@ -2389,7 +2399,7 @@ maximum slowdown found by each algorithm.
 #+BEGIN_SRC R
 library(xtable)
 
-df_all_methods <- read.csv("./data/complete_1000.csv", strip.white = T, header = T)
+df_all_methods <- read.csv("./dopt_anova_experiments/data/complete_1000.csv", strip.white = T, header = T)
 df_all_methods$method <- factor(df_all_methods$method, levels = c("RS","LHS","GS","GSR","GA","LM", "LMB", "LMBT", "RQ", "DOPT", "DLM", "DLMT"))
 df_all_methods <- subset(df_all_methods, method %in% c("RS", "LHS", "GS", "GSR", "GA", "LM", "DLMT"))
 
@@ -2435,7 +2445,7 @@ print(x,
 #+RESULTS:
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Mon Oct 15 18:00:57 2018
+% Thu Oct 18 15:00:23 2018
 \begin{table}[ht]
 \centering
 \caption{Slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
