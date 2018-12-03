@@ -107,6 +107,11 @@ capable of finding speedups of up to \boldmath$50\times$, compared to =gcc='s
 - Claim that they provide exploitable knowledge after optimization.
   I didn't find information regarding how that is done in the manuscript
 
+  1. Exploitable knowledge after optimization is provided in the pruned performance model,
+     which can be used as a starting point for new optimizations on the same architecture
+     or for the same class of problems. Each step also provides an ANOVA table for each
+     current model term, which explains the decisions taken at each step.
+
 - Improve the presentation of the work
 
 - Give more details about the performance model
@@ -122,15 +127,33 @@ capable of finding speedups of up to \boldmath$50\times$, compared to =gcc='s
 
 - What happens when factors affecting each other.
 
+  1. We did not consider factor interactions at this stage of the development of our approach,
+     but we intend to do so. We note that the possible interactions between
+     factors did not prevent our approach to find good optimizations using a
+     small budget.
+
 - What it appears from Table II is that authors are doing principle component analysis where they are picking
   important factors. Is that the case?
+
+  1. We are not using PCA in our experiments. We used ANOVA to identify the model terms with the highest
+     explanatory capability of the observed variance in the response.
 
 - Magically came up with a performance model for the example
   given and for the Laplacian kernel. Authors should explain or give insights how
   to construct such a performance model.
 
+  1. We do not claim to be able to construct accurate performance models using our approach.
+     What we propose is a strategy capable of leveraging existing expert and
+     domain knowledge to improve upon initial performance models. We present
+     results on SPAPT kernels, where third degree polynomials where used as
+     generic models for every kernel. The models where subsequently pruned and
+     fit to specific data for each kernel.
+
 - They simply say an initial model will be created based on expert knowledge however there is no
   explanation how they come up with the model for Laplacian for example.
+
+  1. We believe that a complete explanation of the construction of each specific model is out of
+     the scope of this work, since it would entail presenting and analyzing data for each case.
 
 - Authors could have compared the performances for the well-known kernels with their library
   implementations. For example MKL for dgemm could be one of them.
