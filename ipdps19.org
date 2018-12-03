@@ -104,114 +104,152 @@ capable of finding speedups of up to \boldmath$50\times$, compared to =gcc='s
 * Initial Reviewer Feedback                                        :noexport:
 ** Reviewer 1
 *** Detailed Review
-- Claim that they provide exploitable knowledge after optimization.
-  I didn't find information regarding how that is done in the manuscript
+1. DONE Claim that they provide exploitable knowledge after optimization.
+   I didn't find information regarding how that is done in the manuscript
 
-  1. Exploitable knowledge after optimization is provided in the pruned performance model,
-     which can be used as a starting point for new optimizations on the same architecture
-     or for the same class of problems. Each step also provides an ANOVA table for each
-     current model term, which explains the decisions taken at each step.
+2. Improve the presentation of the work
 
-- Improve the presentation of the work
+3. Give more details about the performance model
 
-- Give more details about the performance model
+4. I didn't think that src-to-src translators should be part of the related work. Even though authors
+   are using some of the tools for transformations, it seems not relevant to me.
 
-- I didn't think that src-to-src translators should be part of the related work. Even though authors
-  are using some of the tools for transformations, it seems not relevant to me.
+5. I think authors should have compared the results with other autotuning
+   frameworks
 
-- I think authors should have compared the results with other autotuning
-  frameworks
+6. It is hard to think that people use gradient descent for search space exploration.
+   If they do, authors should cite those in that section.
 
-- It is hard to think that people use gradient descent for search space exploration.
-  If they do, authors should cite those in that section.
+7. DONE What happens when factors affecting each other.
 
-- What happens when factors affecting each other.
+8. DONE What it appears from Table II is that authors are doing principle component analysis where they are picking
+   important factors. Is that the case?
 
-  1. We did not consider factor interactions at this stage of the development of our approach,
-     but we intend to do so. We note that the possible interactions between
-     factors did not prevent our approach to find good optimizations using a
-     small budget.
+9. DONE Magically came up with a performance model for the example
+   given and for the Laplacian kernel. Authors should explain or give insights how
+   to construct such a performance model.
 
-- What it appears from Table II is that authors are doing principle component analysis where they are picking
-  important factors. Is that the case?
+10. DONE They simply say an initial model will be created based on expert knowledge however there is no
+    explanation how they come up with the model for Laplacian for example.
 
-  1. We are not using PCA in our experiments. We used ANOVA to identify the model terms with the highest
-     explanatory capability of the observed variance in the response.
+11. Authors could have compared the performances for the well-known kernels with their library
+    implementations. For example MKL for dgemm could be one of them.
 
-- Magically came up with a performance model for the example
-  given and for the Laplacian kernel. Authors should explain or give insights how
-  to construct such a performance model.
-
-  1. We do not claim to be able to construct accurate performance models using our approach.
-     What we propose is a strategy capable of leveraging existing expert and
-     domain knowledge to improve upon initial performance models. We present
-     results on SPAPT kernels, where third degree polynomials where used as
-     generic models for every kernel. The models where subsequently pruned and
-     fit to specific data for each kernel.
-
-- They simply say an initial model will be created based on expert knowledge however there is no
-  explanation how they come up with the model for Laplacian for example.
-
-  1. We believe that a complete explanation of the construction of each specific model is out of
-     the scope of this work, since it would entail presenting and analyzing data for each case.
-
-- Authors could have compared the performances for the well-known kernels with their library
-  implementations. For example MKL for dgemm could be one of them.
-
-- I also suggest using Intel compiler for the work.
+12. I also suggest using Intel compiler for the work.
 *** Modifications requested - 2nd round
 I would like to see more explanation on performance model and how it is
 constructed. In addition, it could be nice if authors can explain whether they
 are performing PCA or not for D-Optimal design.
 ** Reviewer 2
 *** Detailed Review
-- The novelty of the contribution is not made clear, the authors appear to largely
-  have applied know approaches to experimental design to the problem of autotuning
-  parameter space search
+1. The novelty of the contribution is not made clear, the authors appear to largely
+   have applied know approaches to experimental design to the problem of autotuning
+   parameter space search
 
-- Several pages of the paper are devoted to a tutorial style description of
-  experimental design techniques but there is not as much detail provided in the
-  portions of the paper that discuss the application of the proposed technique to
-  the Laplacian and SPAPT test cases
+2. DONE Several pages of the paper are devoted to a tutorial style description of
+   experimental design techniques but there is not as much detail provided in the
+   portions of the paper that discuss the application of the proposed technique to
+   the Laplacian and SPAPT test cases
 
-- The majority of the paper is given to a tutorial style introduction to
-  Placket-Burman and D-Optimal techniques applied to an artificial problem.
+3. The majority of the paper is given to a tutorial style introduction to
+   Placket-Burman and D-Optimal techniques applied to an artificial problem.
 
-- In the outlined approach to applying Design of Experiments techniques to Autotuning is
-  it not entire clear what the unique elements are the the authors are
-  contributing versus applying established techniques to Autotuning problems.
+4. In the outlined approach to applying Design of Experiments techniques to Autotuning is
+   it not entire clear what the unique elements are the authors are
+   contributing versus applying established techniques to Autotuning problems.
 
-- In the applications of these techniques to the Laplacian SPAPT kernels more
-  detailed description of the steps would have been helpful.
+5. In the applications of these techniques to the Laplacian SPAPT kernels more
+   detailed description of the steps would have been helpful.
 
 *** Modifications requested - 2nd round
-- Reduce the general Plackett-Burman and D-optimal descriptions given in Section
-  III and provide more details of the approach described in Section IV and it's
-  application in Section V
+1. DONE Reduce the general Plackett-Burman and D-optimal descriptions given in Section
+   III and provide more details of the approach described in Section IV and it's
+   application in Section V
 
-- The use of dummy parameters in the Plackett-Burman analysis is mentioned but the
-  reason for them is not given
+2. DONE The use of dummy parameters in the Plackett-Burman analysis is mentioned but the
+   reason for them is not given
 
-- It would be helpful to define the meaning of the F and Pr(<F) values in the
- Plackett-Burman example
+3. It would be helpful to define the meaning of the F and Pr(<F) values in the
+   Plackett-Burman example
 
-- It was not clear how Pr(<F) was used to determine that the x1 value should be
-  kept in the Plackett-Burman example
+4. It was not clear how Pr(<F) was used to determine that the x1 value should be
+   kept in the Plackett-Burman example
 
-- Defining the meaning of the parameters in table VII would be useful for
-  interpreting equation
+5. Defining the meaning of the parameters in table VII would be useful for
+   interpreting equation
 
-- It is difficult to quantify the DLMT improvements from Figs 4 & 5, a more
-  quantitative comparison like a table would be helpful
+6. It is difficult to quantify the DLMT improvements from Figs 4 & 5, a more
+   quantitative comparison like a table would be helpful
 
-- In Figure 4 the meaning of the X axis label “Best Cost” is not immediately
-  clear, this axis should be relabeled or described more explicitly
+7. In Figure 4 the meaning of the X axis label “Best Cost” is not immediately
+   clear, this axis should be relabeled or described more explicitly
 
-- Figure 5 was unclear and lacks X axis values
+8. Figure 5 was unclear and lacks X axis values
 
-- Page 1, Column 1, Paragraph 2 - should “software of hardware metrics” be
-  “software or hardware metrics”?
+9. Page 1, Column 1, Paragraph 2 - should “software of hardware metrics” be
+   “software or hardware metrics”?
 ** Rebuttal (max. 250 words)
+*** Collected Answers
+1. (Rev.1 Q1) Exploitable knowledge after optimization is provided in the pruned performance model,
+   which can be used as a starting point for new optimizations on the same architecture
+   or for the same class of problems. Each step also provides an ANOVA table for each
+   current model term, which explains the decisions taken at each step.
+
+2. (Rev.1 Q7) We did not consider factor interactions at this stage of the development of our approach,
+   but we intend to do so. We note that the possible interactions between
+   factors did not prevent our approach to find good optimizations using a
+   small budget.
+
+3. (Rev.1 Q8) We are not using PCA in our experiments. We used ANOVA to identify the model terms with the highest
+   explanatory capability of the observed variance in the response.
+
+4. (Rev.1 Q9) We do not claim to be able to construct accurate performance models using our approach.
+   What we propose is a strategy capable of leveraging existing expert and
+   domain knowledge to improve upon initial performance models. We present
+   results on SPAPT kernels, where third degree polynomials where used as
+   generic models for every kernel. The models where subsequently pruned and
+   fit to specific data for each kernel.
+
+5. (Rev.1 Q10) We believe that a complete explanation of the construction of each specific model is out of
+   the scope of this work, since it would entail presenting and analyzing data for each case.
+
+6. (Rev.2 Q2) We decided to spend pages on the example because it enabled us
+   to describe our approach using a simple problem. This initial description
+   made it easier to present the details and adaptations we needed to make to
+   apply it to an autotuning context, which is done in Section IV.
+
+7. (Rev.2 M1) The approach in Section IV is essentially the same from Section III,
+   with adaptations for the autotuning context.
+
+8. (Rev.2 M2) We mention that the dummy parameters are used to complete the number of
+   columns needed to construct the design. We thought an in-depth explanation
+   of this construction was out of scope for this paper.
+*** Rebuttal
+We thank the reviewers for their valuable comments and questions.
+
+Our approach uses knowledge from statistics and Design of Experiments, providing
+a transparent autotuning strategy suited for budget-constrained applications.
+Applying this knowledge to autotuning presented several obstacles, namely
+dealing with response heteroscedasticity, mixing multi-level categorical and
+numerical factors, and sampling high-dimensional search spaces.
+
+To the best of our knowledge, there is no autotuning strategy that solves these
+problems in the general context we tackle. Our contribution is presenting a way
+to overcome these problems while satisfying budget constraints and providing
+exploitable knowledge after optimization in the form of a pruned performance
+model, which can be used as a starting point for new optimizations on the same
+architecture or for the same class of problems
+
+We do not claim to be able to build accurate performance models, but our
+strategy is capable of leveraging initial performance models. We present results
+on SPAPT kernels where generic performance models were used, and subsequently
+pruned and fit to specific data for each kernel.
+
+We decided to present a detailed introductory example because it enables us to
+describe our approach using a simpler problem, which made it easier to present
+in Section IV the details and the problems we overcame when adapting the
+approach to autotuning.
+
 * Arnaud's Draft                                                   :noexport:
 ** Intro
 ** Context
