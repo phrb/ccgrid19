@@ -104,127 +104,90 @@ capable of finding speedups of up to \boldmath$50\times$, compared to =gcc='s
 * Initial Reviewer Feedback                                        :noexport:
 ** Reviewer 1
 *** Detailed Review
-Authors present an autotuning approach that uses design of experiments as the
-main method. The proposed approach particularly works well when there is a tight
-budget for the tuning process such as number of measurements, running time etc.
-The success of the method depends on the performance model and existing
-knowledge about the problem. I like the main motivation of the work where
-authors stress that finding the best level configuration wastes too much CPU
-cycles as well as energy, thus reducing search space is very important. They
-also make a claim that they provide exploitable knowledge after optimization.
-However I didn't find information regarding how that is done in the manuscript.
-Even though the results are compelling, authors should improve the presentation
-of the work and give more details about the performance model. Here are my more
-detailed comments:
+- Claim that they provide exploitable knowledge after optimization.
+  I didn't find information regarding how that is done in the manuscript
+
+- Improve the presentation of the work
+
+- Give more details about the performance model
 
 - I didn't think that src-to-src translators should be part of the related work. Even though authors
-are using some of the tools for transformations, it seems not relevant to me.
+  are using some of the tools for transformations, it seems not relevant to me.
 
-- I like the section where they discuss the search space exploration strategies. However,
-I think authors should have compared the results with other autotuning
-frameworks because it is hard to think that people use gradient decent for
-search space exploration. If they do, authors should cite those in that section.
+- I think authors should have compared the results with other autotuning
+  frameworks
 
-- I wish authors explained the design of experiments better in the paper. It is not clear
-what happens when factors affecting each other. What it appears from Table II is
-that authors are doing principle component analysis where they are picking
-important factors. Is that the case?
+- It is hard to think that people use gradient descent for search space exploration.
+  If they do, authors should cite those in that section.
 
-- One of the most important part of the proposed approach is to construct the performance model.
-However, authors magically came up with a performance model for the example
-given and for the Laplacian kernel. Authors should explain or give insights how
-to construct such a performance model. They simply say an initial model will be
-created based on expert knowledge however there is no explanation how they come
-up with the model for Laplacian for example.
+- What happens when factors affecting each other.
+
+- What it appears from Table II is that authors are doing principle component analysis where they are picking
+  important factors. Is that the case?
+
+- Magically came up with a performance model for the example
+  given and for the Laplacian kernel. Authors should explain or give insights how
+  to construct such a performance model.
+
+- They simply say an initial model will be created based on expert knowledge however there is no
+  explanation how they come up with the model for Laplacian for example.
 
 - Authors could have compared the performances for the well-known kernels with their library
-implementations. For example MKL for dgemm could be one of them.
+  implementations. For example MKL for dgemm could be one of them.
 
 - I also suggest using Intel compiler for the work.
-
-Overall, paper should be improved.
 *** Modifications requested - 2nd round
 I would like to see more explanation on performance model and how it is
 constructed. In addition, it could be nice if authors can explain whether they
 are performing PCA or not for D-Optimal design.
 ** Reviewer 2
 *** Detailed Review
-Strengths:
-- The paper outlines an approach to autotuning search optimization and applies it
-to a set of benchmark codes and demonstrates obtaining comparable results to
-other approaches with fewer evaluations
+- The novelty of the contribution is not made clear, the authors appear to largely
+  have applied know approaches to experimental design to the problem of autotuning
+  parameter space search
 
-Weaknesses:
-- the novelty of the contribution is not made clear, the authors appear to largely
-have applied know approaches to experimental design to the problem of autotuning
-parameter space search
+- Several pages of the paper are devoted to a tutorial style description of
+  experimental design techniques but there is not as much detail provided in the
+  portions of the paper that discuss the application of the proposed technique to
+  the Laplacian and SPAPT test cases
 
-- several pages of the paper are devoted to a tutorial style description of
-experimental design techniques but there is not as much detail provided in the
-portions of the paper that discuss the application of the proposed technique to
-the Laplacian and SPAPT test cases
+- The majority of the paper is given to a tutorial style introduction to
+  Placket-Burman and D-Optimal techniques applied to an artificial problem.
 
-The paper provides a description of search space exploration strategies for
-Autotuning and walks through an artificial example of the application of the
-Placket-Burman and D-Optimal techniques from Design of Experiments approaches.
-An approach to applying Design Of Experiments techniques to Autotuning is
-outlined. The approach is applied to two cases: a GPU Laplacian kernel and
-kernels from the SPAPT benchmark suite and the need for fewer measurements to
-achieve a level of optimization comparable to other approaches is shown.
+- In the outlined approach to applying Design of Experiments techniques to Autotuning is
+  it not entire clear what the unique elements are the the authors are
+  contributing versus applying established techniques to Autotuning problems.
 
-The majority of the paper is given to a tutorial style introduction to
-Placket-Burman and D-Optimal techniques applied to an artificial problem. In the
-outlined approach to applying Design of Experiments techniques to Autotuning is
-it not entire clear what the unique elements are the the authors are
-contributing versus applying established techniques to Autotuning problems. In
-the applications of these techniques to the Laplacian SPAPT kernels more
-detailed description of the steps would have been helpful.
+- In the applications of these techniques to the Laplacian SPAPT kernels more
+  detailed description of the steps would have been helpful.
 
 *** Modifications requested - 2nd round
-Reduce the general Plackett-Burman and D-optimal descriptions given in Section
-III and provide more details of the approach described in Section IV and it's
-application in Section V
+- Reduce the general Plackett-Burman and D-optimal descriptions given in Section
+  III and provide more details of the approach described in Section IV and it's
+  application in Section V
 
-The use of dummy parameters in the Plackett-Burman analysis is mentioned but the
-reason for them is not given
+- The use of dummy parameters in the Plackett-Burman analysis is mentioned but the
+  reason for them is not given
 
-It would be helpful to define the meaning of the F and Pr(<F) values in the
-Plackett-Burman example
+- It would be helpful to define the meaning of the F and Pr(<F) values in the
+ Plackett-Burman example
 
-It was not clear how Pr(<F) was used to determine that the x1 value should be
-kept in the Plackett-Burman example
+- It was not clear how Pr(<F) was used to determine that the x1 value should be
+  kept in the Plackett-Burman example
 
-Defining the meaning of the parameters in table VII would be useful for
-interpreting equation
+- Defining the meaning of the parameters in table VII would be useful for
+  interpreting equation
 
-It is difficult to quantify the DLMT improvements from Figs 4 & 5, a more
-quantitative comparison like a table would be helpful
+- It is difficult to quantify the DLMT improvements from Figs 4 & 5, a more
+  quantitative comparison like a table would be helpful
 
-In Figure 4 the meaning of the X axis label “Best Cost” is not immediately
-clear, this axis should be relabeled or described more explicitly
+- In Figure 4 the meaning of the X axis label “Best Cost” is not immediately
+  clear, this axis should be relabeled or described more explicitly
 
-Figure 5 was unclear and lacks X axis values
+- Figure 5 was unclear and lacks X axis values
 
-Page 1, Column 1, Paragraph 2 - should “software of hardware metrics” be
-“software or hardware metrics”?
-** Reviewer 3
-*** Detailed Review
-This paper summarizes the D-optimal design framework and automated system. The
-authors intend to utilize the D-optimal design technique to enable mixing
-categorical and numerical factors embedded in the screening design and enable
-the autotuner to exploit global search space structure. The proposed autotuning
-framework includes several components and steps, such as definition search
-space, initial model, design generator, experiment runs, ANOVA tests, model
-selection, user input, model fitting, and factor level prediction. The proposed
-model, D-optimal Design approach (DLMT), shows better performance compared with
-other six search algorithms. The systematic structure of the autotuner actively
-requires successive and strong stochastic framework and automation framework.
-The work by the authors, in fact, demonstrated excellent performance improvement
-compared to other search algorithms and approaches. These are strong points of
-the paper. The reviewer understands these efforts relevant to IPDPS conference,
-thus, recommend this work to the second round review.
-*** Modifications requested - 2nd round
-None
+- Page 1, Column 1, Paragraph 2 - should “software of hardware metrics” be
+  “software or hardware metrics”?
 ** Rebuttal (max. 250 words)
 * Arnaud's Draft                                                   :noexport:
 ** Intro
