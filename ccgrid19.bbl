@@ -208,9 +208,9 @@ D.~Balouek, A.~Carpen~Amarie, G.~Charrier, F.~Desprez, E.~Jeannot,
   Eds.\hskip 1em plus 0.5em minus 0.4em\relax Springer International
   Publishing, 2013, vol. 367, pp. 3--20.
 
-\bibitem{bruel2018ipdps19}
+\bibitem{bruel2018ccgrid19}
 P.~Bruel, ``Git repository with all scripts and data,''
-  \url{https://github.com/phrb/ipdps19}.
+  \url{https://github.com/phrb/ccgrid19}.
 
 \bibitem{bruel2017autotuninghls}
 P.~Bruel, A.~Goldman, S.~R. Chalamalasetti, and D.~Milojicic, ``Autotuning

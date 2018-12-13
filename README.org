@@ -1,11 +1,14 @@
 **  Autotuning under Tight Budget Constraints: a Transparent Design of Experiments Approach
 
  This repository contains the scripts to generate the =pdf= and the figures in
- our IPDPS'19 submission. The data produced by our the experiments is stored in
+ our CCGRID'19 submission. The data produced by our the experiments is stored in
  two other git repositories:
 
  - [[https://github.com/phrb/dopt_anova_experiments][GPU Laplacian Kernel]]
  - [[https://github.com/phrb/dlmt_spapt_experiments][SPAPT benchmark suite]]
+
+The Grid5000 scripts we used are stored in this repository:
+
  - [[https://github.com/phrb/orio_experiments_g5kjob][Grid5000 configuration & run scripts]]
 
  Our implementation of DLMT is publicly hosted in GitHub in the following files:
