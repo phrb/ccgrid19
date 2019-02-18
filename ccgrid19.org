@@ -160,6 +160,100 @@ ORIO
   - Other benchmarks
   - source-to-source + compiler flags
   - connexion with online learning
+** TODO List from Reviewer's Comments                             :noexport:
+List of requested changes from the major comments from the 3 reviewers:
+*** TODO *Add an explicit list of contributions*
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 13:59]
+:END:
+*** TODO *Move Section IV to before Section III*
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 13:59]
+:END:
+**** TODO Provide more context to the tutorial
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:00]
+:END:
+**** TODO Add numbering to Figure 2
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:00]
+:END:
+*** TODO *Discuss reliability on intial performance models*
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:00]
+:END:
+*** TODO Acronym HPC
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:01]
+:END:
+Define the acronym "HPC" in the introduction when the term "High Performance
+Computing" is first used and use the acronym everywhere else in the paper
+(otherwise, the term should not be in upper case as it is not a proper noun).
+*** TODO It, Its
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:01]
+:END:
+Carefully review the use of "it" (and "its") as the pronoun is frequently used
+in the submitted paper without a proper antecedent and often used in at least
+one location to refer to tow different things (In "After exploring a search
+space, it is impossible to confidently deduce its global properties since its
+was automatically explored with unknown biases", the first "it" has not
+antecedent and does not really refer to anything).
+*** TODO Reduce the use of split infinitives.
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:01]
+:END:
+*** TODO Use "\noindent" in paragraphs that continue after equations.
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:02]
+:END:
+*** TODO Fewer, Less
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:02]
+:END:
+Use the word "fewer" in several locations instead of "less" (e.g., "10X less
+measurements" => "10X fewer measurements").
+*** TODO Table VII
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:03]
+:END:
+Table VII needs an additional column that provides a description of each
+parameter in words.
+*** TODO Top- bottom-place figures and tables
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:03]
+:END:
+All tables (and figures) should be top-placed or bottom-placed in order to avoid
+breaking up the flow of the body text and making it difficult to read at times.
+*** TODO References
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:04]
+:END:
+The references need to be proofread: all acronyms and names need to put in the
+appropriate case; a single name should be used for all occurrences of a
+conference series (IPDPS, in reference 5, in particular is different from all
+other instances of IPDPS); "31th" should be "31st"; the long form of PACT in
+reference 22 should be in title case and should include the word "Techniques".
+*** TODO Improve Equation 3 (parenthesis?)
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:37]
+:END:
+*** TODO Table VIII: Fix mentioning finding the global optimum in the Laplacian case
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:40]
+:END:
+*** TODO Improve Labelling of Figures 4 & 5
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:41]
+:END:
+*** TODO Shorten the Figures 4 & 5?
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:38]
+:END:
+*** TODO Explain Dummy Factors in Plackett-Burman?
+:LOGBOOK:
+- State "TODO"       from              [2019-02-18 Mon 14:46]
+:END:
 * Rosenbrock Example Setup                                         :noexport:
 #+HEADER: :results output :session *R* :exports none :eval no-export
 #+BEGIN_SRC R
