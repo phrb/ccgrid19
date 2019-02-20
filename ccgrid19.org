@@ -160,6 +160,19 @@ ORIO
   - Other benchmarks
   - source-to-source + compiler flags
   - connexion with online learning
+** Generate =diff=                                                :noexport:
+#+begin_src sh :eval no-export
+git show fb9826f8b5ab99e3bedf3044812b20c5ee8fd57d:ccgrid19.tex > ccgrid19_old.tex
+latexdiff ccgrid19_old.tex ccgrid19.tex > ccgrid19_diff.tex
+
+latexmk pdflatex="pdflatex" -pdf -f ccgrid19_diff.tex
+latexmk -c
+
+rm ccgrid19_diff.tex ccgrid19_old.tex ccgrid19_diff.bbl
+#+end_src
+
+#+RESULTS:
+
 ** TODO List from Reviewer's Comments                             :noexport:
 List of requested changes from the major comments from the 3 reviewers:
 *** TODO *Add an explicit list of contributions*
@@ -182,8 +195,10 @@ List of requested changes from the major comments from the 3 reviewers:
 :LOGBOOK:
 - State "TODO"       from              [2019-02-18 Mon 14:00]
 :END:
-*** TODO It, Its
+*** DONE It, Its
+CLOSED: [2019-02-20 Wed 14:57]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-20 Wed 14:57]
 - State "TODO"       from              [2019-02-18 Mon 14:01]
 :END:
 Carefully review the use of "it" (and "its") as the pronoun is frequently used
@@ -266,22 +281,6 @@ CLOSED: [2019-02-20 Wed 12:24]
 - State "DONE"       from "TODO"       [2019-02-20 Wed 12:24]
 - State "TODO"       from              [2019-02-18 Mon 14:40]
 :END:
-** Generate =diff=                                                :noexport:
-#+begin_src sh :eval no-export
-git show fb9826f8b5ab99e3bedf3044812b20c5ee8fd57d:ccgrid19.tex > ccgrid19_old.tex
-git show fb9826f8b5ab99e3bedf3044812b20c5ee8fd57d:references.bib > references_old.bib
-
-latexdiff ccgrid19_old.tex ccgrid19.tex > ccgrid19_diff.tex
-sed -i 's/{references}/{references_old}/g' ccgrid19_diff.tex
-latexmk -c -pdflatex='pdflatex' -pdf -f ccgrid19_diff.tex
-
-latexdiff references_old.bib references.bib > references_diff.bib
-sed -i 's/{references_old}/{references_diff}/g' ccgrid19_diff.tex
-latexmk -c -pdflatex='pdflatex' -pdf -f ccgrid19_diff.tex
-#+end_src
-
-#+RESULTS:
-
 * Rosenbrock Example Setup                                         :noexport:
 #+HEADER: :results output :session *R* :exports none :eval no-export
 #+BEGIN_SRC R
@@ -1872,7 +1871,7 @@ the purpose of this example, this is sufficient reason to include them in our
 linear model for the next step. We decide as well to discard factors
 $\left\{x_2,x_4,x_6\right\}$ in our model for now, due to their low
 significance. We see that factor $x_1$ has a significance mark of ``\cdot'', but
-comparing its F-test and P$(<\text{F})$ values we decide that they are fairly
+comparing F-test and P$(<\text{F})$ values we decide that they are fairly
 smaller than the values of factors that had no significance at all, and we keep
 this factor.
 
@@ -2552,7 +2551,7 @@ between flags can also be considered in an initial model. Numerical factors are
 also common, such as block sizes for CUDA programs or loop unrolling amounts.
 Deciding which levels to include for these kinds of factors requires a more
 careful analysis. For example, if we suspect the performance model has a
-quadratic term for a certain factor, we should include at least three of its
+quadratic term for a certain factor, we should include at least three factor
 levels. The ordering between the levels of other compiler parameters, such as
 \texttt{-O(0,1,2,3)}, is not obviously translated to a number. Factors like
 these are named /categorical/, and must be treated differently when constructing
@@ -2925,7 +2924,7 @@ more efficiently, even for kernels where it performed similarly to random
 sampling.
 
 We presented a completely automated version of our approach in this paper so
-that we could perform a thorough evaluation of its performance on comprehensive
+that we could perform a thorough performance evaluation on comprehensive
 benchmarks. In future work we will explore the impact of user input and expert
 knowledge in the selection of the initial performance model and in the
 subsequent elimination of factors using ANOVA tests. We expect that tailored
