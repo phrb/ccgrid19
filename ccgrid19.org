@@ -82,7 +82,7 @@
 
 #+LATEX: \begin{abstract}
 A large amount of resources is spent writing, porting, and optimizing scientific
-and industrial HPC applications, which makes autotuning
+and industrial High Performance Computing applications, which makes autotuning
 techniques fundamental to lower the cost of leveraging the improvements on
 execution time and power consumption provided by the latest software and
 hardware platforms. Despite the need for economy, most autotuning techniques
@@ -161,14 +161,17 @@ ORIO
   - source-to-source + compiler flags
   - connexion with online learning
 ** Generate =diff=                                                :noexport:
-#+begin_src sh :eval no-export
-git show fb9826f8b5ab99e3bedf3044812b20c5ee8fd57d:ccgrid19.tex > ccgrid19_old.tex
-latexdiff ccgrid19_old.tex ccgrid19.tex > ccgrid19_diff.tex
+#+begin_src sh :results value :eval no-export
+git show submitted_CCGRID:ccgrid19.tex > ccgrid19_old.tex
+latexdiff --config="PICTUREENV=(?:picture|DIFnomarkup|table)[\w\d*@]*" ccgrid19_old.tex ccgrid19.tex > ccgrid19_diff.tex
 
-latexmk pdflatex="pdflatex" -pdf -f ccgrid19_diff.tex
+latexmk -pdflatex='pdflatex' -pdf -f ccgrid19_diff.tex
 latexmk -c
 
-rm ccgrid19_diff.tex ccgrid19_old.tex ccgrid19_diff.bbl
+rm ccgrid19_diff.tex ccgrid19_diff.bbl ccgrid19_old.tex
+mkdir -p diff
+
+mv ccgrid19_diff.pdf diff
 #+end_src
 
 #+RESULTS:
@@ -207,12 +210,16 @@ one location to refer to tow different things (In "After exploring a search
 space, it is impossible to confidently deduce its global properties since its
 was automatically explored with unknown biases", the first "it" has not
 antecedent and does not really refer to anything).
-*** TODO Use "\noindent" in paragraphs that continue after equations.
+*** WAITING Use "\noindent" in paragraphs that continue after equations.
 :LOGBOOK:
+- State "WAITING"    from "TODO"       [2019-02-20 Wed 16:03] \\
+  noindents were added but are not working properly, need to figure out why
 - State "TODO"       from              [2019-02-18 Mon 14:02]
 :END:
-*** TODO Table VII
+*** DONE Table VII
+CLOSED: [2019-02-20 Wed 17:08]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-20 Wed 17:08]
 - State "TODO"       from              [2019-02-18 Mon 14:03]
 :END:
 Table VII needs an additional column that provides a description of each
@@ -1535,15 +1542,14 @@ transformations and compiler configuration.
 Autotuning can be studied as a search problem where the objective is to minimize
 software or hardware metrics. The exploration of the search spaces defined by
 code and compiler configurations and optimizations presents interesting
-challenges. Such spaces grow exponentially with the number of parameters and
-their possible values. They are also difficult to explore extensively due to the
-often prohibitive costs of hardware utilization, program compilation and
-execution times. Developing autotuning strategies capable of producing good
-optimizations while minimizing resource utilization is therefore essential. The
-capability of acquiring knowledge about an optimization problem is also a
-desired feature of an autotuning strategy, since this knowledge can decrease the
-cost of subsequent optimizations of the same application or for the same
-hardware.
+challenges. Such spaces grow exponentially with the number of parameters, and
+are also difficult to explore extensively due to the often prohibitive costs of
+hardware utilization, program compilation and execution times. Developing
+autotuning strategies capable of producing good optimizations while minimizing
+resource utilization is therefore essential. The capability of acquiring
+knowledge about an optimization problem is also crucial in an autotuning
+strategy, since this knowledge can decrease the cost of subsequent optimizations
+of the same application or for the same hardware.
 
 It is common and usually effective to use search meta-heuristics such as genetic
 algorithms and simulated annealing in autotuning. These strategies attempt to
@@ -1554,18 +1560,18 @@ al./\nbsp{}\cite{balaprakash2011can,balaprakash2012experimental} report that
 these strategies are not more effective than a naive uniform random sample of
 the search space, and usually rely on a large number of measurements or restarts
 to achieve performance improvements. Search strategies based on gradient descent
-are also commonly used in autotuning and also rely on a large number of
-measurements. Their effectiveness diminishes significantly in search spaces with
-complex local structures. Automated machine learning autotuning
+are also commonly used in autotuning, and also rely on a large number of
+measurements, but their effectiveness diminishes significantly in search spaces
+with complex local structures. Automated machine learning autotuning
 strategies\nbsp{}\cite{beckingsale2017apollo,falch2017machine,balaprakash2016automomml}
-are promising in building models for predicting important optimization
-parameters, but still rely on a sizable data set for training.
+are promising for building models for predicting important parameters, but still
+rely on a sizable data set for training.
 
-Search strategies based on meta-heuristics, gradient descent and machine
-learning require a large number of measurements to be effective, and are usually
-incapable of providing knowledge about search spaces to users. Since these
-strategies are not transparent, at the end of each autotuning session it is
-difficult to decide if and where further exploration is warranted, and often
+In summary, search strategies based on meta-heuristics, gradient descent and
+machine learning require a large number of measurements to be effective, and are
+usually incapable of providing knowledge about search spaces to users. Since
+these strategies are not transparent, at the end of each autotuning session it
+is difficult to decide if and where further exploration is warranted, and often
 impossible to know which parameters are responsible for the observed
 improvements. After exploring a search space, deducing any of the space's global
 properties confidently is impossible, since the space was automatically explored
@@ -1575,7 +1581,7 @@ The contribution of this paper is an autotuning strategy that leverages existing
 knowledge about a problem by using an initial performance model that is refined
 iteratively using performance measurements, statistical analysis, and user
 input. Our strategy places a heavy weight on decreasing autotuning costs by
-using a /Design of Experiments/ methodology to minimize the number of
+using a /Design of Experiments/ (DoE) methodology to minimize the number of
 experiments needed to find optimizations. Each iteration uses /Analysis of
 Variance/ (ANOVA) tests and /linear model regressions/ to identify promising
 subspaces and parameter significance. An architecture- and problem-specific
@@ -1598,12 +1604,12 @@ using up to $10\times$ fewer measurements than random sampling.
 The rest of this paper is organized as follows. Section\nbsp{}[[Background]]
 presents related work on source-to-source transformation, which is the main
 optimization target in SPAPT kernels, on autotuning systems and on search space
-exploration strategies. Section\nbsp{}[[Design of Experiments]] discusses the Design
-of Experiments, ANOVA, and linear regression methodology we used to develop our
-approach. Section\nbsp{}[[Autotuning with Design of Experiments]] discusses the
-implementation of our approach in detail. Section\nbsp{}[[Performance Evaluation]]
-presents the results on the GPU Laplacian Kernel and on the SPAPT benchmark
-suite. Section\nbsp{}[[Conclusion]] discusses our conclusions and future work.
+exploration strategies. Section\nbsp{}[[Design of Experiments]] discusses the DoE,
+ANOVA, and linear regression methodology we used to develop our approach.
+Section\nbsp{}[[Autotuning with Design of Experiments]] discusses the implementation
+of our approach in detail. Section\nbsp{}[[Performance Evaluation]] presents the
+results on the GPU Laplacian Kernel and on the SPAPT benchmark suite.
+Section\nbsp{}[[Conclusion]] discusses our conclusions and future work.
 * Background
 This section presents the background and related work on source-to-source
 transformation, autotuning systems and search space exploration strategies.
@@ -1670,18 +1676,18 @@ after optimization.
 Measurement of the kernels optimized on the performance evaluations in
 Section\nbsp{}[[Performance Evaluation]] can exceed 20 minutes, including the time
 of code transformation, compilation, and execution. Measurements in other
-problem domains can take much longer to complete. This strengthens the motivation
-to consider search space exploration strategies capable of operating under tight
-budget constraints. These strategies have been developed and improved by
-statisticians for a long time, and can be grouped under the Design of
-Experiments term.
+problem domains can take much longer to complete. This strengthens the
+motivation to consider search space exploration strategies capable of operating
+under tight budget constraints. These strategies have been developed and
+improved by statisticians for a long time, and can be grouped under the DoE
+term.
 
 The D-Optimal sampling strategies shown on the two rightmost bottom panels of
-Figure\nbsp{}[[fig:sampling_comparison]] are based on the Design of Experiments
+Figure\nbsp{}[[fig:sampling_comparison]] are based on the DoE
 methodology, and leverage previous knowledge about search spaces for an
 efficient exploration. These strategies provide transparent analyses that
 enable focusing on interesting subspaces. In the next
-section we present the Design of Experiments methodology used to implement our
+section we present the DoE methodology used to implement our
 approach.
 * Design of Experiments
 An /experimental design/ determines a selection of experiments whose objective
@@ -1695,8 +1701,8 @@ The /effect/ of a factor on the measured response, without the factor's
 Experimental designs can be constructed with different goals, such as
 identifying the main effects or building an analytical model for the response.
 
-In this section we first present the assumptions of a traditional Design of
-Experiments methodology using an example of /2-level screening designs/, which
+In this section we first present the assumptions of a traditional DoE
+methodology using an example of /2-level screening designs/, which
 are an efficient way to identify main effects. We then discuss some techniques
 for the construction of efficient designs for factors with arbitrary numbers and
 types of levels, and present /D-Optimal/ designs, the technique we use in the
@@ -1721,19 +1727,18 @@ for each factor.
 
 Assuming a crude linear relationship between factors and the response is
 fundamental for running ANOVA tests using a Plackett-Burman design. Consider the
-following linear relationship:
+linear relationship
 #+LATEX: \vspace{-5pt}
 #+BEGIN_EXPORT latex
 {\normalsize
-\begin{align}
-\mathbf{Y} = \bm{\beta}\mathbf{X} + \varepsilon,
+\begin{equation}
+\mathbf{Y} = \bm{\beta}\mathbf{X} + \varepsilon\text{,}
 %\caption{Linear model assumed in main-effect analysis of screening designs}
 \label{eq:linear_assumption}
-\end{align}
-}
+\end{equation}\noindent
+}\noindent
 #+END_EXPORT
 #+LATEX: \vspace{-1pt}
-@@latex:\noindent@@
 where $\varepsilon$ is the error term, $\mathbf{Y}$ is the observed response,
 $\mathbf{X} = \left\{1, x_1,\dots,x_n\right\}$ is the set of $n$ 2-level
 factors, and $\bm{\beta} = \left\{\beta_0,\dots,\beta_n\right\}$ is the set with
@@ -1753,9 +1758,9 @@ $x_1,\dots,x_8$ assuming values are in $\left\{-1, -0.8, -0.6, \dots, 0.6, 0.8,
 \label{eq:real_model}
 y_i = & -1.5x_1 + 1.3x_3 + 3.1x_5 + \\
 & -1.4x_7 + 1.35x_8^2 + 1.6x_3x_5 + \varepsilon. \nonumber
-\end{align}
+\end{align}\noindent
 %\caption{Real model used to obtain the data on Table\ref{tab:plackett}}
-}
+}\noindent
 #+END_EXPORT
 #+LATEX: \vspace{-1pt}
 Suppose that, for the purpose of this example, the computation is done by a very
@@ -2067,7 +2072,7 @@ problem and use a more flexible design construction technique. Next, we will
 discuss the construction of efficient designs using problem-specific formulas
 and continue the optimization of our example.
 ** D-Optimal Designs
-The application of Design of Experiments to autotuning problems requires design
+The application of DoE to autotuning problems requires design
 construction techniques that support factors of arbitrary types and number of
 levels. Autotuning problems typically combine factors such as binary flags,
 integer and floating point numerical values, and unordered enumerations of
@@ -2230,7 +2235,7 @@ $x_1$ & 461.596 & 0.000 & $***$ \\
 We are now going to fit this model using the results of the experiments in our
 D-Optimal design. Table\nbsp{}\ref{tab:correct_fit} shows the model fit table
 and compares the estimated and real model coefficients. This example illustrates
-that the Design of Experiments approach can achieve close model estimations
+that the DoE approach can achieve close model estimations
 using few resources, provided the approach is able to use user input to identify
 relevant factors and knowledge about the problem domain to tweak the model.
 
@@ -2369,7 +2374,7 @@ lating hypercube sampling.
 
 The process of screening for factor significance using ANOVA and fitting a
 new model using acquired knowledge is essentially a step in the transparent
-Design of Experiments approach we present in the next section.
+DoE approach we present in the next section.
 *** Optimizing the Rosenbrock Function                           :noexport:
 #+CAPTION: Defining the Rosenbrock function in =R=
 #+BEGIN_figure
@@ -2524,7 +2529,7 @@ x           & $7.5 \times 10^{-6}$ &   1 \\
 \end{table}
 #+END_EXPORT
 * Autotuning with Design of Experiments
-In this section we discuss in detail our iterative Design of Experiments
+In this section we discuss in detail our iterative DoE
 approach to autotuning. At the start of the process it is necessary to define
 the factors and levels that compose the search space of the target problem,
 select an initial performance model, and generate an experimental design. Then,
@@ -2537,7 +2542,7 @@ each iteration, guiding and speeding up the process.
 Figure\nbsp{}[[fig:doe_anova_strategy]] presents an overview of our approach.
 
 #+NAME: fig:doe_anova_strategy
-#+CAPTION: Overview of the Design of Experiments approach to autotuning proposed in this paper
+#+CAPTION: Overview of the DoE approach to autotuning proposed in this paper
 #+ATTR_LATEX: :width .95\columnwidth :placement [b]\vspace{-.5cm}
 #+ATTR_ORG: :width 400 :placement [b]
 [[./img/doe_anova_strategy.pdf]]
@@ -2656,20 +2661,20 @@ Sampling (RS); Latin Hypercube Sampling (LHS); Greedy Search (GS); Greedy Search
 with Restart (GSR); and Genetic Algorithm (GA). Each algorithm performed /at
 most/ 125 measurements over 1000 repetitions, without user intervention.
 
-#+ATTR_LATEX: :booktabs t :align ll :font \scriptsize :float t :placement [t]
+#+ATTR_LATEX: :booktabs t :align llp{0.37\columnwidth} :font \scriptsize :float t :placement [t]
 #+NAME: tab:gpu_laplacian_factors
 #+CAPTION: Parameters of the Laplacian Kernel
-|-------------------------------+-------------------------------|
-| Factor                        | Levels                        |
-|-------------------------------+-------------------------------|
-| \texttt{vector\_length}       | $2^0,\dots,2^4$               |
-| \texttt{load\_overlap}        | \textit{true}, \textit{false} |
-| \texttt{temporary\_size}      | $2,4$                         |
-| \texttt{elements\_number}     | $1,\dots,24$                  |
-| \texttt{y\_component\_number} | $1,\dots,6$                   |
-| \texttt{threads\_number}      | $2^5,\dots,2^{10}$            |
-| \texttt{lws\_y}               | $2^0,\dots,2^{10}$            |
-|-------------------------------+-------------------------------|
+|-------------------------------+-------------------------------+---------------------------------------------------------|
+| Factor                        | Levels                        | Short Description                                       |
+|-------------------------------+-------------------------------+---------------------------------------------------------|
+| \texttt{vector\_length}       | $2^0,\dots,2^4$               | Size of support arrays                                  |
+| \texttt{load\_overlap}        | \textit{true}, \textit{false} | Allow data load overlaps in vectorization               |
+| \texttt{temporary\_size}      | $2,4$                         | Size of temporary data (\texttt{int} or \texttt{short}) |
+| \texttt{elements\_number}     | $1,\dots,24$                  | Size of equal data splits                               |
+| \texttt{y\_component\_number} | $1,\dots,6$                   | Loop tile size                                          |
+| \texttt{threads\_number}      | $2^5,\dots,2^{10}$            | Size of thread groups                                   |
+| \texttt{lws\_y}               | $2^0,\dots,2^{10}$            | Block y dimension size                                  |
+|-------------------------------+-------------------------------+---------------------------------------------------------|
 
 Since we measured the entire valid search space, we could use the /slowdown/
 relative to the /global minimum/ to compare the performance of algorithms.
@@ -2906,7 +2911,7 @@ speedups by efficiently exploring search spaces.
 [[./img/split_histograms.pdf]]
 
 * Conclusion
-We presented in this paper a transparent Design of Experiments approach for
+We presented in this paper a transparent DoE approach for
 program autotuning under tight budget constraints. We discussed the underlying
 concepts that enable our approach to reduce significantly the measurement budget
 needed to find good optimizations consistently over different kernels exposing
