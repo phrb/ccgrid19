@@ -82,7 +82,7 @@
 
 #+LATEX: \begin{abstract}
 A large amount of resources is spent writing, porting, and optimizing scientific
-and industrial High Performance Computing applications, which makes autotuning
+and industrial HPC applications, which makes autotuning
 techniques fundamental to lower the cost of leveraging the improvements on
 execution time and power consumption provided by the latest software and
 hardware platforms. Despite the need for economy, most autotuning techniques
@@ -98,7 +98,7 @@ configuration of a GPU Laplacian kernel using half of the measurement budget
 used by other common autotuning techniques. We show that our approach is also
 capable of finding speedups of up to \boldmath$50\times$, compared to =gcc='s
 =-O3=, for some kernels from the SPAPT benchmark suite, using up to
-\boldmath$10\times$ less measurements than random sampling.
+\boldmath$10\times$ fewer measurements than random sampling.
 #+LATEX: \end{abstract}
 
 * Meta                                                             :noexport:
@@ -182,13 +182,6 @@ List of requested changes from the major comments from the 3 reviewers:
 :LOGBOOK:
 - State "TODO"       from              [2019-02-18 Mon 14:00]
 :END:
-*** TODO Acronym HPC
-:LOGBOOK:
-- State "TODO"       from              [2019-02-18 Mon 14:01]
-:END:
-Define the acronym "HPC" in the introduction when the term "High Performance
-Computing" is first used and use the acronym everywhere else in the paper
-(otherwise, the term should not be in upper case as it is not a proper noun).
 *** TODO It, Its
 :LOGBOOK:
 - State "TODO"       from              [2019-02-18 Mon 14:01]
@@ -199,54 +192,25 @@ one location to refer to tow different things (In "After exploring a search
 space, it is impossible to confidently deduce its global properties since its
 was automatically explored with unknown biases", the first "it" has not
 antecedent and does not really refer to anything).
-*** TODO Reduce the use of split infinitives.
-:LOGBOOK:
-- State "TODO"       from              [2019-02-18 Mon 14:01]
-:END:
 *** TODO Use "\noindent" in paragraphs that continue after equations.
 :LOGBOOK:
 - State "TODO"       from              [2019-02-18 Mon 14:02]
 :END:
-*** TODO Fewer, Less
-:LOGBOOK:
-- State "TODO"       from              [2019-02-18 Mon 14:02]
-:END:
-Use the word "fewer" in several locations instead of "less" (e.g., "10X less
-measurements" => "10X fewer measurements").
 *** TODO Table VII
 :LOGBOOK:
 - State "TODO"       from              [2019-02-18 Mon 14:03]
 :END:
 Table VII needs an additional column that provides a description of each
 parameter in words.
-*** TODO Top- bottom-place figures and tables
-:LOGBOOK:
-- State "TODO"       from              [2019-02-18 Mon 14:03]
-:END:
-All tables (and figures) should be top-placed or bottom-placed in order to avoid
-breaking up the flow of the body text and making it difficult to read at times.
-*** TODO References
-:LOGBOOK:
-- State "TODO"       from              [2019-02-18 Mon 14:04]
-:END:
-The references need to be proofread: all acronyms and names need to put in the
-appropriate case; a single name should be used for all occurrences of a
-conference series (IPDPS, in reference 5, in particular is different from all
-other instances of IPDPS); "31th" should be "31st"; the long form of PACT in
-reference 22 should be in title case and should include the word "Techniques".
 *** TODO Improve Equation 3 (parenthesis?)
 :LOGBOOK:
 - State "TODO"       from              [2019-02-18 Mon 14:37]
-:END:
-*** TODO Table VIII: Fix mentioning finding the global optimum in the Laplacian case
-:LOGBOOK:
-- State "TODO"       from              [2019-02-18 Mon 14:40]
 :END:
 *** TODO Improve Labelling of Figures 4 & 5
 :LOGBOOK:
 - State "TODO"       from              [2019-02-18 Mon 14:41]
 :END:
-*** TODO Shorten the Figures 4 & 5?
+*** TODO Shorten Figures 4 & 5?
 :LOGBOOK:
 - State "TODO"       from              [2019-02-18 Mon 14:38]
 :END:
@@ -254,6 +218,70 @@ reference 22 should be in title case and should include the word "Techniques".
 :LOGBOOK:
 - State "TODO"       from              [2019-02-18 Mon 14:46]
 :END:
+*** DONE Acronym HPC
+CLOSED: [2019-02-20 Wed 13:09]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-20 Wed 13:09]
+- State "TODO"       from              [2019-02-18 Mon 14:01]
+:END:
+Define the acronym "HPC" in the introduction when the term "High Performance
+Computing" is first used and use the acronym everywhere else in the paper
+(otherwise, the term should not be in upper case as it is not a proper noun).
+*** DONE Reduce the use of split infinitives.
+CLOSED: [2019-02-20 Wed 13:18]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-20 Wed 13:18]
+- State "TODO"       from              [2019-02-18 Mon 14:01]
+:END:
+*** DONE Fewer, Less
+CLOSED: [2019-02-20 Wed 12:27]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-20 Wed 12:27]
+- State "TODO"       from              [2019-02-18 Mon 14:02]
+:END:
+Use the word "fewer" in several locations instead of "less" (e.g., "10X less
+measurements" => "10X fewer measurements").
+*** DONE Top- bottom-place figures and tables
+CLOSED: [2019-02-20 Wed 13:05]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-20 Wed 13:05]
+- State "TODO"       from              [2019-02-18 Mon 14:03]
+:END:
+All tables (and figures) should be top-placed or bottom-placed in order to avoid
+breaking up the flow of the body text and making it difficult to read at times.
+*** DONE References
+CLOSED: [2019-02-20 Wed 12:54]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-20 Wed 12:54]
+- State "TODO"       from              [2019-02-18 Mon 14:04]
+:END:
+The references need to be proofread: all acronyms and names need to put in the
+appropriate case; a single name should be used for all occurrences of a
+conference series (IPDPS, in reference 5, in particular is different from all
+other instances of IPDPS); "31th" should be "31st"; the long form of PACT in
+reference 22 should be in title case and should include the word "Techniques".
+*** DONE Table VIII: Fix mentioning finding the global optimum in the Laplacian case
+CLOSED: [2019-02-20 Wed 12:24]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-20 Wed 12:24]
+- State "TODO"       from              [2019-02-18 Mon 14:40]
+:END:
+** Generate =diff=                                                :noexport:
+#+begin_src sh :eval no-export
+git show fb9826f8b5ab99e3bedf3044812b20c5ee8fd57d:ccgrid19.tex > ccgrid19_old.tex
+git show fb9826f8b5ab99e3bedf3044812b20c5ee8fd57d:references.bib > references_old.bib
+
+latexdiff ccgrid19_old.tex ccgrid19.tex > ccgrid19_diff.tex
+sed -i 's/{references}/{references_old}/g' ccgrid19_diff.tex
+latexmk -c -pdflatex='pdflatex' -pdf -f ccgrid19_diff.tex
+
+latexdiff references_old.bib references.bib > references_diff.bib
+sed -i 's/{references_old}/{references_diff}/g' ccgrid19_diff.tex
+latexmk -c -pdflatex='pdflatex' -pdf -f ccgrid19_diff.tex
+#+end_src
+
+#+RESULTS:
+
 * Rosenbrock Example Setup                                         :noexport:
 #+HEADER: :results output :session *R* :exports none :eval no-export
 #+BEGIN_SRC R
@@ -1495,12 +1523,12 @@ data <- bind_rows(data, doptq_data)
 * Introduction
 Optimizing code for objectives such as performance and power consumption is
 fundamental to the success and cost-effectiveness of industrial and scientific
-endeavors in High Performance Computing. A considerable amount of highly
+endeavors in High Performance Computing (HPC). A considerable amount of highly
 specialized time and effort is spent in porting and optimizing code for GPUs,
 FPGAs and other hardware accelerators. Experts are also needed to leverage
 bleeding edge software improvements in compilers, languages, libraries and
 frameworks. The objective of techniques for the automatic configuration and
-optimization of High Performance Computing applications, or /autotuning/, is to
+optimization of HPC applications, or /autotuning/, is to
 decrease the cost and time needed to adopt efficient hardware and software.
 Typical autotuning targets include algorithm selection, source-to-source
 transformations and compiler configuration.
@@ -1509,7 +1537,7 @@ Autotuning can be studied as a search problem where the objective is to minimize
 software or hardware metrics. The exploration of the search spaces defined by
 code and compiler configurations and optimizations presents interesting
 challenges. Such spaces grow exponentially with the number of parameters and
-their possible values. They are also difficult to extensively explore due to the
+their possible values. They are also difficult to explore extensively due to the
 often prohibitive costs of hardware utilization, program compilation and
 execution times. Developing autotuning strategies capable of producing good
 optimizations while minimizing resource utilization is therefore essential. The
@@ -1540,9 +1568,9 @@ incapable of providing knowledge about search spaces to users. Since these
 strategies are not transparent, at the end of each autotuning session it is
 difficult to decide if and where further exploration is warranted, and often
 impossible to know which parameters are responsible for the observed
-improvements. After exploring a search space, it is impossible to confidently
-deduce its global properties since its was automatically explored with unknown
-biases.
+improvements. After exploring a search space, deducing any of the space's global
+properties confidently is impossible, since the space was automatically explored
+with unknown biases.
 
 The contribution of this paper is an autotuning strategy that leverages existing
 knowledge about a problem by using an initial performance model that is refined
@@ -1566,7 +1594,7 @@ where we obtained diverse results. Out of the 17 SPAPT kernels benchmarked, no
 speedup could be found for three kernels, but uniform random sampling performed
 well on all others. For eight of the kernels, our approach found speedups of up
 to $50\times$, compared to =gcc='s =-O3= with no code transformations, while
-using up to $10\times$ less measurements than random sampling.
+using up to $10\times$ fewer measurements than random sampling.
 
 The rest of this paper is organized as follows. Section\nbsp{}[[Background]]
 presents related work on source-to-source transformation, which is the main
@@ -1624,7 +1652,7 @@ bandit strategy.
 ** Search Space Exploration Strategies
 #+NAME: fig:sampling_comparison
 #+CAPTION: Exploration of the search space, using a fixed budget of 50 points. The red ``$+$'' represents the best point found by each strategy, and ``$\times$''s denote neighborhood exploration
-#+ATTR_LATEX: :width .95\columnwidth
+#+ATTR_LATEX: :width .95\columnwidth :placement [b]
 [[./img/sampling_comparison.pdf]]
 
 Figure\nbsp{}[[fig:sampling_comparison]] shows the contour of a search space defined
@@ -1633,7 +1661,7 @@ a local perturbation, and the exploration of that search space by six different
 strategies. In such a simple search space, even a uniform random sample can find
 points close to the optimum, despite not exploiting geometry. A Latin
 Hypercube\nbsp{}\cite{carnell2018lhs} sampling strategy covers the search space
-more evenly, but still does not exploit its geometry. Strategies based on
+more evenly, but still does not exploit the space's geometry. Strategies based on
 neighborhood exploration such as simulated annealing and gradient descent can
 exploit local structures, but may get trapped in local minima. Their
 performance is strongly dependent on search starting point. These strategies do
@@ -1663,10 +1691,10 @@ factors and responses can refer to different concrete entities in other domains,
 in computer experiments factors can be configuration parameters for algorithms
 and compilers, for example, and responses can be the execution time or memory
 consumption of a program. Each possible value of a factor is called a /level/.
-The /effect/ of a factor on the measured response, without its /interactions/
-with other factors, is the /main effect/ of that factor. Experimental designs
-can be constructed with different goals, such as identifying the main effects
-or building an analytical model for the response.
+The /effect/ of a factor on the measured response, without the factor's
+/interactions/ with other factors, is the /main effect/ of that factor.
+Experimental designs can be constructed with different goals, such as
+identifying the main effects or building an analytical model for the response.
 
 In this section we first present the assumptions of a traditional Design of
 Experiments methodology using an example of /2-level screening designs/, which
@@ -1706,6 +1734,7 @@ following linear relationship:
 }
 #+END_EXPORT
 #+LATEX: \vspace{-1pt}
+@@latex:\noindent@@
 where $\varepsilon$ is the error term, $\mathbf{Y}$ is the observed response,
 $\mathbf{X} = \left\{1, x_1,\dots,x_n\right\}$ is the set of $n$ 2-level
 factors, and $\bm{\beta} = \left\{\beta_0,\dots,\beta_n\right\}$ is the set with
@@ -1734,10 +1763,10 @@ Suppose that, for the purpose of this example, the computation is done by a very
 expensive black-box procedure. Note that factors $\{x_2,x_4,x_6\}$ have no
 contribution to the response, and we can think of the error term $\varepsilon$
 as representing not only noise, but our uncertainty regarding the model. Higher
-amplitudes of $\varepsilon$ might make it harder to justify isolating factors
-with low significance.
+amplitudes of $\varepsilon$ might make isolating factors with low significance
+harder to justify.
 
-To efficiently study this problem we decide to construct a Plackett-Burman
+To study this problem efficiently we decided to construct a Plackett-Burman
 design, which minimizes the experiments needed to identify significant factors. The
 analysis of this design will enable decreasing the dimension of the problem.
 Table\nbsp{}\ref{tab:plackett} presents the Plackett-Burman design we generated.
@@ -2048,7 +2077,7 @@ example we had to restrict our factors to the extremes of their levels in the
 interval $\left\{-1, -0.8, -0.6,\dots,0.6, 0.8, 1\right\}$, because such designs
 only support 2-level factors. We have seen that this restriction makes it
 difficult to measure the significance of quadratic terms in the model. We will
-now show how to further optimize our example by using /D-Optimal designs/, which
+now show how to optimize our example further by using /D-Optimal designs/, which
 increase the number of levels we can efficiently screen for and enables
 detecting the significance of more complex model terms.
 
@@ -2203,8 +2232,8 @@ We are now going to fit this model using the results of the experiments in our
 D-Optimal design. Table\nbsp{}\ref{tab:correct_fit} shows the model fit table
 and compares the estimated and real model coefficients. This example illustrates
 that the Design of Experiments approach can achieve close model estimations
-using few resources, provided it is able to use user input to identify relevant
-factors and knowledge about the problem domain to tweak the model.
+using few resources, provided the approach is able to use user input to identify
+relevant factors and knowledge about the problem domain to tweak the model.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
@@ -2231,7 +2260,7 @@ print(x, size = "\\small",
       math.style.exponents = TRUE,
       booktabs = TRUE,
       sanitize.text.function = function(x){x},
-      table.placement="ht",
+      table.placement="b",
       caption.placement = "top")
 #+END_SRC
 
@@ -2239,7 +2268,7 @@ print(x, size = "\\small",
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
 % Mon Oct 15 18:06:01 2018
-\begin{table}[ht]
+\begin{table}[b]
 \centering
 \caption{Correct model fit comparing real and estimated coefficients, with significance intervals from the \texttt{R} language}
 \label{tab:correct_fit}
@@ -2335,7 +2364,7 @@ start exploring the search space with a less naive model. We could also continue
 the optimization of this problem by further exploring levels of factors
 $\left\{x_2,x_4,x_6\right\}$. The significance of these factors could now be
 detectable by ANOVA tests since the other factors are now fixed. If we still
-cannot identify any significant factor, it might advisable to spend the
+cannot identify any significant factor, it might be advisable to spend the
 remaining budget using another exploration strategy such as uniform random or
 lating hypercube sampling.
 
@@ -2511,7 +2540,7 @@ Figure\nbsp{}[[fig:doe_anova_strategy]] presents an overview of our approach.
 #+NAME: fig:doe_anova_strategy
 #+CAPTION: Overview of the Design of Experiments approach to autotuning proposed in this paper
 #+ATTR_LATEX: :width .95\columnwidth :placement [b]\vspace{-.5cm}
-#+ATTR_ORG: :width 400
+#+ATTR_ORG: :width 400 :placement [b]
 [[./img/doe_anova_strategy.pdf]]
 
 The first step of our approach is to define which are the target factors and
@@ -2559,10 +2588,10 @@ domain knowledge to analyze the ANOVA table and determine which factors are
 relevant. Certain factors might not appear relevant, in which case the user
 should not include them in the regression model, but save them for further
 exploration. Selecting the model after the ANOVA test also benefits from domain
-knowledge. The impact of the number of threads used by a parallel program on its
-performance is usually modeled using an inverse term, which accounts for the
-speedup of adding more threads, plus a linear term, which accounts for the
-overhead of their management.
+knowledge. The impact of the number of threads used by a parallel program on the
+program's performance is usually modeled using an inverse term, which accounts
+for the speedup of adding more threads, plus a linear term, which accounts for
+the overhead of their management.
 
 A central assumption of ANOVA is the /homoscedasticity/ of the response, which
 can be interpreted as requiring the observed error on measurements to be
@@ -2695,7 +2724,7 @@ print(x,
       booktabs = TRUE,
       add.to.row = list(pos = as.list(c(6)), command = c("\\rowcolor{red!25}")),
       math.style.exponents = TRUE,
-      table.placement = "ht",
+      table.placement = "b",
       caption.placement = "top")
 #+END_SRC
 
@@ -2703,7 +2732,7 @@ print(x,
 #+BEGIN_EXPORT latex
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
 % Thu Oct 18 15:00:23 2018
-\begin{table}[ht]
+\begin{table}[b]
 \centering
 \caption{Slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
 \label{tab:gpu_laplacian_compare_budget}
@@ -2729,9 +2758,9 @@ All algorithms performed relatively well in this kernel, with only Greedy Search
 (GS) not being able to find slowdowns smaller than 4$\times$ in some runs. As
 expected, other search algorithms had results similar to Random Sampling (RS).
 The LM algorithm was able to find the global minimum on most runs, but some runs
-could not find slowdowns smaller than $4\times$. Our approach was able to find
-the global minimum in all of the 1000 runs while using /at most/ less than half
-of the allotted budget.
+could not find slowdowns smaller than $4\times$. Our approach reached a slowdown
+of 1% from the global minimum /in all/ of the 1000 runs while using /at most/
+fewer than half of the allotted budget.
 
 We implemented a simple approach for the prediction step in this problem,
 choosing the best value of our fitted models on the complete set of valid level
@@ -2755,7 +2784,7 @@ performance evaluation of our approach in a larger and more comprehensive
 benchmark.
 ** SPAPT Benchmark Suite
 The SPAPT\nbsp{}\cite{balaprakash2012spapt} benchmark suite provides
-parametrized CPU kernels from different High Performance Computing domains. The
+parametrized CPU kernels from different HPC domains. The
 kernels shown in Table\nbsp{}[[tab:spapt_apps]] are implemented using the code
 annotation and transformation tools provided by
 Orio\nbsp{}\cite{hartono2009annotation}. Search space sizes are overall larger
@@ -2779,7 +2808,7 @@ Figure\nbsp{}[[fig:doe_anova_strategy]]. Experiments were performed using
 Grid5000\nbsp{}\cite{balouek2013adding}, on /Debian Jessie/, using an /Intel
 Xeon E5-2630v3/ CPU and \texttt{gcc} version \texttt{6.3.0}.
 
-#+ATTR_LATEX: :booktabs t :align llll :font \scriptsize :float t :placement [ht]
+#+ATTR_LATEX: :booktabs t :align llll :font \scriptsize :float t :placement [t]
 #+NAME: tab:spapt_apps
 #+CAPTION: Kernels from the SPAPT benchmark used in this evaluation
 |---------------+---------------------------------+---------+----------------------|
@@ -2871,7 +2900,7 @@ speedups by efficiently exploring search spaces.
 #+NAME: fig:split_histograms
 #+CAPTION: Histograms of explored search spaces, showing the real count of measured configurations.
 #+CAPTION: Kernels are grouped in the same way as in Figure\nbsp{}[[fig:iteration_best_comparison]].
-#+CAPTION: DLMT spent less measurements than RS in configurations with smaller speedups or with slowdowns,
+#+CAPTION: DLMT spent fewer measurements than RS in configurations with smaller speedups or with slowdowns,
 #+CAPTION: even for kernels in the orange group. DLMT also spent more time exploring configurations with
 #+CAPTION: larger speedups
 #+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
@@ -2880,7 +2909,7 @@ speedups by efficiently exploring search spaces.
 * Conclusion
 We presented in this paper a transparent Design of Experiments approach for
 program autotuning under tight budget constraints. We discussed the underlying
-concepts that enable our approach to significantly reduce the measurement budget
+concepts that enable our approach to reduce significantly the measurement budget
 needed to find good optimizations consistently over different kernels exposing
 configuration parameters of source-to-source transformations. We have made
 efforts to make our results, figures and analyses reproducible by hosting all
@@ -2891,7 +2920,7 @@ optimum of the search space defined by the optimization of a Laplacian kernel
 for GPUs, while using at most half of the allotted budget. In a more
 comprehensive evaluation using kernels from the SPAPT benchmark, our approach
 was able to find the same speedups as random sampling while using up to
-$10\times$ less measurements. We showed that our approach explored search spaces
+$10\times$ fewer measurements. We showed that our approach explored search spaces
 more efficiently, even for kernels where it performed similarly to random
 sampling.
 

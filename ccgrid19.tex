@@ -1,4 +1,4 @@
-% Created 2019-02-18 Mon 14:54
+% Created 2019-02-20 Wed 14:29
 % Intended LaTeX compiler: pdflatex
 \documentclass[conference]{IEEEtran}
 
@@ -74,7 +74,7 @@ Alfredo Goldman\IEEEauthorrefmark{2}}}
 \maketitle
 \begin{abstract}
 A large amount of resources is spent writing, porting, and optimizing scientific
-and industrial High Performance Computing applications, which makes autotuning
+and industrial HPC applications, which makes autotuning
 techniques fundamental to lower the cost of leveraging the improvements on
 execution time and power consumption provided by the latest software and
 hardware platforms. Despite the need for economy, most autotuning techniques
@@ -90,19 +90,19 @@ configuration of a GPU Laplacian kernel using half of the measurement budget
 used by other common autotuning techniques. We show that our approach is also
 capable of finding speedups of up to \boldmath\(50\times\), compared to \texttt{gcc}'s
 \texttt{-O3}, for some kernels from the SPAPT benchmark suite, using up to
-\boldmath\(10\times\) less measurements than random sampling.
+\boldmath\(10\times\) fewer measurements than random sampling.
 \end{abstract}
 
 \section{Introduction}
-\label{sec:orge7093f5}
+\label{sec:orgfa3153b}
 Optimizing code for objectives such as performance and power consumption is
 fundamental to the success and cost-effectiveness of industrial and scientific
-endeavors in High Performance Computing. A considerable amount of highly
+endeavors in High Performance Computing (HPC). A considerable amount of highly
 specialized time and effort is spent in porting and optimizing code for GPUs,
 FPGAs and other hardware accelerators. Experts are also needed to leverage
 bleeding edge software improvements in compilers, languages, libraries and
 frameworks. The objective of techniques for the automatic configuration and
-optimization of High Performance Computing applications, or \emph{autotuning}, is to
+optimization of HPC applications, or \emph{autotuning}, is to
 decrease the cost and time needed to adopt efficient hardware and software.
 Typical autotuning targets include algorithm selection, source-to-source
 transformations and compiler configuration.
@@ -111,7 +111,7 @@ Autotuning can be studied as a search problem where the objective is to minimize
 software or hardware metrics. The exploration of the search spaces defined by
 code and compiler configurations and optimizations presents interesting
 challenges. Such spaces grow exponentially with the number of parameters and
-their possible values. They are also difficult to extensively explore due to the
+their possible values. They are also difficult to explore extensively due to the
 often prohibitive costs of hardware utilization, program compilation and
 execution times. Developing autotuning strategies capable of producing good
 optimizations while minimizing resource utilization is therefore essential. The
@@ -142,9 +142,9 @@ incapable of providing knowledge about search spaces to users. Since these
 strategies are not transparent, at the end of each autotuning session it is
 difficult to decide if and where further exploration is warranted, and often
 impossible to know which parameters are responsible for the observed
-improvements. After exploring a search space, it is impossible to confidently
-deduce its global properties since its was automatically explored with unknown
-biases.
+improvements. After exploring a search space, deducing any of the space's global
+properties confidently is impossible, since the space was automatically explored
+with unknown biases.
 
 The contribution of this paper is an autotuning strategy that leverages existing
 knowledge about a problem by using an initial performance model that is refined
@@ -168,26 +168,26 @@ where we obtained diverse results. Out of the 17 SPAPT kernels benchmarked, no
 speedup could be found for three kernels, but uniform random sampling performed
 well on all others. For eight of the kernels, our approach found speedups of up
 to \(50\times\), compared to \texttt{gcc}'s \texttt{-O3} with no code transformations, while
-using up to \(10\times\) less measurements than random sampling.
+using up to \(10\times\) fewer measurements than random sampling.
 
-The rest of this paper is organized as follows. Section~\ref{sec:orgc9b641f}
+The rest of this paper is organized as follows. Section~\ref{sec:org0a6b8d4}
 presents related work on source-to-source transformation, which is the main
 optimization target in SPAPT kernels, on autotuning systems and on search space
-exploration strategies. Section~\ref{sec:org8f0cc11} discusses the Design
+exploration strategies. Section~\ref{sec:org48c45f3} discusses the Design
 of Experiments, ANOVA, and linear regression methodology we used to develop our
-approach. Section~\ref{sec:orgaa53d92} discusses the
-implementation of our approach in detail. Section~\ref{sec:org50bcb89}
+approach. Section~\ref{sec:org9c7452d} discusses the
+implementation of our approach in detail. Section~\ref{sec:org4d10db0}
 presents the results on the GPU Laplacian Kernel and on the SPAPT benchmark
-suite. Section~\ref{sec:org89704da} discusses our conclusions and future work.
+suite. Section~\ref{sec:org5160beb} discusses our conclusions and future work.
 \section{Background}
-\label{sec:orgc9b641f}
+\label{sec:org0a6b8d4}
 This section presents the background and related work on source-to-source
 transformation, autotuning systems and search space exploration strategies.
 \subsection{Source-to-Source Transformation}
-\label{sec:org392c1e4}
+\label{sec:org3fb8172}
 Our approach can be applied to any autotuning domain that expresses optimization
 as a search problem, although the performance evaluations we present in
-Section~\ref{sec:org50bcb89} were obtained in the domain of
+Section~\ref{sec:org4d10db0} were obtained in the domain of
 source-to-source transformation. Several frameworks, compilers and autotuners
 provide tools to generate and optimize architecture-specific
 code~\cite{hartono2009annotation,videau2017boast,tiwari2009scalable,yi2007poet,ansel2009petabricks}.
@@ -197,7 +197,7 @@ transformations targeting parallelization on CPUs and GPUs, vectorization, loop
 transformations such as tiling and unrolling, and data structure size and
 copying.
 \subsection{Autotuning}
-\label{sec:org50b29e8}
+\label{sec:org8c04c2c}
 John Rice's Algorithm Selection framework~\cite{rice1976algorithm} is the
 precursor of autotuners in various problem domains. In 1997, the PHiPAC
 system~\cite{bilmes1997optimizing} used code generators and search scripts
@@ -227,21 +227,21 @@ framework~\cite{ansel2014opentuner} provides ensembles of techniques that
 search the same space in parallel, while exploration is managed by a multi-armed
 bandit strategy.
 \subsection{Search Space Exploration Strategies}
-\label{sec:orga68dd36}
-\begin{figure}[htbp]
+\label{sec:org271a989}
+\begin{figure}[b]
 \centering
 \includegraphics[width=.95\columnwidth]{./img/sampling_comparison.pdf}
-\caption{\label{fig:orgbd9e098}
+\caption{\label{fig:org4313cb7}
 Exploration of the search space, using a fixed budget of 50 points. The red ``\(+\)'' represents the best point found by each strategy, and ``\(\times\)''s denote neighborhood exploration}
 \end{figure}
 
-Figure~\ref{fig:orgbd9e098} shows the contour of a search space defined
+Figure~\ref{fig:org4313cb7} shows the contour of a search space defined
 by a function of the form \(z = x^2 + y^2 + \varepsilon\), where \(\varepsilon\) is
 a local perturbation, and the exploration of that search space by six different
 strategies. In such a simple search space, even a uniform random sample can find
 points close to the optimum, despite not exploiting geometry. A Latin
 Hypercube~\cite{carnell2018lhs} sampling strategy covers the search space
-more evenly, but still does not exploit its geometry. Strategies based on
+more evenly, but still does not exploit the space's geometry. Strategies based on
 neighborhood exploration such as simulated annealing and gradient descent can
 exploit local structures, but may get trapped in local minima. Their
 performance is strongly dependent on search starting point. These strategies do
@@ -249,7 +249,7 @@ not leverage global search space structure, or provide exploitable knowledge
 after optimization.
 
 Measurement of the kernels optimized on the performance evaluations in
-Section~\ref{sec:org50bcb89} can exceed 20 minutes, including the time
+Section~\ref{sec:org4d10db0} can exceed 20 minutes, including the time
 of code transformation, compilation, and execution. Measurements in other
 problem domains can take much longer to complete. This strengthens the motivation
 to consider search space exploration strategies capable of operating under tight
@@ -258,24 +258,24 @@ statisticians for a long time, and can be grouped under the Design of
 Experiments term.
 
 The D-Optimal sampling strategies shown on the two rightmost bottom panels of
-Figure~\ref{fig:orgbd9e098} are based on the Design of Experiments
+Figure~\ref{fig:org4313cb7} are based on the Design of Experiments
 methodology, and leverage previous knowledge about search spaces for an
 efficient exploration. These strategies provide transparent analyses that
 enable focusing on interesting subspaces. In the next
 section we present the Design of Experiments methodology used to implement our
 approach.
 \section{Design of Experiments}
-\label{sec:org8f0cc11}
+\label{sec:org48c45f3}
 An \emph{experimental design} determines a selection of experiments whose objective
 is to identify the relationships between \emph{factors} and \emph{responses}. While
 factors and responses can refer to different concrete entities in other domains,
 in computer experiments factors can be configuration parameters for algorithms
 and compilers, for example, and responses can be the execution time or memory
 consumption of a program. Each possible value of a factor is called a \emph{level}.
-The \emph{effect} of a factor on the measured response, without its \emph{interactions}
-with other factors, is the \emph{main effect} of that factor. Experimental designs
-can be constructed with different goals, such as identifying the main effects
-or building an analytical model for the response.
+The \emph{effect} of a factor on the measured response, without the factor's
+\emph{interactions} with other factors, is the \emph{main effect} of that factor.
+Experimental designs can be constructed with different goals, such as
+identifying the main effects or building an analytical model for the response.
 
 In this section we first present the assumptions of a traditional Design of
 Experiments methodology using an example of \emph{2-level screening designs}, which
@@ -284,7 +284,7 @@ for the construction of efficient designs for factors with arbitrary numbers and
 types of levels, and present \emph{D-Optimal} designs, the technique we use in the
 approach presented in this paper.
 \subsection{Screening \& Plackett-Burman Designs}
-\label{sec:org3818a9f}
+\label{sec:org37ecba4}
 Screening designs provide a parsimonious way to identify the main
 effects of 2-level factors in the initial stages of studying a problem. While
 interactions are not considered at this stage, identifying main effects early
@@ -314,6 +314,7 @@ following linear relationship:
 \end{align}
 }
 \vspace{-1pt}
+\noindent
 where \(\varepsilon\) is the error term, \(\mathbf{Y}\) is the observed response,
 \(\mathbf{X} = \left\{1, x_1,\dots,x_n\right\}\) is the set of \(n\) 2-level
 factors, and \(\bm{\beta} = \left\{\beta_0,\dots,\beta_n\right\}\) is the set with
@@ -340,10 +341,10 @@ Suppose that, for the purpose of this example, the computation is done by a very
 expensive black-box procedure. Note that factors \(\{x_2,x_4,x_6\}\) have no
 contribution to the response, and we can think of the error term \(\varepsilon\)
 as representing not only noise, but our uncertainty regarding the model. Higher
-amplitudes of \(\varepsilon\) might make it harder to justify isolating factors
-with low significance.
+amplitudes of \(\varepsilon\) might make isolating factors with low significance
+harder to justify.
 
-To efficiently study this problem we decide to construct a Plackett-Burman
+To study this problem efficiently we decided to construct a Plackett-Burman
 design, which minimizes the experiments needed to identify significant factors. The
 analysis of this design will enable decreasing the dimension of the problem.
 Table~\ref{tab:plackett} presents the Plackett-Burman design we generated.
@@ -468,7 +469,7 @@ correctly for \(x_7\). The linear model predicted wrong levels for \(x_1\), perh
 due to this factor's interaction with \(x_3\), and for \(x_8\). Arguably, it would
 be impossible to predict the correct level for \(x_8\) using this linear model,
 since a quadratic term composes the true formula of \(Y\). As we showed in
-Figure~\ref{fig:orgbd9e098}, a D-Optimal design using a linear model
+Figure~\ref{fig:org4313cb7}, a D-Optimal design using a linear model
 could detect the significance of a quadratic term, but the resulting
 regression will often predict the wrong minimum point.
 
@@ -477,7 +478,7 @@ problem and use a more flexible design construction technique. Next, we will
 discuss the construction of efficient designs using problem-specific formulas
 and continue the optimization of our example.
 \subsection{D-Optimal Designs}
-\label{sec:orgefc95b8}
+\label{sec:org8c93efe}
 The application of Design of Experiments to autotuning problems requires design
 construction techniques that support factors of arbitrary types and number of
 levels. Autotuning problems typically combine factors such as binary flags,
@@ -487,7 +488,7 @@ example we had to restrict our factors to the extremes of their levels in the
 interval \(\left\{-1, -0.8, -0.6,\dots,0.6, 0.8, 1\right\}\), because such designs
 only support 2-level factors. We have seen that this restriction makes it
 difficult to measure the significance of quadratic terms in the model. We will
-now show how to further optimize our example by using \emph{D-Optimal designs}, which
+now show how to optimize our example further by using \emph{D-Optimal designs}, which
 increase the number of levels we can efficiently screen for and enables
 detecting the significance of more complex model terms.
 
@@ -517,7 +518,7 @@ Fedorov's algorithm. Since we need enough degrees of freedom to fit our model,
 we construct the design with 12 experiments shown in Table~\ref{tab:d_optimal}.
 Note that the design includes \(-1\), \(0\) and \(1\) levels for factor \(x_8\). The design
 will sample from different regions of the search space due to the quadratic term,
-as was shown in Figure~\ref{fig:orgbd9e098}.
+as was shown in Figure~\ref{fig:org4313cb7}.
 
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
 % Mon Oct 15 18:05:40 2018
@@ -551,12 +552,12 @@ We are now going to fit this model using the results of the experiments in our
 D-Optimal design. Table~\ref{tab:correct_fit} shows the model fit table
 and compares the estimated and real model coefficients. This example illustrates
 that the Design of Experiments approach can achieve close model estimations
-using few resources, provided it is able to use user input to identify relevant
-factors and knowledge about the problem domain to tweak the model.
+using few resources, provided the approach is able to use user input to identify
+relevant factors and knowledge about the problem domain to tweak the model.
 
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
 % Mon Oct 15 18:06:01 2018
-\begin{table}[ht]
+\begin{table}[b]
 \centering
 \caption{Correct model fit comparing real and estimated coefficients, with significance intervals from the \texttt{R} language}
 \label{tab:correct_fit}
@@ -617,7 +618,7 @@ start exploring the search space with a less naive model. We could also continue
 the optimization of this problem by further exploring levels of factors
 \(\left\{x_2,x_4,x_6\right\}\). The significance of these factors could now be
 detectable by ANOVA tests since the other factors are now fixed. If we still
-cannot identify any significant factor, it might advisable to spend the
+cannot identify any significant factor, it might be advisable to spend the
 remaining budget using another exploration strategy such as uniform random or
 lating hypercube sampling.
 
@@ -625,7 +626,7 @@ The process of screening for factor significance using ANOVA and fitting a
 new model using acquired knowledge is essentially a step in the transparent
 Design of Experiments approach we present in the next section.
 \section{Autotuning with Design of Experiments}
-\label{sec:orgaa53d92}
+\label{sec:org9c7452d}
 In this section we discuss in detail our iterative Design of Experiments
 approach to autotuning. At the start of the process it is necessary to define
 the factors and levels that compose the search space of the target problem,
@@ -636,12 +637,12 @@ model, which is used for predicting levels for each relevant factor. The process
 can then restart, generating a new design for the new problem subspace with the
 remaining factors. Informed decisions made by the user play a central role in
 each iteration, guiding and speeding up the process.
-Figure~\ref{fig:org0c91ace} presents an overview of our approach.
+Figure~\ref{fig:org3aaaad7} presents an overview of our approach.
 
 \begin{figure}[b]\vspace{-.5cm}
 \centering
 \includegraphics[width=.95\columnwidth]{./img/doe_anova_strategy.pdf}
-\caption{\label{fig:org0c91ace}
+\caption{\label{fig:org3aaaad7}
 Overview of the Design of Experiments approach to autotuning proposed in this paper}
 \end{figure}
 
@@ -683,17 +684,17 @@ common in this step due to problems such as incorrect output. The user can
 decide whether to construct a new design using the successfully completed
 experiments or to continue to the analysis step if enough experiments succeed.
 
-The next four steps of an iteration, shown in Figure \ref{fig:org0c91ace},
+The next four steps of an iteration, shown in Figure \ref{fig:org3aaaad7},
 were discussed in detail in the previous section. User input is fundamental to
 the success of these steps. After running the ANOVA test, the user should apply
 domain knowledge to analyze the ANOVA table and determine which factors are
 relevant. Certain factors might not appear relevant, in which case the user
 should not include them in the regression model, but save them for further
 exploration. Selecting the model after the ANOVA test also benefits from domain
-knowledge. The impact of the number of threads used by a parallel program on its
-performance is usually modeled using an inverse term, which accounts for the
-speedup of adding more threads, plus a linear term, which accounts for the
-overhead of their management.
+knowledge. The impact of the number of threads used by a parallel program on the
+program's performance is usually modeled using an inverse term, which accounts
+for the speedup of adding more threads, plus a linear term, which accounts for
+the overhead of their management.
 
 A central assumption of ANOVA is the \emph{homoscedasticity} of the response, which
 can be interpreted as requiring the observed error on measurements to be
@@ -720,17 +721,17 @@ correctly, we will have restricted further search to better regions of the
 search space. In the next section we present the performance of our approach in
 scenarios that differ on search space size, availability and complexity.
 \section{Performance Evaluation}
-\label{sec:org50bcb89}
+\label{sec:org4d10db0}
 In this section we present performance evaluations of our approach in two
 scenarios.
 \vspace{-5pt}
 \subsection{GPU Laplacian Kernel}
-\label{sec:org6f690c0}
+\label{sec:org64faada}
 We first evaluated the performance of our approach in a Laplacian Kernel
 implemented using BOAST~\cite{videau2017boast} and targeting the \emph{Nvidia
 K40c} GPU. The objective was to minimize the \emph{time to compute each pixel} by
 finding the best level combination for the factors listed in Table
-\ref{tab:orgfda2dab}. Considering only factors and levels, the size of the
+\ref{tab:org157c652}. Considering only factors and levels, the size of the
 search space is \(1.9\times10^5\), but removing points that fail at runtime yields
 a search space of size \(2.3\times10^4\). The complete search space took 154 hours
 to be evaluated on \emph{Debian Jessie}, using an \emph{Intel Xeon E5-2630v2} CPU,
@@ -751,7 +752,7 @@ We applied domain knowledge to construct the following initial performance model
 \end{minipage}
 This performance model was used by the Iterative Linear Model (LM) algorithm and
 by our D-Optimal Design approach (DLMT). The LM algorithm is identical to our
-approach, described Section~\ref{sec:orgaa53d92}, except
+approach, described Section~\ref{sec:org9c7452d}, except
 for the design generation step, where it uses a fixed-size random sample of the
 search space instead of generating D-Optimal designs. We compared the
 performance of our approach with the following algorithms: uniform Random
@@ -760,7 +761,7 @@ with Restart (GSR); and Genetic Algorithm (GA). Each algorithm performed \emph{a
 most} 125 measurements over 1000 repetitions, without user intervention.
 
 \begin{table}[t]
-\caption{\label{tab:orgfda2dab}
+\caption{\label{tab:org157c652}
 Parameters of the Laplacian Kernel}
 \centering
 \scriptsize
@@ -784,13 +785,13 @@ relative to the \emph{global minimum} to compare the performance of algorithms.
 Table~\ref{tab:gpu_laplacian_compare_budget} shows the mean, minimum and
 maximum slowdowns in comparison to the global minimum, for each algorithm. It
 also shows the mean and maximum budget used by each algorithm.
-Figure~\ref{fig:org6f14b62} presents histograms with the
+Figure~\ref{fig:orgac26eca} presents histograms with the
 count of the slowdowns found by each of the 1000 repetitions. Arrows point the
 maximum slowdown found by each algorithm.
 
 % latex table generated in R 3.5.1 by xtable 1.8-2 package
 % Thu Oct 18 15:00:23 2018
-\begin{table}[ht]
+\begin{table}[b]
 \centering
 \caption{Slowdown and budget used by 7 optimization methods on the Laplacian Kernel, using a budget of 125 points with 1000 repetitions}
 \label{tab:gpu_laplacian_compare_budget}
@@ -815,9 +816,9 @@ All algorithms performed relatively well in this kernel, with only Greedy Search
 (GS) not being able to find slowdowns smaller than 4\(\times\) in some runs. As
 expected, other search algorithms had results similar to Random Sampling (RS).
 The LM algorithm was able to find the global minimum on most runs, but some runs
-could not find slowdowns smaller than \(4\times\). Our approach was able to find
-the global minimum in all of the 1000 runs while using \emph{at most} less than half
-of the allotted budget.
+could not find slowdowns smaller than \(4\times\). Our approach reached a slowdown
+of 1\% from the global minimum \emph{in all} of the 1000 runs while using \emph{at most}
+fewer than half of the allotted budget.
 
 We implemented a simple approach for the prediction step in this problem,
 choosing the best value of our fitted models on the complete set of valid level
@@ -825,12 +826,12 @@ combinations. This was possible for this problem since all valid combinations
 were known and fit in memory. For problems were the search space is too large to
 be generated, we would have to either adapt this step and run the prediction on
 a sample or minimize the model using the differentiation strategies mentioned
-in Section~\ref{sec:org3818a9f}.
+in Section~\ref{sec:org37ecba4}.
 
 \begin{figure}[t]\vspace{-.5cm}
 \centering
 \includegraphics[width=.9\columnwidth]{./img/comparison_histogram.pdf}
-\caption{\label{fig:org6f14b62}
+\caption{\label{fig:orgac26eca}
 Distribution of slowdowns in relation to the global minimum for 7 optimization methods on the Laplacian Kernel, using a budget of 125 points over 1000 repetitions \vspace{-.5cm}}
 \end{figure}
 
@@ -842,10 +843,10 @@ approach was able to exploit search space geometry. We will now present a
 performance evaluation of our approach in a larger and more comprehensive
 benchmark.
 \subsection{SPAPT Benchmark Suite}
-\label{sec:org7a7b576}
+\label{sec:orgbeeee64}
 The SPAPT~\cite{balaprakash2012spapt} benchmark suite provides
-parametrized CPU kernels from different High Performance Computing domains. The
-kernels shown in Table~\ref{tab:orgca5a6b1} are implemented using the code
+parametrized CPU kernels from different HPC domains. The
+kernels shown in Table~\ref{tab:org3a17ea1} are implemented using the code
 annotation and transformation tools provided by
 Orio~\cite{hartono2009annotation}. Search space sizes are overall larger
 than in the Laplacian Kernel example. Kernel factors are either integers in an
@@ -864,12 +865,12 @@ transformations, as a \emph{baseline} for computing the \emph{speedups} achieved
 strategy. We performed 10 autotuning repetitions for each kernel using random
 sampling and our approach, using a budget of \emph{at most} 400 measurements. Our
 approach was allowed to perform only 4 of the iterations shown in
-Figure~\ref{fig:org0c91ace}. Experiments were performed using
+Figure~\ref{fig:org3aaaad7}. Experiments were performed using
 Grid5000~\cite{balouek2013adding}, on \emph{Debian Jessie}, using an \emph{Intel
 Xeon E5-2630v3} CPU and \texttt{gcc} version \texttt{6.3.0}.
 
-\begin{table}[ht]
-\caption{\label{tab:orgca5a6b1}
+\begin{table}[t]
+\caption{\label{tab:org3a17ea1}
 Kernels from the SPAPT benchmark used in this evaluation}
 \centering
 \scriptsize
@@ -913,7 +914,7 @@ automation and identical initial models might have limited the improvements at
 each step of our application, our results show that it still succeeded in
 decreasing the budget needed to find significant speedups for some kernels.
 
-Figure~\ref{fig:org9865c84} presents the \emph{speedup} found by each
+Figure~\ref{fig:orgb238550} presents the \emph{speedup} found by each
 run of RS and DLMT, plotted against the algorithm \emph{iteration} where that speedup
 was found. We divided the kernels into 3 groups according to the results. The
 group where no algorithm found any speedups contains 3 kernels and is marked
@@ -926,9 +927,9 @@ underlying distribution lies, and a dashed line marks the \texttt{-03} baseline.
 In comparison to RS, our approach significantly decreased the average number of
 iterations needed to find speedups for the 8 kernels in the green group.
 
-Figure~\ref{fig:orgd538c25} shows the search space exploration performed
+Figure~\ref{fig:org68042b7} shows the search space exploration performed
 by RS and DLMT. It uses the same color groups as
-Figure~\ref{fig:org9865c84}, and shows the distribution of the
+Figure~\ref{fig:orgb238550}, and shows the distribution of the
 speedups that where found during all repetitions of the experiments. Histogram
 areas corresponding to DLMT are usually smaller because it always stopped at 4
 iterations, while RS always performed 400 measurements. This is particularly
@@ -948,22 +949,22 @@ speedups by efficiently exploring search spaces.
 \begin{figure*}[p]
 \centering
 \includegraphics[width=\textwidth]{./img/iteration_best_comparison.pdf}
-\caption{\label{fig:org9865c84}
+\caption{\label{fig:orgb238550}
 Cost of best points found on each run, and the iteration where they were found. RS and DLMT found no speedups with similar budgets for kernels marked with ``[0]'' and \emph{blue} headers, and similar speedups with similar budgets for kernels marked with ``[=]'' and \emph{orange} headers. DLMT found similar speedups using smaller budgets for kernels marked with ``[+]'' \emph{green} headers. Ellipses delimit an estimate of where 95\% of the underlying distribution lies}
 \end{figure*}
 
 \begin{figure*}[p]
 \centering
 \includegraphics[width=\textwidth]{./img/split_histograms.pdf}
-\caption{\label{fig:orgd538c25}
-Histograms of explored search spaces, showing the real count of measured configurations. Kernels are grouped in the same way as in Figure~\ref{fig:org9865c84}. DLMT spent less measurements than RS in configurations with smaller speedups or with slowdowns, even for kernels in the orange group. DLMT also spent more time exploring configurations with larger speedups}
+\caption{\label{fig:org68042b7}
+Histograms of explored search spaces, showing the real count of measured configurations. Kernels are grouped in the same way as in Figure~\ref{fig:orgb238550}. DLMT spent fewer measurements than RS in configurations with smaller speedups or with slowdowns, even for kernels in the orange group. DLMT also spent more time exploring configurations with larger speedups}
 \end{figure*}
 
 \section{Conclusion}
-\label{sec:org89704da}
+\label{sec:org5160beb}
 We presented in this paper a transparent Design of Experiments approach for
 program autotuning under tight budget constraints. We discussed the underlying
-concepts that enable our approach to significantly reduce the measurement budget
+concepts that enable our approach to reduce significantly the measurement budget
 needed to find good optimizations consistently over different kernels exposing
 configuration parameters of source-to-source transformations. We have made
 efforts to make our results, figures and analyses reproducible by hosting all
@@ -974,7 +975,7 @@ optimum of the search space defined by the optimization of a Laplacian kernel
 for GPUs, while using at most half of the allotted budget. In a more
 comprehensive evaluation using kernels from the SPAPT benchmark, our approach
 was able to find the same speedups as random sampling while using up to
-\(10\times\) less measurements. We showed that our approach explored search spaces
+\(10\times\) fewer measurements. We showed that our approach explored search spaces
 more efficiently, even for kernels where it performed similarly to random
 sampling.
 
@@ -999,7 +1000,7 @@ such as High-Level Synthesis and compiler configuration for FPGAs, where search
 spaces can get as large as \(10^{126}\), and where we already have some
 experience~\cite{bruel2017autotuninghls}.
 \section*{Acknowledgment}
-\label{sec:org8eae3c1}
+\label{sec:org9c84bca}
 Experiments presented in this paper were carried out using the Grid'5000
 testbed, supported by a scientific interest group hosted by Inria and including
 CNRS, RENATER and several Universities as well as other organizations.
