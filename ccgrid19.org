@@ -161,9 +161,13 @@ ORIO
   - source-to-source + compiler flags
   - connexion with online learning
 ** Generate =diff=                                                :noexport:
+This source block pulls the =.tex= file with the submitted version of the paper
+and compares it with the current version using =latexmk=. The resulting
+=diff='ed =.pdf= is moved to the =diff= directory.
+
 #+begin_src sh :results value :eval no-export
 git show submitted_CCGRID:ccgrid19.tex > ccgrid19_old.tex
-latexdiff --config="PICTUREENV=(?:picture|DIFnomarkup|table)[\w\d*@]*" ccgrid19_old.tex ccgrid19.tex > ccgrid19_diff.tex
+latexdiff --config="PICTUREENV=(?:picture|DIFnomarkup|table|align)[\w\d*@]*" ccgrid19_old.tex ccgrid19.tex > ccgrid19_diff.tex
 
 latexmk -pdflatex='pdflatex' -pdf -f ccgrid19_diff.tex
 latexmk -c
@@ -177,26 +181,46 @@ mv ccgrid19_diff.pdf diff
 #+RESULTS:
 
 ** TODO List from Reviewer's Comments                             :noexport:
+:LOGBOOK:
+- State "TODO"       from "TODO"       [2019-02-21 Thu 15:59]
+:END:
 List of requested changes from the major comments from the 3 reviewers:
-*** TODO *Add an explicit list of contributions*
+*** DONE *Add an explicit list of contributions*
+CLOSED: [2019-02-21 Thu 15:37]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-21 Thu 15:37]
 - State "TODO"       from              [2019-02-18 Mon 13:59]
 :END:
-*** TODO *Move Section IV to before Section III*
+*** DONE *Move Section IV to before Section III*
+CLOSED: [2019-02-21 Thu 11:36]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-21 Thu 11:36]
 - State "TODO"       from              [2019-02-18 Mon 13:59]
 :END:
-**** TODO Provide more context to the tutorial
+**** DONE Provide more context to the tutorial
+CLOSED: [2019-02-21 Thu 11:36]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-21 Thu 11:36]
 - State "TODO"       from              [2019-02-18 Mon 14:00]
 :END:
-**** TODO Add numbering to Figure 2
+**** DONE Add numbering to Figure 2
+CLOSED: [2019-02-21 Thu 11:36]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-21 Thu 11:36]
 - State "TODO"       from              [2019-02-18 Mon 14:00]
 :END:
-*** TODO *Discuss reliability on intial performance models*
+*** DONE *Discuss reliability on initial performance models*
+CLOSED: [2019-02-21 Thu 15:58]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-21 Thu 15:58]
 - State "TODO"       from              [2019-02-18 Mon 14:00]
+:END:
+*** DONE *Refactor to remove as much text as possible*
+CLOSED: [2019-02-21 Thu 15:38]
+:LOGBOOK:
+- State "DONE"       from "STARTED"    [2019-02-21 Thu 15:38]
+- State "STARTED"    from "TODO"       [2019-02-21 Thu 11:36]
+- State "TODO"       from              [2019-02-20 Wed 18:10]
 :END:
 *** DONE It, Its
 CLOSED: [2019-02-20 Wed 14:57]
@@ -210,8 +234,11 @@ one location to refer to tow different things (In "After exploring a search
 space, it is impossible to confidently deduce its global properties since its
 was automatically explored with unknown biases", the first "it" has not
 antecedent and does not really refer to anything).
-*** WAITING Use "\noindent" in paragraphs that continue after equations.
+*** DONE Use "\noindent" in paragraphs that continue after equations.
+CLOSED: [2019-02-21 Thu 14:55]
 :LOGBOOK:
+- State "DONE"       from "WAITING"    [2019-02-21 Thu 14:55] \\
+  reason for not working was an extra {} block
 - State "WAITING"    from "TODO"       [2019-02-20 Wed 16:03] \\
   noindents were added but are not working properly, need to figure out why
 - State "TODO"       from              [2019-02-18 Mon 14:02]
@@ -224,20 +251,29 @@ CLOSED: [2019-02-20 Wed 17:08]
 :END:
 Table VII needs an additional column that provides a description of each
 parameter in words.
-*** TODO Improve Equation 3 (parenthesis?)
+*** DONE Improve Equation 3 (parenthesis?)
+CLOSED: [2019-02-21 Thu 14:48]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-21 Thu 14:48]
 - State "TODO"       from              [2019-02-18 Mon 14:37]
 :END:
-*** TODO Improve Labelling of Figures 4 & 5
+*** DONE Improve Labeling of Figures 4 & 5
+CLOSED: [2019-02-21 Thu 15:47]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-21 Thu 15:47]
 - State "TODO"       from              [2019-02-18 Mon 14:41]
 :END:
-*** TODO Shorten Figures 4 & 5?
+*** DEFERRED Shorten Figures 4 & 5?
+CLOSED: [2019-02-21 Thu 15:38]
 :LOGBOOK:
+- State "DEFERRED"   from "TODO"       [2019-02-21 Thu 15:38] \\
+  cutting text provided a lot of space to work with
 - State "TODO"       from              [2019-02-18 Mon 14:38]
 :END:
-*** TODO Explain Dummy Factors in Plackett-Burman?
+*** DONE Explain Dummy Factors in Plackett-Burman?
+CLOSED: [2019-02-21 Thu 14:48]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-21 Thu 14:48]
 - State "TODO"       from              [2019-02-18 Mon 14:46]
 :END:
 *** DONE Acronym HPC
@@ -287,6 +323,10 @@ CLOSED: [2019-02-20 Wed 12:24]
 :LOGBOOK:
 - State "DONE"       from "TODO"       [2019-02-20 Wed 12:24]
 - State "TODO"       from              [2019-02-18 Mon 14:40]
+:END:
+*** TODO Discuss Orio and the GPU Laplacian briefly
+:LOGBOOK:
+- State "TODO"       from              [2019-02-21 Thu 15:59]
 :END:
 * Rosenbrock Example Setup                                         :noexport:
 #+HEADER: :results output :session *R* :exports none :eval no-export
@@ -887,7 +927,27 @@ complete_plot_data <- plot_data
 #+END_SRC
 
 #+RESULTS:
-: There were 50 or more warnings (use warnings() to see the first 50)
+#+begin_example
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:plyr’:
+
+    arrange, count, desc, failwith, id, mutate, rename, summarise,
+    summarize
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Registering fonts with R
+
+There were 50 or more warnings (use warnings() to see the first 50)
+#+end_example
 **** Back-to-back Histograms
 #+HEADER: :results graphics output :session *R* :eval no-export
 #+HEADER: :file ./img/split_histograms.pdf
@@ -933,7 +993,7 @@ p1 <- ggplot(hist_data) +
        geom_histogram(data = subset(hist_data, technique == "RS"), aes(x = cost_mean, y = -..count.., fill = technique), bins = nbins) +
        #scale_x_log10(labels = scales::trans_format("log10", scales::math_format(10^.x))) +
        ggtitle("") +
-       xlab("Cost") +
+       xlab("Cost in Seconds") +
        ylab("Count") +
        scale_size_manual("", values = 0.45) +
        guides(fill = guide_legend(reverse = TRUE)) +
@@ -1048,7 +1108,7 @@ p1 <- ggplot(it_data, aes(min_run_cost, best_iteration, color = technique)) +
     annotation_logticks(sides = "b") +
     ggtitle("") +
     ylab("Iteration where Best was Found") +
-    xlab("Best Cost") +
+    xlab("Best Cost in Seconds") +
     guides(color = guide_legend(reverse = TRUE)) +
     theme_bw(base_size = 18) +
     theme(legend.position = c(0.91, 0.15),
@@ -1604,12 +1664,13 @@ using up to $10\times$ fewer measurements than random sampling.
 The rest of this paper is organized as follows. Section\nbsp{}[[Background]]
 presents related work on source-to-source transformation, which is the main
 optimization target in SPAPT kernels, on autotuning systems and on search space
-exploration strategies. Section\nbsp{}[[Design of Experiments]] discusses the DoE,
-ANOVA, and linear regression methodology we used to develop our approach.
-Section\nbsp{}[[Autotuning with Design of Experiments]] discusses the implementation
-of our approach in detail. Section\nbsp{}[[Performance Evaluation]] presents the
-results on the GPU Laplacian Kernel and on the SPAPT benchmark suite.
-Section\nbsp{}[[Conclusion]] discusses our conclusions and future work.
+exploration strategies. Section\nbsp{}[[Autotuning with Design of Experiments]]
+discusses the implementation of our approach in detail. Section\nbsp{}[[Design of
+Experiments]] discusses the DoE, ANOVA, and linear regression methodology we used
+to develop our approach. Section\nbsp{}[[Performance Evaluation]] presents the
+results on the performance evaluation on the GPU Laplacian Kernel and on the
+SPAPT benchmark suite. Section\nbsp{}[[Conclusion]] discusses our conclusions and
+future work.
 * Background
 This section presents the background and related work on source-to-source
 transformation, autotuning systems and search space exploration strategies.
@@ -1683,86 +1744,165 @@ improved by statisticians for a long time, and can be grouped under the DoE
 term.
 
 The D-Optimal sampling strategies shown on the two rightmost bottom panels of
-Figure\nbsp{}[[fig:sampling_comparison]] are based on the DoE
-methodology, and leverage previous knowledge about search spaces for an
-efficient exploration. These strategies provide transparent analyses that
-enable focusing on interesting subspaces. In the next
-section we present the DoE methodology used to implement our
-approach.
-* Design of Experiments
+Figure\nbsp{}[[fig:sampling_comparison]] are based on the DoE methodology, and
+leverage previous knowledge about search spaces for an efficient exploration.
+These strategies provide transparent analyses that enable focusing on
+interesting subspaces. In the next section we describe our approach to
+autotuning based on the DoE methodology.
+* Autotuning with Design of Experiments
 An /experimental design/ determines a selection of experiments whose objective
 is to identify the relationships between /factors/ and /responses/. While
 factors and responses can refer to different concrete entities in other domains,
 in computer experiments factors can be configuration parameters for algorithms
-and compilers, for example, and responses can be the execution time or memory
-consumption of a program. Each possible value of a factor is called a /level/.
-The /effect/ of a factor on the measured response, without the factor's
-/interactions/ with other factors, is the /main effect/ of that factor.
-Experimental designs can be constructed with different goals, such as
-identifying the main effects or building an analytical model for the response.
+and compilers, and responses can be the execution time or memory consumption of
+a program. Each possible value of a factor is called a /level/. The /effect/ of
+a factor on the measured response, without the factor's /interactions/ with
+other factors, is the /main effect/ of that factor. Experimental designs can be
+constructed with different goals, such as identifying the main effects or
+building an analytical model for the response.
 
+In this section we discuss in detail our iterative DoE approach to autotuning.
+Figure\nbsp{}[[fig:doe_anova_strategy]] presents an overview of our approach, with
+numbered steps. In step 1 we define the factors and levels that compose the
+search space of the target problem, in step 2 we select an initial performance
+model, and in step 3 we generate an experimental design. We run the experiments
+in step 4 and then, as we discuss in the next section, we identify significant
+factors with an ANOVA test in step 5. This enables selecting and fitting a new
+performance model in steps 6 and 7. The new model is used in step 8 for
+predicting levels for each significant factor. We then go back to step 3,
+generating a new design for the new problem subspace with the remaining factors.
+Informed decisions made by the user at each step guide the outcome of each
+iteration.
+
+#+NAME: fig:doe_anova_strategy
+#+CAPTION: Overview of the DoE approach to autotuning proposed in this paper
+#+ATTR_LATEX: :width .95\columnwidth :placement [b]\vspace{-.5cm}
+#+ATTR_ORG: :width 400 :placement [b]
+[[./img/doe_anova_strategy.pdf]]
+
+Step 1 of our approach is to define target factors and which of their levels are
+worth exploring. Then, the user must select an initial performance model in
+step 2. Compilers typically expose many 2-level factors in the form of
+configuration flags, and the performance model for a single flag can only be a
+linear term, since there are only 2 values to measure. Interactions between
+flags and numerical factors such as block sizes in CUDA programs or loop
+unrolling amounts are also common. Deciding which levels to include for these
+kinds of factors requires more careful analysis. For example, if we suspect the
+performance model has a quadratic term for a certain factor, the design should
+include at least three factor levels. The ordering between the levels of other
+compiler parameters, such as \texttt{-O(0,1,2,3)}, is not obviously translated
+to a number. Factors like these are named /categorical/, and must be treated
+differently when constructing designs in step 3 and analyzing results in step 5.
+
+We decided to use D-Optimal designs because their construction techniques enable
+mixing categorical and numerical factors in the same screening design, while
+biasing sampling according to the performance model. This enables the autotuner
+to exploit global search space structures if we use the right model. When
+constructing a D-Optimal design in step 3 the user can require that specific
+points in the search space are included, or that others are not. Algorithms for
+constructing D-Optimal designs are capable of adapting to these requirements by
+optimizing a starting design. Before settling on D-Optimal designs, we explored
+other design construction techniques such as the
+Plackett-Burman\nbsp{}\cite{plackett1946design} screening designs shown in the
+next section, the /contractive replacement/ technique of
+Addelman-Kempthorne\nbsp{}\cite{addelman1961some} and the /direct generation/
+algorithm by Grömping and Fontana\nbsp{}\cite{ulrike2018algorithm}. These
+techniques have strong requirements on design size and level mixing, so we opted
+for a more flexible technique that would enable exploring a more comprehensive
+class of autotuning problems.
+
+After the design is constructed in step 3, we run each selected experiment in
+step 4. This step can run in parallel since experiments are independent. Not
+all target programs run successfully in their entire input range, making runtime
+failures common in this step. The user can decide whether to construct a new
+design using the successfully completed experiments or to continue to the
+analysis step if enough experiments succeed.
+
+After running the ANOVA test in step 5, the user should apply domain knowledge
+to analyze the ANOVA table and determine which factors are significant. Certain
+factors might not appear significant and should not be included in the
+regression model. Selecting the model after the ANOVA test in step 6 also
+benefits from domain knowledge.
+
+A central assumption of ANOVA is the /homoscedasticity/ of the response, which
+can be interpreted as requiring the observed error on measurements to be
+independent of factor levels and of the number of measurements. Fortunately,
+there are statistical tests and corrections for lack of homoscedasticity. Our
+approach uses the homoscedasticity check and correction by power transformations
+from the =car= package\nbsp{}\cite{fox2011car} of the =R= language.
+
+We fit the selected model to our design's data in step 7, and use the fitted
+model in step 8 to find levels that minimize the response. The choice of the
+method used to find these levels depends on factor types and on the complexity
+of the model and search space. If factors have discrete levels, neighborhood
+exploration might be needed to find levels that minimize the response around
+predicted levels. Constraints might put predicted levels on an undefined or
+invalid region on the search space. This presents challenge, because the borders
+of valid regions would have to be explored.
+
+In step 8 we also fix factor levels to those predicted to achieve best
+performance. The user can also decide the level of trust placed on the
+prediction at this step, by keeping other levels available. In step 8 we perform
+a reduction of problem dimension by eliminating factors and decreasing the size
+of the search space. If we identified significant parameters correctly, we will
+have restricted further search to better regions. In the next section we present
+a simple fictional application our approach that illustrates the fundamentals of
+the DoE methodology, screening designs and D-Optimal designs.
+* Design of Experiments
 In this section we first present the assumptions of a traditional DoE
-methodology using an example of /2-level screening designs/, which
-are an efficient way to identify main effects. We then discuss some techniques
-for the construction of efficient designs for factors with arbitrary numbers and
-types of levels, and present /D-Optimal/ designs, the technique we use in the
-approach presented in this paper.
+methodology using an example of /2-level screening designs/, an efficient way to
+identify main effects. We then discuss techniques for the construction of
+efficient designs for factors with arbitrary numbers and types of levels, and
+present /D-Optimal/ designs, the technique used in this paper.
 ** Screening & Plackett-Burman Designs
-Screening designs provide a parsimonious way to identify the main
-effects of 2-level factors in the initial stages of studying a problem. While
-interactions are not considered at this stage, identifying main effects early
-enables focusing on a smaller set of factors on subsequent more detailed
-experiments. A specially efficient design construction technique for screening
-designs was presented by Plackett and Burman\nbsp{}\cite{plackett1946design} in
-1946, and is available in the =FrF2=
+Screening designs identify parsimoniously the main effects of 2-level factors in
+the initial stages of studying a problem. While interactions are not considered
+at this stage, identifying main effects early enables focusing on a smaller set
+of factors on subsequent experiments. A specially efficient design construction
+technique for screening designs was presented by Plackett and
+Burman\nbsp{}\cite{plackett1946design} in 1946, and is available in the =FrF2=
 package\nbsp{}\cite{gromping2014frf2} of the =R=
 language\nbsp{}\cite{team2018rlanguage}.
 
-Despite having strong restrictions on the number of factors they support,
+Despite having strong restrictions on the number of factors supported,
 Plackett-Burman designs enable the identification of main effects of $n$ factors
 with $n + 1$ experiments. Factors may have many levels, but Plackett-Burman
 designs can only be constructed for 2-level factors. Therefore, before
 constructing a Plackett-Burman design we must identify /high/ and /low/ levels
 for each factor.
 
-Assuming a crude linear relationship between factors and the response is
-fundamental for running ANOVA tests using a Plackett-Burman design. Consider the
-linear relationship
-#+LATEX: \vspace{-5pt}
+Assuming a linear relationship between factors and the response is fundamental
+for running ANOVA tests using a Plackett-Burman design. Consider the linear
+relationship
+#+LATEX: \vspace{-2pt}
 #+BEGIN_EXPORT latex
-{\normalsize
 \begin{equation}
 \mathbf{Y} = \bm{\beta}\mathbf{X} + \varepsilon\text{,}
-%\caption{Linear model assumed in main-effect analysis of screening designs}
 \label{eq:linear_assumption}
+\vspace{-2pt}
 \end{equation}\noindent
-}\noindent
 #+END_EXPORT
-#+LATEX: \vspace{-1pt}
 where $\varepsilon$ is the error term, $\mathbf{Y}$ is the observed response,
 $\mathbf{X} = \left\{1, x_1,\dots,x_n\right\}$ is the set of $n$ 2-level
 factors, and $\bm{\beta} = \left\{\beta_0,\dots,\beta_n\right\}$ is the set with
 the /intercept/ $\beta_0$ and the corresponding /model coefficients/. ANOVA
-tests can rigorously compute the significance of each factor. We can think of
-that intuitively by noting that less relevant factors will have corresponding
+tests can rigorously compute the significance of each factor, we can think of
+that intuitively by noting that less significant factors will have corresponding
 values in $\bm{\beta}$ close to zero.
 
-We now present an example to illustrate the screening methodology. Suppose we
-wish to minimize a performance metric $Y$ of a problem with factors
-$x_1,\dots,x_8$ assuming values are in $\left\{-1, -0.8, -0.6, \dots, 0.6, 0.8,
-1\right\}$. Each $y_i \in Y$ is computed using the following equation:
-#+LATEX: \vspace{-5pt}
+The next example illustrates the screening methodology. Suppose we wish to
+minimize a performance metric $Y$ of a problem with factors $x_1,\dots,x_8$
+assuming values are in $\left\{-1, -0.8, -0.6, \dots, 0.6, 0.8, 1\right\}$. Each
+$y_i \in Y$ is computed using the following equation:
+#+LATEX: \vspace{-2pt}
 #+BEGIN_EXPORT latex
-{\normalsize
 \begin{align}
 \label{eq:real_model}
 y_i = & -1.5x_1 + 1.3x_3 + 3.1x_5 + \\
-& -1.4x_7 + 1.35x_8^2 + 1.6x_3x_5 + \varepsilon. \nonumber
+& -1.4x_7 + 1.35x_8^2 + 1.6x_3x_5 + \varepsilon\text{.} \nonumber
+\vspace{-2pt}
 \end{align}\noindent
-%\caption{Real model used to obtain the data on Table\ref{tab:plackett}}
-}\noindent
 #+END_EXPORT
-#+LATEX: \vspace{-1pt}
 Suppose that, for the purpose of this example, the computation is done by a very
 expensive black-box procedure. Note that factors $\{x_2,x_4,x_6\}$ have no
 contribution to the response, and we can think of the error term $\varepsilon$
@@ -1771,14 +1911,14 @@ amplitudes of $\varepsilon$ might make isolating factors with low significance
 harder to justify.
 
 To study this problem efficiently we decided to construct a Plackett-Burman
-design, which minimizes the experiments needed to identify significant factors. The
-analysis of this design will enable decreasing the dimension of the problem.
+design, which minimizes the experiments needed to identify significant factors.
+The analysis of this design will enable decreasing the dimension of the problem.
 Table\nbsp{}\ref{tab:plackett} presents the Plackett-Burman design we generated.
 It contains high and low values, chosen to be $-1$ and $1$, for the factors
-$x_1,\dots,x_8$, and the observed response $\mathbf{Y}$. As is common when
-constructing screening designs, we had to add 3 ``dummy'' factors
-$d_1,\dots,d_3$ to complete the 12 columns needed to construct a Plackett-Burman
-design for 8 factors.
+$x_1,\dots,x_8$, and the observed response $\mathbf{Y}$. It is a required step
+to add the 3 ``dummy'' factors $d_1,\dots,d_3$ to complete the 12 columns needed
+to construct a Plackett-Burman design for 8
+factors\nbsp{}\cite{plackett1946design}.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
@@ -1862,23 +2002,22 @@ $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $x_8$ & $d_1$ & $d_2$ & 
 \end{table}
 #+END_EXPORT
 
-We use our initial assumption shown in
-Equation\nbsp{}\eqref{eq:linear_assumption} to identify the most relevant
-factors by performing an ANOVA test. The resulting ANOVA table is shown in
-Table\nbsp{}\ref{tab:anova_linear}, where the /significance/ of each factor can
-be interpreted from the F-test and P$(<\text{F})$ values.
-Table\nbsp{}\ref{tab:anova_linear} uses ``$*$'', as is convention in the
+We use our initial assumption in Equation\nbsp{}\eqref{eq:linear_assumption} to
+identify the most significant factors by performing an ANOVA test. The results
+are shown in Table\nbsp{}\ref{tab:anova_linear}, where the /significance/ of
+each factor is interpreted from the F-test and $\text{P}_{\text{r}}(>\text{F})$
+values. Table\nbsp{}\ref{tab:anova_linear} uses ``$*$'', as is convention in the
 \texttt{R} language, to represent the significance values for each factor.
 
 We see on Table\nbsp{}\ref{tab:anova_linear} that factors
 $\left\{x_3,x_5,x_7,x_8\right\}$ have at least one ``$*$'' of significance. For
 the purpose of this example, this is sufficient reason to include them in our
 linear model for the next step. We decide as well to discard factors
-$\left\{x_2,x_4,x_6\right\}$ in our model for now, due to their low
-significance. We see that factor $x_1$ has a significance mark of ``\cdot'', but
-comparing F-test and P$(<\text{F})$ values we decide that they are fairly
-smaller than the values of factors that had no significance at all, and we keep
-this factor.
+$\left\{x_2,x_4,x_6\right\}$ from our model, due to their low significance. We
+see that factor $x_1$ has a significance mark of ``\cdot'', but comparing F-test
+and $\text{P}_{\text{r}}(>\text{F})$ values we decide that they are fairly
+smaller than the values of factors that had no significance, and we keep this
+factor.
 
 #+HEADER: :results graphics output :session *R* :exports none :eval no-export
 #+HEADER: :file ./img/main_effects.pdf
@@ -1920,7 +2059,7 @@ s_regression$stars <- symnum(s_regression[ , "Pr(>F)"], na = FALSE,
                              cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1),
                              symbols = c("$***$", "$**$", "$*$", "$\\cdot$", " "))
 
-names(s_regression) <- c("F value", "Pr$(<\\text{F})$", "Signif.")
+names(s_regression) <- c("F value", "$\\text{P}_{\\text{r}}(>\\text{F})$", "Signif.")
 
 rownames(s_regression) <- c("$x_1$", "$x_2$", "$x_3$",
                             "$x_4$", "$x_5$", "$x_6$",
@@ -1949,7 +2088,7 @@ print(x, size = "\\small",
 \begingroup\small
 \begin{tabular}{lrrl}
   \toprule
- & F value & Pr$(<\text{F})$ & Signif. \\
+ & F value & $\text{P}_{\text{r}}(>\text{F})$ & Signif. \\
   \midrule
 $x_1$ & 8.382 & 0.063 & $\cdot$ \\
   $x_2$ & 0.370 & 0.586 &   \\
@@ -1967,10 +2106,9 @@ $x_1$ & 8.382 & 0.063 & $\cdot$ \\
 
 Moving forward, we will build a linear model using factors
 $\left\{x_1,x_3,x_5,x_7,x_8\right\}$, fit the model using the values of $Y$ we
-obtained when running our design, and use the coefficients of this fitted model
-to predict the levels for each factor that minimize the real response. We can do
-that because these factors are numerical, even though only discrete values are
-allowed.
+obtained when running our design, and use model coefficients to predict the
+levels of each factor that minimize the real response. We can do that because
+these factors are numerical, even though only discrete values are allowed.
 
 We now proceed to the prediction step, where we wish to identify the levels of
 factors $\left\{x_1,x_3,x_5,x_7,x_8\right\}$ that minimize our fitted model,
@@ -1982,8 +2120,8 @@ Table\nbsp{}\ref{tab:linear_prediction_comparison} compares the prediction for
 $Y$ from our linear model with the selected factors
 $\left\{x_1,x_3,x_5,x_7,x_8\right\}$ with the actual global minimum $Y$ for this
 problem. Note that factors $\left\{x_2,x_4,x_6\right\}$ are included for the
-global minimum. This happens here because of the error term $\varepsilon$,
-but could also be interpreted as due to model uncertainty.
+global minimum. This happens here because of the error term $\varepsilon$, but
+could also be interpreted as due to model uncertainty.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
@@ -2056,34 +2194,32 @@ print(x,
 \end{table}
 #+END_EXPORT
 
-Using 12 measurements and a simple linear model, the predicted best
-value of $Y$ was around $10\times$ larger than the global optimum. Note that the
-model predicted the correct levels for $x_3$ and $x_5$, and almost predicted
-correctly for $x_7$. The linear model predicted wrong levels for $x_1$, perhaps
-due to this factor's interaction with $x_3$, and for $x_8$. Arguably, it would
-be impossible to predict the correct level for $x_8$ using this linear model,
-since a quadratic term composes the true formula of $Y$. As we showed in
+Using 12 measurements and a simple linear model, the predicted best value of $Y$
+was around $10\times$ larger than the global optimum. Note that the model
+predicted the correct levels for $x_3$ and $x_5$, and almost for $x_7$. The
+linear model predicted wrong levels for $x_1$, perhaps due to this factor's
+interaction with $x_3$, and for $x_8$. Arguably, it would be impossible to
+predict the correct level for $x_8$ using this linear model, since a quadratic
+term composes the true formula of $Y$. As we showed in
 Figure\nbsp{}[[fig:sampling_comparison]], a D-Optimal design using a linear model
-could detect the significance of a quadratic term, but the resulting
-regression will often predict the wrong minimum point.
+could detect the significance of a quadratic term, but the resulting regression
+will often lead to the wrong level.
 
 We can improve upon this result if we introduce some information about the
 problem and use a more flexible design construction technique. Next, we will
 discuss the construction of efficient designs using problem-specific formulas
 and continue the optimization of our example.
 ** D-Optimal Designs
-The application of DoE to autotuning problems requires design
-construction techniques that support factors of arbitrary types and number of
-levels. Autotuning problems typically combine factors such as binary flags,
-integer and floating point numerical values, and unordered enumerations of
-abstract values. Previously, to construct a Plackett-Burman design for our
-example we had to restrict our factors to the extremes of their levels in the
-interval $\left\{-1, -0.8, -0.6,\dots,0.6, 0.8, 1\right\}$, because such designs
-only support 2-level factors. We have seen that this restriction makes it
-difficult to measure the significance of quadratic terms in the model. We will
-now show how to optimize our example further by using /D-Optimal designs/, which
-increase the number of levels we can efficiently screen for and enables
-detecting the significance of more complex model terms.
+The application of DoE to autotuning problems requires design construction
+techniques that support factors of arbitrary types and number of levels.
+Autotuning problems typically combine factors such as binary flags, integer and
+floating point numerical values, and unordered enumerations of abstract values.
+Because Plackett-Burman designs only support 2-level factors, we had to restrict
+factor levels to interval extremities in our example. We have seen that this
+restriction makes it difficult to measure the significance of quadratic terms.
+We will now show how to optimize our example further by using /D-Optimal
+designs/, which increase the number of levels we can efficiently screen for and
+enables detecting the significance of more complex terms.
 
 To construct a D-Optimal design it is necessary to choose an initial model,
 which can be done based on previous experiments or on expert knowledge of the
@@ -2091,19 +2227,18 @@ problem. Once a model is selected, algorithmic construction is performed by
 searching for the set of experiments that minimizes /D-Optimality/, a measure of
 the /variance/ of the /estimators/ for the /regression coefficients/ associated
 with the selected model. This search is usually done by swapping experiments
-from the current candidate set with experiments from a pool of possible
+from the current candidate design with experiments from a pool of possible
 experiments, according to certain rules, until some stopping criterion is met.
-In the example in this section, as well as in the approach presented in this
-paper, we use Fedorov's algorithm\nbsp{}\cite{fedorov1972theory} for
-constructing D-Optimal designs, implemented in =R= in the =AlgDesign=
-package\nbsp{}\cite{wheeler2014algdesign}.
+In the example in this section and in our approach we use Fedorov's
+algorithm\nbsp{}\cite{fedorov1972theory} for constructing D-Optimal designs,
+implemented in =R= in the =AlgDesign= package\nbsp{}\cite{wheeler2014algdesign}.
 
-Going back to our example, suppose that in addition to using our previous
-screening results we decide to hire an expert in our problem's domain. The
-expert confirms our initial assumptions that the factor $x_1$ should be included
-in our model since it is usually relevant for this kind of problem and has a
-strong interaction with factor $x_3$. She also mentions we should replace
-the linear term for $x_8$ by a quadratic term for this factor.
+In our example, suppose that in addition to using our previous screening results
+we decide to hire an expert in our problem's domain. The expert confirms our
+initial assumptions that the factor $x_1$ should be included in our model since
+it is usually significant for this kind of problem and has a strong interaction
+with factor $x_3$. She also mentions we should replace the linear term for $x_8$
+by a quadratic term for this factor.
 
 Using our previous screening and the domain knowledge provided by our expert, we
 choose a new performance model and use it to construct a D-Optimal design using
@@ -2232,12 +2367,12 @@ $x_1$ & 461.596 & 0.000 & $***$ \\
 \end{table}
 #+END_EXPORT
 
-We are now going to fit this model using the results of the experiments in our
-D-Optimal design. Table\nbsp{}\ref{tab:correct_fit} shows the model fit table
-and compares the estimated and real model coefficients. This example illustrates
-that the DoE approach can achieve close model estimations
-using few resources, provided the approach is able to use user input to identify
-relevant factors and knowledge about the problem domain to tweak the model.
+We now fit this model using the results of the experiments in our design.
+Table\nbsp{}\ref{tab:correct_fit} shows the model fit table and compares the
+estimated and real model coefficients. This example illustrates that the DoE
+approach can achieve close model estimations using few resources, provided the
+approach is able to use user input to identify significant factors, and
+knowledge about the problem domain to tweak the model.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
@@ -2295,16 +2430,16 @@ Intercept & 0.000 & 0.050 & 0.305 & 0.776 &   \\
 \end{table}
 #+END_EXPORT
 
-Table\nbsp{}\ref{tab:prediction_comparisons} compares the global minimum in this
+Table\nbsp{}\ref{tab:prediction_comparisons} compares the global minimum of this
 example with the predictions made by our initial linear model from the screening
-step and our improved model from this step. Using screening, D-Optimal designs,
-and domain knowledge we found an optimization within $10\%$ of the global
-optimum computing $Y$ only 24 times. We were able to do that by first reducing
-the dimension of the problem when we eliminated irrelevant factors in the
-screening step. We then constructed a more careful exploration of this new
-problem subspace, helped by domain knowledge provided by an expert. Note that we
-could have reused some of the 12 experiments from the previous step to reduce
-the size of the new design even further.
+step, and our improved model. Using screening, D-Optimal designs, and domain
+knowledge, we found an optimization within $10\%$ of the global optimum while
+computing $Y$ only 24 times. We were able to do that by first reducing the
+problem's dimension when we eliminated insignificant factors in the screening
+step. We then constructed a more careful exploration of this new problem
+subspace, aided by domain knowledge provided by an expert. Note that we could
+have reused some of the 12 experiments from the previous step to reduce the size
+of the new design further.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
@@ -2362,19 +2497,20 @@ print(x,
 We are able to explain the performance improvements we obtained in each step of
 the process, because we finish steps with a performance model and a performance
 prediction. Each factor is included or removed using information obtained in
-statistical tests or expert knowledge. If we need to optimize this problem
-again, for a different architecture or with larger input, for example, we could
-start exploring the search space with a less naive model. We could also continue
-the optimization of this problem by further exploring levels of factors
+statistical tests, or expert knowledge. If we need to optimize this problem
+again, for a different architecture or with larger input, we could start
+exploring the search space with a less naive model. We could also continue the
+optimization of this problem by exploring levels of factors
 $\left\{x_2,x_4,x_6\right\}$. The significance of these factors could now be
 detectable by ANOVA tests since the other factors are now fixed. If we still
 cannot identify any significant factor, it might be advisable to spend the
 remaining budget using another exploration strategy such as uniform random or
-lating hypercube sampling.
+latin hypercube sampling.
 
-The process of screening for factor significance using ANOVA and fitting a
-new model using acquired knowledge is essentially a step in the transparent
-DoE approach we present in the next section.
+The process of screening for factor significance using ANOVA and fitting a new
+model using acquired knowledge is equivalent to steps 5, 6, and 7 in
+Figure\nbsp{}[[fig:doe_anova_strategy]]. In the next section we evaluate the
+performance of our DoE approach in two scenarios.
 *** Optimizing the Rosenbrock Function                           :noexport:
 #+CAPTION: Defining the Rosenbrock function in =R=
 #+BEGIN_figure
@@ -2528,102 +2664,9 @@ x           & $7.5 \times 10^{-6}$ &   1 \\
 \endgroup
 \end{table}
 #+END_EXPORT
-* Autotuning with Design of Experiments
-In this section we discuss in detail our iterative DoE
-approach to autotuning. At the start of the process it is necessary to define
-the factors and levels that compose the search space of the target problem,
-select an initial performance model, and generate an experimental design. Then,
-as discussed in the previous section, we identify relevant factors by running an
-ANOVA test on the results. This enables selecting and fitting a new performance
-model, which is used for predicting levels for each relevant factor. The process
-can then restart, generating a new design for the new problem subspace with the
-remaining factors. Informed decisions made by the user play a central role in
-each iteration, guiding and speeding up the process.
-Figure\nbsp{}[[fig:doe_anova_strategy]] presents an overview of our approach.
-
-#+NAME: fig:doe_anova_strategy
-#+CAPTION: Overview of the DoE approach to autotuning proposed in this paper
-#+ATTR_LATEX: :width .95\columnwidth :placement [b]\vspace{-.5cm}
-#+ATTR_ORG: :width 400 :placement [b]
-[[./img/doe_anova_strategy.pdf]]
-
-The first step of our approach is to define which are the target factors and
-which levels of each factor are worth exploring. Then, the user must select an
-initial performance model. Compilers typically expose many 2-level factors in
-the form of configuration flags. The performance model for a single flag can
-only be a linear term, since there are only 2 values to measure. Interactions
-between flags can also be considered in an initial model. Numerical factors are
-also common, such as block sizes for CUDA programs or loop unrolling amounts.
-Deciding which levels to include for these kinds of factors requires a more
-careful analysis. For example, if we suspect the performance model has a
-quadratic term for a certain factor, we should include at least three factor
-levels. The ordering between the levels of other compiler parameters, such as
-\texttt{-O(0,1,2,3)}, is not obviously translated to a number. Factors like
-these are named /categorical/, and must be treated differently when constructing
-designs and analyzing the results.
-
-We decided to use D-Optimal designs because their construction techniques enable
-mixing categorical and numerical factors in the same screening design, while
-biasing sampling according to the performance model. This enables the autotuner to
-exploit global search space structures if we use the right model. When
-constructing a D-Optimal design the user can require that specific points in the
-search space are included, or that others are not. Algorithms for constructing
-D-Optimal designs are capable of adapting to these requirements by optimizing a
-starting design. Before settling on D-Optimal designs, we explored other design
-construction techniques such as the
-Plackett-Burman\nbsp{}\cite{plackett1946design} screening designs shown in the
-previous section, the /contractive replacement/ technique of
-Addelman-Kempthorne\nbsp{}\cite{addelman1961some} and the /direct generation/
-algorithm by Grömping and Fontana\nbsp{}\cite{ulrike2018algorithm}. These
-techniques have strong requirements on design size and level mixing, so we opted
-for a more flexible technique that would enable exploring a more comprehensive
-class of autotuning problems.
-
-After the design is constructed we run each selected experiment. This step can
-be done in parallel since experiments are independent. Runtime failures are
-common in this step due to problems such as incorrect output. The user can
-decide whether to construct a new design using the successfully completed
-experiments or to continue to the analysis step if enough experiments succeed.
-
-The next four steps of an iteration, shown in Figure [[fig:doe_anova_strategy]],
-were discussed in detail in the previous section. User input is fundamental to
-the success of these steps. After running the ANOVA test, the user should apply
-domain knowledge to analyze the ANOVA table and determine which factors are
-relevant. Certain factors might not appear relevant, in which case the user
-should not include them in the regression model, but save them for further
-exploration. Selecting the model after the ANOVA test also benefits from domain
-knowledge. The impact of the number of threads used by a parallel program on the
-program's performance is usually modeled using an inverse term, which accounts
-for the speedup of adding more threads, plus a linear term, which accounts for
-the overhead of their management.
-
-A central assumption of ANOVA is the /homoscedasticity/ of the response, which
-can be interpreted as requiring the observed error on measurements to be
-independent of factor levels and of the number of measurements. Fortunately, up
-to a point, there are statistical tests and corrections for lack of
-homoscedasticity. Our approach uses the homoscedasticity check and correction by
-power transformations from the =car= package\nbsp{}\cite{fox2011car} of the =R=
-language before every ANOVA step.
-
-The prediction step uses the fitted model to find factor levels that minimize
-the response. The choice of the method to find these levels depends on factor
-types and model and search space complexity. If factors have discrete levels,
-neighborhood exploration might be needed to find valid levels that minimize the
-response around the predicted levels. Validity constraints might put predicted
-levels on an undefined or invalid region on the search space. This presents a
-harder challenge, where the borders of valid regions would have to be explored.
-
-The last step of an iteration is fixing factor levels to those predicted to have
-best performance. The user can also decide the level of trust that will be
-placed on the model and ANOVA at this step by allowing other levels. This step
-performs a reduction on the dimension of the problem by eliminating factors and
-decreasing the size of the search space. If we identify relevant parameters
-correctly, we will have restricted further search to better regions of the
-search space. In the next section we present the performance of our approach in
-scenarios that differ on search space size, availability and complexity.
 * Performance Evaluation
 In this section we present performance evaluations of our approach in two
-scenarios.
+scenarios that differ on search space size and complexity.
 #+LATEX: \vspace{-5pt}
 ** GPU Laplacian Kernel
 We first evaluated the performance of our approach in a Laplacian Kernel
@@ -2642,48 +2685,49 @@ We applied domain knowledge to construct the following initial performance model
 \\\begin{minipage}{\linewidth}\scriptsize
 \begin{align}
 \label{eq:gpu_laplacian_performance_model}
-\texttt{time\_per\_pixel} \sim & \scriptsize\; \texttt{y\_component\_number} + 1 / \texttt{y\_component\_number} \; + \nonumber \\
-& \scriptsize\; \texttt{vector\_length} + \texttt{lws\_y} + 1 / \texttt{lws\_y} \; + \nonumber \\
-& \scriptsize\; \texttt{load\_overlap} + \texttt{temporary\_size} \; + \\
-& \scriptsize\; \texttt{elements\_number} + 1 / \texttt{elements\_number} \; + \nonumber \\
-& \scriptsize\; \texttt{threads\_number} + 1 /\texttt{threads\_number} \nonumber
+\texttt{time\_per\_pixel} \sim & \scriptsize\; \texttt{y\_component\_number} + \texttt{vector\_length} \; + \nonumber \\
+& \scriptsize\; \texttt{load\_overlap} + \texttt{temporary\_size} + \texttt{lws\_y} \; + \nonumber \\
+& \scriptsize\; \texttt{elements\_number} + \texttt{threads\_number}  \; + \nonumber \\
+& \scriptsize\; \frac{1}{\texttt{y\_component\_number}} + \frac{1}{\texttt{lws\_y}} \; + \\
+& \scriptsize\; \frac{1}{\texttt{elements\_number}} + \frac{1}{\texttt{threads\_number}}\text{.} \nonumber
 \end{align}
 \vspace{2pt}
 \end{minipage}
 #+END_EXPORT
 This performance model was used by the Iterative Linear Model (LM) algorithm and
-by our D-Optimal Design approach (DLMT). The LM algorithm is identical to our
-approach, described Section\nbsp{}[[Autotuning with Design of Experiments]], except
-for the design generation step, where it uses a fixed-size random sample of the
-search space instead of generating D-Optimal designs. We compared the
-performance of our approach with the following algorithms: uniform Random
-Sampling (RS); Latin Hypercube Sampling (LHS); Greedy Search (GS); Greedy Search
-with Restart (GSR); and Genetic Algorithm (GA). Each algorithm performed /at
-most/ 125 measurements over 1000 repetitions, without user intervention.
+by our D-Optimal Design approach (DLMT). LM is almost identical to our approach,
+described Section\nbsp{}[[Autotuning with Design of Experiments]], but it uses a
+fixed-size random sample of the search space instead of generating D-Optimal
+designs. We compared the performance of our approach with the following
+algorithms: uniform Random Sampling (RS); Latin Hypercube Sampling (LHS); Greedy
+Search (GS); Greedy Search with Restart (GSR); and Genetic Algorithm (GA). Each
+algorithm performed /at most/ 125 measurements over 1000 repetitions, without
+user intervention.
 
 #+ATTR_LATEX: :booktabs t :align llp{0.37\columnwidth} :font \scriptsize :float t :placement [t]
 #+NAME: tab:gpu_laplacian_factors
 #+CAPTION: Parameters of the Laplacian Kernel
-|-------------------------------+-------------------------------+---------------------------------------------------------|
-| Factor                        | Levels                        | Short Description                                       |
-|-------------------------------+-------------------------------+---------------------------------------------------------|
-| \texttt{vector\_length}       | $2^0,\dots,2^4$               | Size of support arrays                                  |
-| \texttt{load\_overlap}        | \textit{true}, \textit{false} | Allow data load overlaps in vectorization               |
-| \texttt{temporary\_size}      | $2,4$                         | Size of temporary data (\texttt{int} or \texttt{short}) |
-| \texttt{elements\_number}     | $1,\dots,24$                  | Size of equal data splits                               |
-| \texttt{y\_component\_number} | $1,\dots,6$                   | Loop tile size                                          |
-| \texttt{threads\_number}      | $2^5,\dots,2^{10}$            | Size of thread groups                                   |
-| \texttt{lws\_y}               | $2^0,\dots,2^{10}$            | Block y dimension size                                  |
-|-------------------------------+-------------------------------+---------------------------------------------------------|
+|-------------------------------+-------------------------------+--------------------------------|
+| Factor                        | Levels                        | Short Description              |
+|-------------------------------+-------------------------------+--------------------------------|
+| \texttt{vector\_length}       | $2^0,\dots,2^4$               | Size of support arrays         |
+| \texttt{load\_overlap}        | \textit{true}, \textit{false} | Load overlaps in vectorization |
+| \texttt{temporary\_size}      | $2,4$                         | Byte size of temporary data    |
+| \texttt{elements\_number}     | $1,\dots,24$                  | Size of equal data splits      |
+| \texttt{y\_component\_number} | $1,\dots,6$                   | Loop tile size                 |
+| \texttt{threads\_number}      | $2^5,\dots,2^{10}$            | Size of thread groups          |
+| \texttt{lws\_y}               | $2^0,\dots,2^{10}$            | Block size in $y$ dimension    |
+|-------------------------------+-------------------------------+--------------------------------|
 
 Since we measured the entire valid search space, we could use the /slowdown/
-relative to the /global minimum/ to compare the performance of algorithms.
+relative to the /global minimum/ to compare algorithm performance.
 Table\nbsp{}\ref{tab:gpu_laplacian_compare_budget} shows the mean, minimum and
 maximum slowdowns in comparison to the global minimum, for each algorithm. It
 also shows the mean and maximum budget used by each algorithm.
 Figure\nbsp{}[[fig:gpu_laplacian_comparison_histogram]] presents histograms with the
 count of the slowdowns found by each of the 1000 repetitions. Arrows point the
-maximum slowdown found by each algorithm.
+maximum slowdown found by each algorithm. Note that GS's maximum slowdown was
+left out of range to help the comparison between the other algorithms.
 
 #+HEADER: :results output latex :session *R* :exports results :eval no-export
 #+BEGIN_SRC R
@@ -2758,21 +2802,21 @@ RS & 1.10 & 1.00 & 1.39 & 120.00 & 120.00 \\
 \end{table}
 #+END_EXPORT
 
-All algorithms performed relatively well in this kernel, with only Greedy Search
-(GS) not being able to find slowdowns smaller than 4$\times$ in some runs. As
-expected, other search algorithms had results similar to Random Sampling (RS).
-The LM algorithm was able to find the global minimum on most runs, but some runs
-could not find slowdowns smaller than $4\times$. Our approach reached a slowdown
-of 1% from the global minimum /in all/ of the 1000 runs while using /at most/
-fewer than half of the allotted budget.
+All algorithms performed relatively well in this kernel, with only GS not being
+able to find slowdowns smaller than 4$\times$ in some runs. As expected, other
+search algorithms had results similar to RS. LM was able to find slowdowns close
+to the global minimum on most runs, but some runs could not find slowdowns
+smaller than $4\times$. Our approach reached a slowdown of 1% from the global
+minimum /in all/ of the 1000 runs while using /at most/ fewer than half of the
+allotted budget.
 
 We implemented a simple approach for the prediction step in this problem,
 choosing the best value of our fitted models on the complete set of valid level
 combinations. This was possible for this problem since all valid combinations
-were known and fit in memory. For problems were the search space is too large to
-be generated, we would have to either adapt this step and run the prediction on
-a sample or minimize the model using the differentiation strategies mentioned
-in Section\nbsp{}[[Screening & Plackett-Burman Designs]].
+were known. For problems were the search space is too large to be generated, we
+would have to either adapt this step and run the prediction on a sample or
+minimize the model using the differentiation strategies mentioned in
+Section\nbsp{}[[Screening & Plackett-Burman Designs]].
 
 #+NAME: fig:gpu_laplacian_comparison_histogram
 #+CAPTION: Distribution of slowdowns in relation to the global minimum for 7 optimization methods on the Laplacian Kernel, using a budget of 125 points over 1000 repetitions \vspace{-.5cm}
@@ -2781,34 +2825,50 @@ in Section\nbsp{}[[Screening & Plackett-Burman Designs]].
 
 This kernel provided ideal conditions for using our approach, where the
 performance model is approximately known and the complete valid search space is
-small enough to be stored and used for prediction. The global minimum also
-appears to not be isolated in a region of points with bad performance, since our
-approach was able to exploit search space geometry. We will now present a
-performance evaluation of our approach in a larger and more comprehensive
-benchmark.
+small enough to be used for prediction. The global minimum also appears to not
+be isolated in a region of points with bad performance, since our approach was
+able to exploit space geometry. We will now present a performance evaluation of
+our approach in a larger and more comprehensive benchmark.
 ** SPAPT Benchmark Suite
 The SPAPT\nbsp{}\cite{balaprakash2012spapt} benchmark suite provides
-parametrized CPU kernels from different HPC domains. The
-kernels shown in Table\nbsp{}[[tab:spapt_apps]] are implemented using the code
-annotation and transformation tools provided by
-Orio\nbsp{}\cite{hartono2009annotation}. Search space sizes are overall larger
-than in the Laplacian Kernel example. Kernel factors are either integers in an
-interval, such as loop unrolling and register tiling amounts, or binary flags
-that control parallelization and vectorization.
+parametrized CPU kernels from different HPC domains. The kernels shown in
+Table\nbsp{}[[tab:spapt_apps]] are implemented using the code annotation and
+transformation tools provided by Orio\nbsp{}\cite{hartono2009annotation}. Search
+space sizes are larger than in the Laplacian Kernel example. Kernel factors are
+either integers in an interval, such as loop unrolling and register tiling
+amounts, or binary flags that control parallelization and vectorization.
+
+#+NAME: fig:iteration_best_comparison
+#+CAPTION: Cost of best points found on each run, and the iteration where
+#+CAPTION: they were found. RS and DLMT found no speedups with similar budgets
+#+CAPTION: for kernels marked with ``[0]'' and /blue/ headers, and similar speedups with
+#+CAPTION: similar budgets for kernels marked with ``[=]'' and /orange/ headers. DLMT found similar
+#+CAPTION: speedups using smaller budgets for kernels marked with ``[+]'' /green/ headers.
+#+CAPTION: Ellipses delimit an estimate of where 95% of the underlying distribution lies
+#+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
+[[./img/iteration_best_comparison.pdf]]
+
+#+NAME: fig:split_histograms
+#+CAPTION: Histograms of explored search spaces, showing the real count of measured configurations.
+#+CAPTION: Kernels are grouped in the same way as in Figure\nbsp{}[[fig:iteration_best_comparison]].
+#+CAPTION: DLMT spent fewer measurements than RS in configurations with smaller speedups or with slowdowns,
+#+CAPTION: even for kernels in the orange group. DLMT also spent more time exploring configurations with
+#+CAPTION: larger speedups
+#+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
+[[./img/split_histograms.pdf]]
 
 We used the Random Sampling (RS) implementation available in Orio and integrated
 an implementation of our approach (DLMT) to the system. We omitted the other
 Orio algorithms because other studies using SPAPT
 kernels\nbsp{}\cite{balaprakash2011can,balaprakash2012experimental} showed that
 their performance is similar to RS regarding budget usage. The global minima are
-not known for any of the problems, and problem search spaces are too large to
-allow complete measurements. Therefore, we used the performance of each
-application compiled with \texttt{gcc}'s \texttt{-O3}, with no code
-transformations, as a /baseline/ for computing the /speedups/ achieved by each
-strategy. We performed 10 autotuning repetitions for each kernel using random
-sampling and our approach, using a budget of /at most/ 400 measurements. Our
-approach was allowed to perform only 4 of the iterations shown in
-Figure\nbsp{}[[fig:doe_anova_strategy]]. Experiments were performed using
+not known for any of the problems, and search spaces are too large to allow
+complete measurements. Therefore, we used the performance of each application
+compiled with \texttt{gcc}'s \texttt{-O3}, with no code transformations, as a
+/baseline/ for computing the /speedups/ achieved by each strategy. We performed
+10 autotuning repetitions for each kernel using RS and DLMT, using a budget of
+/at most/ 400 measurements. DLMT was allowed to perform only 4 of the iterations
+shown in Figure\nbsp{}[[fig:doe_anova_strategy]]. Experiments were performed using
 Grid5000\nbsp{}\cite{balouek2013adding}, on /Debian Jessie/, using an /Intel
 Xeon E5-2630v3/ CPU and \texttt{gcc} version \texttt{6.3.0}.
 
@@ -2837,20 +2897,20 @@ Xeon E5-2630v3/ CPU and \texttt{gcc} version \texttt{6.3.0}.
 |---------------+---------------------------------+---------+----------------------|
 
 The time to measure each kernel varied from a few seconds to up to 20 minutes.
-We discovered in testing that some transformations caused the compiler to enter
-an internal optimization process that did not stop for over 12 hours. We did not
-study why these cases took so long to complete, and implemented an execution
-timeout of 20 minutes, considering cases that took longer than that to compile
-to be runtime failures.
+In testing, some transformations caused the compiler to enter an internal
+optimization process that did not stop for over 12 hours. We did not study why
+these cases delayed for so long, and implemented an execution timeout of 20
+minutes, considering cases that took longer than that to compile to be runtime
+failures.
 
 Similar to the previous example, we automated factor elimination based on ANOVA
 tests so that a comprehensive evaluation could be performed. We also did not
-tailor initial performance models, which were the same for all kernels.
-Initial models had a linear term for each factor with two or more levels, plus
-quadratic and cubic terms for factors with sufficient levels. Although
-automation and identical initial models might have limited the improvements at
-each step of our application, our results show that it still succeeded in
-decreasing the budget needed to find significant speedups for some kernels.
+tailor initial performance models, which were the same for all kernels. Initial
+models had a linear term for each factor with two or more levels, plus quadratic
+and cubic terms for factors with sufficient levels. Although automation and
+identical initial models might have limited the improvements at each step of our
+application, our results show that it still succeeded in decreasing the budget
+needed to find significant speedups for some kernels.
 
 Figure\nbsp{}[[fig:iteration_best_comparison]] presents the /speedup/ found by each
 run of RS and DLMT, plotted against the algorithm /iteration/ where that speedup
@@ -2868,13 +2928,13 @@ iterations needed to find speedups for the 8 kernels in the green group.
 Figure\nbsp{}[[fig:split_histograms]] shows the search space exploration performed
 by RS and DLMT. It uses the same color groups as
 Figure\nbsp{}[[fig:iteration_best_comparison]], and shows the distribution of the
-speedups that where found during all repetitions of the experiments. Histogram
+speedups that were found during all repetitions of the experiments. Histogram
 areas corresponding to DLMT are usually smaller because it always stopped at 4
 iterations, while RS always performed 400 measurements. This is particularly
 visible in =lu=, =mvt=, and =jacobi=. We also observe that the quantity of
 configurations with high speedups found by DLMT is higher, even for kernels on
 the orange group. This is noticeable in =gemver=, =bicgkernel=, =mm= and
-=tensor=, and means that our approach spent less of the budget exploring
+=tensor=, and means that DLMT spent less of the budget exploring
 configurations with small speedups or slowdowns, in comparison with RS.
 
 # We removed this sentence after finding out hessian data was mixed with
@@ -2891,50 +2951,37 @@ and green groups. Even in this automated setting, the results with SPAPT kernels
 illustrate the ability our approach has to reduce the budget needed to find good
 speedups by efficiently exploring search spaces.
 
-#+NAME: fig:iteration_best_comparison
-#+CAPTION: Cost of best points found on each run, and the iteration where
-#+CAPTION: they were found. RS and DLMT found no speedups with similar budgets
-#+CAPTION: for kernels marked with ``[0]'' and /blue/ headers, and similar speedups with
-#+CAPTION: similar budgets for kernels marked with ``[=]'' and /orange/ headers. DLMT found similar
-#+CAPTION: speedups using smaller budgets for kernels marked with ``[+]'' /green/ headers.
-#+CAPTION: Ellipses delimit an estimate of where 95% of the underlying distribution lies
-#+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
-[[./img/iteration_best_comparison.pdf]]
-
-#+NAME: fig:split_histograms
-#+CAPTION: Histograms of explored search spaces, showing the real count of measured configurations.
-#+CAPTION: Kernels are grouped in the same way as in Figure\nbsp{}[[fig:iteration_best_comparison]].
-#+CAPTION: DLMT spent fewer measurements than RS in configurations with smaller speedups or with slowdowns,
-#+CAPTION: even for kernels in the orange group. DLMT also spent more time exploring configurations with
-#+CAPTION: larger speedups
-#+ATTR_LATEX: :float multicolumn :placement [p] :width \textwidth
-[[./img/split_histograms.pdf]]
-
 * Conclusion
-We presented in this paper a transparent DoE approach for
-program autotuning under tight budget constraints. We discussed the underlying
-concepts that enable our approach to reduce significantly the measurement budget
-needed to find good optimizations consistently over different kernels exposing
+The contribution of this paper is a transparent DoE approach for program
+autotuning under tight budget constraints. We discussed the underlying concepts
+that enable our approach to reduce significantly the measurement budget needed
+to find good optimizations consistently over different kernels exposing
 configuration parameters of source-to-source transformations. We have made
 efforts to make our results, figures and analyses reproducible by hosting all
 our scripts and data publicly\nbsp{}\cite{bruel2018ccgrid19}.
 
-Our approach outperformed six other search heuristics, always finding the global
-optimum of the search space defined by the optimization of a Laplacian kernel
-for GPUs, while using at most half of the allotted budget. In a more
-comprehensive evaluation using kernels from the SPAPT benchmark, our approach
-was able to find the same speedups as random sampling while using up to
-$10\times$ fewer measurements. We showed that our approach explored search spaces
-more efficiently, even for kernels where it performed similarly to random
-sampling.
+Our approach outperformed six other search heuristics, always finding a slowdown
+of 1% from the global optimum of the search space defined by the optimization of
+a Laplacian kernel for GPUs, while using at most half of the allotted budget. In
+a more comprehensive evaluation, using kernels from the SPAPT benchmark, our
+approach was able to find the same speedups as RS while using up to $10\times$
+fewer measurements. We showed that our approach explored search spaces more
+efficiently, even for kernels where it performed similarly to random sampling.
 
 We presented a completely automated version of our approach in this paper so
 that we could perform a thorough performance evaluation on comprehensive
-benchmarks. In future work we will explore the impact of user input and expert
-knowledge in the selection of the initial performance model and in the
-subsequent elimination of factors using ANOVA tests. We expect that tailored
-initial performance models and assisted factor elimination will improve the
-solutions found by our approach and decrease the budget needed to find them.
+benchmarks. Despite using the same generic performance model for all kernels,
+our approach was able to find good speedups by eliminating insignificant model
+terms at each iteration. This means that our approach can still improve the
+performance of applications using unspecialized models that incorporate only
+general knowledge about algorithm performance. We would incur some budget
+overhead in this case while insignificant terms are removed.
+
+In future work we will explore the impact of user input and expert knowledge in
+the selection of the initial performance model and in the subsequent elimination
+of factors using ANOVA tests. We expect that tailored initial performance models
+and assisted factor elimination will improve the solutions found by our approach
+and decrease the budget needed to find them.
 
 Our current strategy eliminates completely from the model the factors with low
 significance detected by ANOVA tests. In future work we will also explore the
