@@ -180,8 +180,10 @@ mv ccgrid19_diff.pdf diff
 
 #+RESULTS:
 
-** TODO List from Reviewer's Comments                             :noexport:
+** DONE List from Reviewer's Comments                             :noexport:
+CLOSED: [2019-02-27 Wed 13:36]
 :LOGBOOK:
+- State "DONE"       from "TODO"       [2019-02-27 Wed 13:36]
 - State "TODO"       from "TODO"       [2019-02-21 Thu 15:59]
 :END:
 List of requested changes from the major comments from the 3 reviewers:
@@ -324,8 +326,11 @@ CLOSED: [2019-02-20 Wed 12:24]
 - State "DONE"       from "TODO"       [2019-02-20 Wed 12:24]
 - State "TODO"       from              [2019-02-18 Mon 14:40]
 :END:
-*** TODO Discuss Orio and the GPU Laplacian briefly
+*** DEFERRED Discuss Orio and the GPU Laplacian briefly
+CLOSED: [2019-02-27 Wed 13:36]
 :LOGBOOK:
+- State "DEFERRED"   from "DONE"       [2019-02-27 Wed 13:36]
+- State "DONE"       from "TODO"       [2019-02-27 Wed 13:36]
 - State "TODO"       from              [2019-02-21 Thu 15:59]
 :END:
 * Rosenbrock Example Setup                                         :noexport:
@@ -2002,11 +2007,14 @@ $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $x_8$ & $d_1$ & $d_2$ & 
 \end{table}
 #+END_EXPORT
 
-We use our initial assumption in Equation\nbsp{}\eqref{eq:linear_assumption} to
-identify the most significant factors by performing an ANOVA test. The results
-are shown in Table\nbsp{}\ref{tab:anova_linear}, where the /significance/ of
-each factor is interpreted from the F-test and $\text{P}_{\text{r}}(>\text{F})$
-values. Table\nbsp{}\ref{tab:anova_linear} uses ``$*$'', as is convention in the
+So far, we have performed steps 1, 2, and 3 from
+Figure\nbsp{}[[fig:doe_anova_strategy]]. We use our initial assumption in
+Equation\nbsp{}\eqref{eq:linear_assumption} to identify the most significant
+factors by performing an ANOVA test, which is step 5 from
+Figure\nbsp{}[[fig:doe_anova_strategy]]. The results are shown in
+Table\nbsp{}\ref{tab:anova_linear}, where the /significance/ of each factor is
+interpreted from the F-test and $\text{Pr}(>\text{F})$ values.
+Table\nbsp{}\ref{tab:anova_linear} uses ``$*$'', as is convention in the
 \texttt{R} language, to represent the significance values for each factor.
 
 We see on Table\nbsp{}\ref{tab:anova_linear} that factors
@@ -2015,7 +2023,7 @@ the purpose of this example, this is sufficient reason to include them in our
 linear model for the next step. We decide as well to discard factors
 $\left\{x_2,x_4,x_6\right\}$ from our model, due to their low significance. We
 see that factor $x_1$ has a significance mark of ``\cdot'', but comparing F-test
-and $\text{P}_{\text{r}}(>\text{F})$ values we decide that they are fairly
+and $\text{Pr}(>\text{F})$ values we decide that they are fairly
 smaller than the values of factors that had no significance, and we keep this
 factor.
 
@@ -2059,7 +2067,7 @@ s_regression$stars <- symnum(s_regression[ , "Pr(>F)"], na = FALSE,
                              cutpoints = c(0, 0.001, 0.01, 0.05, 0.1, 1),
                              symbols = c("$***$", "$**$", "$*$", "$\\cdot$", " "))
 
-names(s_regression) <- c("F value", "$\\text{P}_{\\text{r}}(>\\text{F})$", "Signif.")
+names(s_regression) <- c("F value", "$\\text{Pr}(>\\text{F})$", "Signif.")
 
 rownames(s_regression) <- c("$x_1$", "$x_2$", "$x_3$",
                             "$x_4$", "$x_5$", "$x_6$",
@@ -2088,7 +2096,7 @@ print(x, size = "\\small",
 \begingroup\small
 \begin{tabular}{lrrl}
   \toprule
- & F value & $\text{P}_{\text{r}}(>\text{F})$ & Signif. \\
+ & F value & $\text{Pr}(>\text{F})$ & Signif. \\
   \midrule
 $x_1$ & 8.382 & 0.063 & $\cdot$ \\
   $x_2$ & 0.370 & 0.586 &   \\
@@ -2104,11 +2112,12 @@ $x_1$ & 8.382 & 0.063 & $\cdot$ \\
 \end{table}
 #+END_EXPORT
 
-Moving forward, we will build a linear model using factors
-$\left\{x_1,x_3,x_5,x_7,x_8\right\}$, fit the model using the values of $Y$ we
-obtained when running our design, and use model coefficients to predict the
-levels of each factor that minimize the real response. We can do that because
-these factors are numerical, even though only discrete values are allowed.
+Moving forward to steps 6, 7, and 8 in Figure\nbsp{}[[fig:doe_anova_strategy]], we
+will build a linear model using factors $\left\{x_1,x_3,x_5,x_7,x_8\right\}$,
+fit the model using the values of $Y$ we obtained when running our design, and
+use model coefficients to predict the levels of each factor that minimize the
+real response. We can do that because these factors are numerical, even though
+only discrete values are allowed.
 
 We now proceed to the prediction step, where we wish to identify the levels of
 factors $\left\{x_1,x_3,x_5,x_7,x_8\right\}$ that minimize our fitted model,
@@ -2244,7 +2253,7 @@ Using our previous screening and the domain knowledge provided by our expert, we
 choose a new performance model and use it to construct a D-Optimal design using
 Fedorov's algorithm. Since we need enough degrees of freedom to fit our model,
 we construct the design with 12 experiments shown in Table\nbsp{}\ref{tab:d_optimal}.
-Note that the design includes $-1$, $0$ and $1$ levels for factor $x_8$. The design
+Note that the design includes levels $-1$, $0$, and $1$ for factor $x_8$. The design
 will sample from different regions of the search space due to the quadratic term,
 as was shown in Figure\nbsp{}[[fig:sampling_comparison]].
 
@@ -2685,10 +2694,10 @@ We applied domain knowledge to construct the following initial performance model
 \\\begin{minipage}{\linewidth}\scriptsize
 \begin{align}
 \label{eq:gpu_laplacian_performance_model}
-\texttt{time\_per\_pixel} \sim & \scriptsize\; \texttt{y\_component\_number} + \texttt{vector\_length} \; + \nonumber \\
-& \scriptsize\; \texttt{load\_overlap} + \texttt{temporary\_size} + \texttt{lws\_y} \; + \nonumber \\
+\texttt{time\_per\_pixel} \sim & \scriptsize\; \texttt{y\_component\_number} + \frac{1}{\texttt{y\_component\_number}} \; + \nonumber \\
+& \scriptsize\; \texttt{load\_overlap} + \texttt{temporary\_size} \; + \nonumber \\
+& \scriptsize\; \texttt{vector\_length} + \texttt{lws\_y} + \frac{1}{\texttt{lws\_y}} \; + \\
 & \scriptsize\; \texttt{elements\_number} + \texttt{threads\_number}  \; + \nonumber \\
-& \scriptsize\; \frac{1}{\texttt{y\_component\_number}} + \frac{1}{\texttt{lws\_y}} \; + \\
 & \scriptsize\; \frac{1}{\texttt{elements\_number}} + \frac{1}{\texttt{threads\_number}}\text{.} \nonumber
 \end{align}
 \vspace{2pt}
