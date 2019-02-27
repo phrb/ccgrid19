@@ -1897,8 +1897,8 @@ values in $\bm{\beta}$ close to zero.
 
 The next example illustrates the screening methodology. Suppose we wish to
 minimize a performance metric $Y$ of a problem with factors $x_1,\dots,x_8$
-assuming values are in $\left\{-1, -0.8, -0.6, \dots, 0.6, 0.8, 1\right\}$. Each
-$y_i \in Y$ is computed using the following equation:
+assuming values in $\left\{-1, -0.8, -0.6, \dots, 0.6, 0.8, 1\right\}$. Each
+$y_i \in Y$ is defined as
 #+LATEX: \vspace{-2pt}
 #+BEGIN_EXPORT latex
 \begin{align}
@@ -2953,13 +2953,20 @@ configurations with small speedups or slowdowns, in comparison with RS.
 # appears to have two pronounced local minima. Since DLMT uses a smaller budget,
 # we could attempt a frequent restart strategy to avoid getting trapped.
 
-Our approach used a generic initial performance model for all kernels, but
-since it iteratively eliminates factors and model terms based on ANOVA tests,
-it was still able to exploit global search space structures for kernels in the orange
+Analyzing the significant performance parameters identified by our automated
+approach for every kernel, we were able to identify interesting relationships
+between parameters and performance. In =bicgkernel=, for example, DLTM
+identified a linear relationship for OpenMP and scalar replacement
+optimizations, and quadratic relationships between register and cache tiling,
+and loop unrolling. This is an example of the transparency in the optimization
+process that can be achieved with a DoE approach.
+
+Our approach used a generic initial performance model for all kernels, but since
+it iteratively eliminates factors and model terms based on ANOVA tests, it was
+still able to exploit global search space structures for kernels in the orange
 and green groups. Even in this automated setting, the results with SPAPT kernels
 illustrate the ability our approach has to reduce the budget needed to find good
 speedups by efficiently exploring search spaces.
-
 * Conclusion
 The contribution of this paper is a transparent DoE approach for program
 autotuning under tight budget constraints. We discussed the underlying concepts
