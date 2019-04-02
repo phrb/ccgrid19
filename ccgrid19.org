@@ -85,8 +85,8 @@ A large amount of resources is spent writing, porting, and optimizing scientific
 and industrial  High Performance Computing applications,  which makes autotuning
 techniques  fundamental to  lower the  cost  of leveraging  the improvements  on
 execution  time  and power  consumption  provided  by  the latest  software  and
-hardware platforms.  Despite the  need for  economy, most  autotuning techniques
-still require a large budget of costly experimental measurements to provide good
+hardware platforms.   Despite the need  for economy, most  autotuning techniques
+still require large budgets of  costly experimental measurements to provide good
 results, while  rarely providing  exploitable knowledge after  optimization. The
 contribution of this  paper is a user-transparent autotuning  technique based on
 Design  of  Experiments   that  operates  under  tight   budget  constraints  by
@@ -95,7 +95,7 @@ approach  enables users  to make  informed decisions  on which  optimizations to
 pursue and when  to stop. We present an experimental  evaluation of our approach
 and show  it is  capable of leveraging  user decisions to  find the  best global
 configuration of  a GPU Laplacian  kernel using  half of the  measurement budget
-used by  other common autotuning techniques.  We show that our  approach is also
+used by other  common autotuning techniques.  We show that  our approach is also
 capable of finding speedups of up  to \boldmath$50\times$, compared to =gcc='s =-O3=, for
 some kernels  from the SPAPT benchmark  suite, using up to  \boldmath$10\times$ fewer
 measurements than random sampling.
